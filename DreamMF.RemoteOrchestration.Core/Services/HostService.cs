@@ -64,4 +64,27 @@ public class HostService
             .ToListAsync();
         return hosts.Select(HostMapper.ToResponse).ToList();
     }
+
+    public async Task<List<RemoteResponse>> GetRemotesByHostIdAsync(int hostId)
+    {
+        var remotes = await _dbContext.Host_Remotes
+            .Where(hr => hr.Host_ID == hostId)
+            .Select(hr => hr.Remote)
+            .ToListAsync();
+        return remotes.Select(RemoteMapper.ToResponse).ToList();
+    }
+
+    public async Task<bool> AttachRemoteToHostAsync(int hostId, int remoteId)
+    {
+        if (!await _dbContext.Hosts.AnyAsync(h => h.Host_ID == hostId) ||
+            !await _dbContext.Remotes.AnyAsync(r => r.Remote_ID == remoteId))
+        {
+            return false;
+        }
+
+        var hostRemote = new Host_Remote { Host_ID = hostId, Remote_ID = remoteId };
+        _dbContext.Host_Remotes.Add(hostRemote);
+        await _dbContext.SaveChangesAsync();
+        return true;
+    }
 }

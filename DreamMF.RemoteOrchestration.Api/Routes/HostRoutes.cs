@@ -60,6 +60,25 @@ public static class HostRoutes
         .Produces(StatusCodes.Status404NotFound)
         .WithMetadata(new EndpointNameMetadata("Delete a host by ID"));
 
+        app.MapGet("/hosts/{id}/remotes", async (int id, HostService hostService) =>
+        {
+            var remotes = await hostService.GetRemotesByHostIdAsync(id);
+            return Results.Ok(remotes);
+        })
+        .WithTags(GroupName)
+        .Produces<List<RemoteResponse>>(StatusCodes.Status200OK)
+        .WithMetadata(new EndpointNameMetadata("List remotes by host ID"));
+
+        app.MapPost("/hosts/{id}/attach", async (int id, int remoteId, HostService hostService) =>
+        {
+            var success = await hostService.AttachRemoteToHostAsync(id, remoteId);
+            return success ? Results.NoContent() : Results.BadRequest();
+        })
+        .WithTags(GroupName)
+        .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status400BadRequest)
+        .WithMetadata(new EndpointNameMetadata("Attach remote to host"));
+
         app.MapPost("/hosts/assign", async (int hostId, int remoteId, HostService hostService) =>
         {
             // Logic to assign remote to host
