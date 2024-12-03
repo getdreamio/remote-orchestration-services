@@ -74,6 +74,7 @@ app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Remote Orch
 app.UseHttpsRedirection();
 
 app.UseLoggingMiddleware();
+app.UseMiddleware<HandledResultMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

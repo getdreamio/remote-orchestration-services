@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using DreamMF.RemoteOrchestration.Core.Providers;
+using DreamMF.RemoteOrchestration.Core.Exceptions;
 
 namespace DreamMF.RemoteOrchestration.Core.Providers;
 
@@ -18,38 +19,71 @@ public class StorageService
 
     public async Task UploadAsync(string containerOrBucketName, string blobOrKey, Stream content)
     {
-        if (_storageType == "Azure")
+        if (string.IsNullOrWhiteSpace(containerOrBucketName) || string.IsNullOrWhiteSpace(blobOrKey) || content == null)
         {
-            await _azureBlobStorageProvider.UploadAsync(containerOrBucketName, blobOrKey, content);
+            throw new HandledException(ExceptionType.Validation, "Invalid input parameters.");
         }
-        else if (_storageType == "S3")
+        try
         {
-            await _s3StorageProvider.UploadAsync(containerOrBucketName, blobOrKey, content);
+            if (_storageType == "Azure")
+            {
+                await _azureBlobStorageProvider.UploadAsync(containerOrBucketName, blobOrKey, content);
+            }
+            else if (_storageType == "S3")
+            {
+                await _s3StorageProvider.UploadAsync(containerOrBucketName, blobOrKey, content);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new HandledException(ExceptionType.Dependency, "Failed to upload file", ex);
         }
     }
 
     public async Task<Stream> DownloadAsync(string containerOrBucketName, string blobOrKey)
     {
-        if (_storageType == "Azure")
+        if (string.IsNullOrWhiteSpace(containerOrBucketName) || string.IsNullOrWhiteSpace(blobOrKey))
         {
-            return await _azureBlobStorageProvider.DownloadAsync(containerOrBucketName, blobOrKey);
+            throw new HandledException(ExceptionType.Validation, "Invalid input parameters.");
         }
-        else if (_storageType == "S3")
+        try
         {
-            return await _s3StorageProvider.DownloadAsync(containerOrBucketName, blobOrKey);
+            if (_storageType == "Azure")
+            {
+                return await _azureBlobStorageProvider.DownloadAsync(containerOrBucketName, blobOrKey);
+            }
+            else if (_storageType == "S3")
+            {
+                return await _s3StorageProvider.DownloadAsync(containerOrBucketName, blobOrKey);
+            }
+            throw new HandledException(ExceptionType.Validation, "Invalid storage type");
         }
-        throw new InvalidOperationException("Invalid storage type");
+        catch (Exception ex)
+        {
+            throw new HandledException(ExceptionType.Dependency, "Failed to download file", ex);
+        }
     }
 
     public async Task DeleteAsync(string containerOrBucketName, string blobOrKey)
     {
-        if (_storageType == "Azure")
+        if (string.IsNullOrWhiteSpace(containerOrBucketName) || string.IsNullOrWhiteSpace(blobOrKey))
         {
-            await _azureBlobStorageProvider.DeleteAsync(containerOrBucketName, blobOrKey);
+            throw new HandledException(ExceptionType.Validation, "Invalid input parameters.");
         }
-        else if (_storageType == "S3")
+        try
         {
-            await _s3StorageProvider.DeleteAsync(containerOrBucketName, blobOrKey);
+            if (_storageType == "Azure")
+            {
+                await _azureBlobStorageProvider.DeleteAsync(containerOrBucketName, blobOrKey);
+            }
+            else if (_storageType == "S3")
+            {
+                await _s3StorageProvider.DeleteAsync(containerOrBucketName, blobOrKey);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new HandledException(ExceptionType.Dependency, "Failed to delete file", ex);
         }
     }
 }
