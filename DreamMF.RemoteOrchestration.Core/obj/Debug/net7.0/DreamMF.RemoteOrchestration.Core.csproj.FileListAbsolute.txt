@@ -1,0 +1,16 @@
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/obj/Debug/net7.0/DreamMF.RemoteOrchestration.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/obj/Debug/net7.0/DreamMF.RemoteOrchestration.Core.AssemblyInfoInputs.cache
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/obj/Debug/net7.0/DreamMF.RemoteOrchestration.Core.AssemblyInfo.cs
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/obj/Debug/net7.0/DreamMF.RemoteOrchestration.Core.csproj.CoreCompileInputs.cache
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/obj/Debug/net7.0/DreamMF.RemoteOrchestration.Core.sourcelink.json
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/obj/Debug/net7.0/DreamMF.RemoteOrchestration.Core.csproj.AssemblyReference.cache
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/bin/Debug/net7.0/DreamMF.RemoteOrchestration.Core.deps.json
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/bin/Debug/net7.0/DreamMF.RemoteOrchestration.Core.dll
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/bin/Debug/net7.0/DreamMF.RemoteOrchestration.Core.pdb
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/bin/Debug/net7.0/DreamMF.RemoteOrchestration.Database.dll
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/bin/Debug/net7.0/DreamMF.RemoteOrchestration.Database.pdb
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/obj/Debug/net7.0/DreamMF..0F637C0C.Up2Date
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/obj/Debug/net7.0/DreamMF.RemoteOrchestration.Core.dll
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/obj/Debug/net7.0/refint/DreamMF.RemoteOrchestration.Core.dll
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/obj/Debug/net7.0/DreamMF.RemoteOrchestration.Core.pdb
+/Users/chrisfryer/GIT/dream-mf/remote-orchestration-services/DreamMF.RemoteOrchestration.Core/obj/Debug/net7.0/ref/DreamMF.RemoteOrchestration.Core.dll

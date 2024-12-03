@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/DreamMF.RemoteOrchestration.Api.props" />
+</Project>

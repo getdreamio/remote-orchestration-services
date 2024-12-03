@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamMF.RemoteOrchestration.Api", "DreamMF.RemoteOrchestration.Api\DreamMF.RemoteOrchestration.Api.csproj", "{559E9071-7F59-4034-900A-ABF746E429F7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamMF.RemoteOrchestration.Core", "DreamMF.RemoteOrchestration.Core\DreamMF.RemoteOrchestration.Core.csproj", "{6349EC37-EF6D-4049-80F1-7119C1A207B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamMF.RemoteOrchestration.Database", "DreamMF.RemoteOrchestration.Database\DreamMF.RemoteOrchestration.Database.csproj", "{81F64E75-1F9E-4D95-9776-16C84D955687}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{559E9071-7F59-4034-900A-ABF746E429F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{559E9071-7F59-4034-900A-ABF746E429F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{559E9071-7F59-4034-900A-ABF746E429F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{559E9071-7F59-4034-900A-ABF746E429F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6349EC37-EF6D-4049-80F1-7119C1A207B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6349EC37-EF6D-4049-80F1-7119C1A207B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6349EC37-EF6D-4049-80F1-7119C1A207B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6349EC37-EF6D-4049-80F1-7119C1A207B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81F64E75-1F9E-4D95-9776-16C84D955687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81F64E75-1F9E-4D95-9776-16C84D955687}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81F64E75-1F9E-4D95-9776-16C84D955687}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81F64E75-1F9E-4D95-9776-16C84D955687}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
