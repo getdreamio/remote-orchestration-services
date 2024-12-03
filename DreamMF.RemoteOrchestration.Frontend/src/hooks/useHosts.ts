@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import type { Host } from '@/types/host';
 
 const fetchHosts = async (): Promise<Host[]> => {
@@ -10,7 +10,7 @@ const fetchHosts = async (): Promise<Host[]> => {
 };
 
 export const useHosts = () => {
-    return useQuery<Host[], Error>({
+    return useSuspenseQuery<Host[]>({
         queryKey: ['hosts'],
         queryFn: fetchHosts
     });
