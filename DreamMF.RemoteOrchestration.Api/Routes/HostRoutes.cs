@@ -62,7 +62,7 @@ public static class HostRoutes
 
         app.MapGet("/hosts/{id}/remotes", async (int id, HostService hostService) =>
         {
-            var remotes = await hostService.GetRemotesByHostIdAsync(id);
+            var remotes = hostService.GetRemotesByHostIdAsync(id);
             return Results.Ok(remotes);
         })
         .WithTags(GroupName)

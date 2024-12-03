@@ -58,7 +58,7 @@ public class TagService
 
     public async Task<bool> AddTagToRemoteAsync(int remoteId, int tagId)
     {
-        if (!await _dbContext.Remotes.AnyAsync(r => r.Remote_ID == remoteId) ||
+        if (!await _dbContext.Remotes.AnyAsync(r => r.Id == remoteId) ||
             !await _dbContext.Tags.AnyAsync(t => t.Tag_ID == tagId))
         {
             return false;

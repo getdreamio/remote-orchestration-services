@@ -65,19 +65,21 @@ public class HostService
         return hosts.Select(HostMapper.ToResponse).ToList();
     }
 
-    public async Task<List<RemoteResponse>> GetRemotesByHostIdAsync(int hostId)
+    public List<RemoteResponse> GetRemotesByHostIdAsync(int hostId)
     {
-        var remotes = await _dbContext.Host_Remotes
+        var remotes = _dbContext.Host_Remotes
             .Where(hr => hr.Host_ID == hostId)
-            .Select(hr => hr.Remote)
-            .ToListAsync();
-        return remotes.Select(RemoteMapper.ToResponse).ToList();
+            .Select(hr => hr.Remote_ID);
+        return _dbContext.Remotes
+            .Where(r => remotes.Contains(r.Id))
+            .Select(r => r.ToResponse())
+            .ToList();
     }
 
     public async Task<bool> AttachRemoteToHostAsync(int hostId, int remoteId)
     {
-        if (!await _dbContext.Hosts.AnyAsync(h => h.Host_ID == hostId) ||
-            !await _dbContext.Remotes.AnyAsync(r => r.Remote_ID == remoteId))
+        if (!await _dbContext.Hosts.AnyAsync(h => h.Id == hostId) ||
+            !await _dbContext.Remotes.AnyAsync(r => r.Id == remoteId))
         {
             return false;
         }
