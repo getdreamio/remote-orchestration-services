@@ -56,4 +56,12 @@ public class HostService
         await _dbContext.SaveChangesAsync();
         return true;
     }
+
+    public async Task<List<HostResponse>> GetHostsByEnvironmentAsync(string environment)
+    {
+        var hosts = await _dbContext.Hosts
+            .Where(h => h.Environment == environment)
+            .ToListAsync();
+        return hosts.Select(HostMapper.ToResponse).ToList();
+    }
 }

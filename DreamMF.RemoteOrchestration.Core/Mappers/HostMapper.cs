@@ -10,7 +10,11 @@ public static class HostMapper
         return new Host
         {
             Name = request.Name,
-            Url = request.Url
+            Url = request.Url,
+            Key = request.Key,
+            Environment = request.Environment,
+            Created_Date = request.Created_Date,
+            Updated_Date = request.Updated_Date
         };
     }
 
@@ -20,7 +24,11 @@ public static class HostMapper
         {
             Id = entity.Id,
             Name = entity.Name,
-            Url = entity.Url
+            Url = entity.Url,
+            Key = entity.Key,
+            Environment = entity.Environment,
+            Created_Date = entity.Created_Date,
+            Updated_Date = entity.Updated_Date
         };
     }
 }

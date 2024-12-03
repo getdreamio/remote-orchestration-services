@@ -68,5 +68,14 @@ public static class HostRoutes
         .WithTags(GroupName)
         .Produces(StatusCodes.Status200OK)
         .WithMetadata(new EndpointNameMetadata("Assign a remote to a host"));
+
+        app.MapGet("/hosts/environment/{environment}", async (string environment, HostService hostService) =>
+        {
+            var hosts = await hostService.GetHostsByEnvironmentAsync(environment);
+            return Results.Ok(hosts);
+        })
+        .WithTags(GroupName)
+        .Produces<List<HostResponse>>(StatusCodes.Status200OK)
+        .WithMetadata(new EndpointNameMetadata("List hosts by environment"));
     }
 }
