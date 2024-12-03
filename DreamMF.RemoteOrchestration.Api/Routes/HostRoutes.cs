@@ -1,3 +1,4 @@
+using DreamMF.RemoteOrchestration.Core.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using DreamMF.RemoteOrchestration.Core.Models;
 using DreamMF.RemoteOrchestration.Core.Services;
@@ -19,6 +20,8 @@ public static class HostRoutes
         })
         .WithTags(GroupName)
         .Produces<List<HostResponse>>(StatusCodes.Status200OK)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("List all hosts"));
 
         app.MapGet("/hosts/{id}", async (int id, HostService hostService) =>
@@ -28,7 +31,8 @@ public static class HostRoutes
         })
         .WithTags(GroupName)
         .Produces<HostResponse>(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status404NotFound)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Get host by ID"));
 
         app.MapPost("/hosts", async (HostRequest request, HostService hostService) =>
@@ -47,7 +51,8 @@ public static class HostRoutes
         })
         .WithTags(GroupName)
         .Produces(StatusCodes.Status204NoContent)
-        .Produces(StatusCodes.Status404NotFound)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Update a host"));
 
         app.MapDelete("/hosts/{id}", async (int id, HostService hostService) =>
@@ -57,7 +62,8 @@ public static class HostRoutes
         })
         .WithTags(GroupName)
         .Produces(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status404NotFound)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Delete a host by ID"));
 
         app.MapGet("/hosts/{id}/remotes", async (int id, HostService hostService) =>
@@ -76,7 +82,8 @@ public static class HostRoutes
         })
         .WithTags(GroupName)
         .Produces(StatusCodes.Status204NoContent)
-        .Produces(StatusCodes.Status400BadRequest)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Attach remote to host"));
 
         app.MapPost("/hosts/assign", async (int hostId, int remoteId, HostService hostService) =>
@@ -86,6 +93,8 @@ public static class HostRoutes
         })
         .WithTags(GroupName)
         .Produces(StatusCodes.Status200OK)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Assign a remote to a host"));
 
         app.MapGet("/hosts/environment/{environment}", async (string environment, HostService hostService) =>
@@ -95,6 +104,8 @@ public static class HostRoutes
         })
         .WithTags(GroupName)
         .Produces<List<HostResponse>>(StatusCodes.Status200OK)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("List hosts by environment"));
     }
 }

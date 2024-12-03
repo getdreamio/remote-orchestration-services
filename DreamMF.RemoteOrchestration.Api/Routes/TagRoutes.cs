@@ -1,3 +1,4 @@
+using DreamMF.RemoteOrchestration.Core.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using DreamMF.RemoteOrchestration.Core.Models;
 using DreamMF.RemoteOrchestration.Core.Services;
@@ -17,6 +18,8 @@ public static class TagRoutes
         })
         .WithTags(GroupName)
         .Produces<List<TagResponse>>(StatusCodes.Status200OK)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("List all tags"));
 
         app.MapGet("/tags/{id}", async (int id, TagService tagService) =>
@@ -26,7 +29,8 @@ public static class TagRoutes
         })
         .WithTags(GroupName)
         .Produces<TagResponse>(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status404NotFound)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Get tag by ID"));
 
         app.MapPost("/tags", async (TagRequest request, TagService tagService) =>
@@ -36,6 +40,8 @@ public static class TagRoutes
         })
         .WithTags(GroupName)
         .Produces<TagResponse>(StatusCodes.Status201Created)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Create a new tag"));
 
         app.MapPut("/tags/{id}", async (int id, TagRequest request, TagService tagService) =>
@@ -45,7 +51,8 @@ public static class TagRoutes
         })
         .WithTags(GroupName)
         .Produces(StatusCodes.Status204NoContent)
-        .Produces(StatusCodes.Status404NotFound)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Update a tag"));
 
         app.MapDelete("/tags/{id}", async (int id, TagService tagService) =>
@@ -65,7 +72,8 @@ public static class TagRoutes
         })
         .WithTags(GroupName)
         .Produces(StatusCodes.Status204NoContent)
-        .Produces(StatusCodes.Status400BadRequest)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Add tag to remote"));
 
         app.MapPost("/tags/host/{hostId}/add/{tagId}", async (int hostId, int tagId, TagService tagService) =>
@@ -75,7 +83,8 @@ public static class TagRoutes
         })
         .WithTags(GroupName)
         .Produces(StatusCodes.Status204NoContent)
-        .Produces(StatusCodes.Status400BadRequest)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Add tag to host"));
     }
 }

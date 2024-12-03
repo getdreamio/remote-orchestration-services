@@ -1,3 +1,4 @@
+using DreamMF.RemoteOrchestration.Core.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using DreamMF.RemoteOrchestration.Core.Models;
 using DreamMF.RemoteOrchestration.Core.Services;
@@ -20,6 +21,8 @@ public static class RemoteRoutes
         })
         .WithTags(GroupName)
         .Produces<List<RemoteResponse>>(StatusCodes.Status200OK)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("List all remotes"));
 
         app.MapGet("/remotes/{id}", async (int id, RemoteService remoteService) =>
@@ -29,7 +32,8 @@ public static class RemoteRoutes
         })
         .WithTags(GroupName)
         .Produces<RemoteResponse>(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status404NotFound)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Get remote by ID"));
 
         app.MapPost("/remotes", async (RemoteRequest request, RemoteService remoteService) =>
@@ -39,6 +43,8 @@ public static class RemoteRoutes
         })
         .WithTags(GroupName)
         .Produces<RemoteResponse>(StatusCodes.Status201Created)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Create a new remote"));
 
         app.MapPut("/remotes/{id}", async (int id, RemoteRequest request, RemoteService remoteService) =>
@@ -48,7 +54,8 @@ public static class RemoteRoutes
         })
         .WithTags(GroupName)
         .Produces(StatusCodes.Status204NoContent)
-        .Produces(StatusCodes.Status404NotFound)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Update a remote"));
 
         app.MapDelete("/remotes/{id}", async (int id, RemoteService remoteService) =>
@@ -58,7 +65,8 @@ public static class RemoteRoutes
         })
         .WithTags(GroupName)
         .Produces(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status404NotFound)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Delete a remote by ID"));
     }
 }
