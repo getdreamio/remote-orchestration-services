@@ -9,9 +9,9 @@ namespace DreamMF.RemoteOrchestration.Core.Services;
 
 public class TagService
 {
-    private readonly RemoteOrchestrationDbContext _dbContext;
+    private readonly IRemoteOrchestrationDbContext _dbContext;
 
-    public TagService(RemoteOrchestrationDbContext dbContext)
+    public TagService(IRemoteOrchestrationDbContext dbContext)
     {
         _dbContext = dbContext;
     }
@@ -155,6 +155,88 @@ public class TagService
         catch (Exception ex)
         {
             throw new HandledException(ExceptionType.Database, "Failed to add tag to host", ex);
+        }
+    }
+
+    public async Task<List<TagResponse>> GetTagsByHostIdAsync(int hostId)
+    {
+        if (hostId <= 0)
+        {
+            throw new HandledException(ExceptionType.Validation, "Host ID must be greater than zero.");
+        }
+        try
+        {
+            var tags = await _dbContext.Tags_Hosts
+                .Where(th => th.Host_ID == hostId)
+                .Select(th => th.Tag)
+                .ToListAsync();
+            return tags.Select(TagMapper.ToResponse).ToList();
+        }
+        catch (Exception ex)
+        {
+            throw new HandledException(ExceptionType.Database, "Failed to retrieve tags by host ID", ex);
+        }
+    }
+
+    public async Task<bool> RemoveTagFromHostAsync(int hostId, int tagId)
+    {
+        if (hostId <= 0 || tagId <= 0)
+        {
+            throw new HandledException(ExceptionType.Validation, "IDs must be greater than zero.");
+        }
+        try
+        {
+            var tagHost = await _dbContext.Tags_Hosts.FirstOrDefaultAsync(th => th.Host_ID == hostId && th.Tag_ID == tagId);
+            if (tagHost == null) return false;
+
+            _dbContext.Tags_Hosts.Remove(tagHost);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new HandledException(ExceptionType.Database, "Failed to remove tag from host", ex);
+        }
+    }
+
+    public async Task<List<TagResponse>> GetTagsByRemoteIdAsync(int remoteId)
+    {
+        if (remoteId <= 0)
+        {
+            throw new HandledException(ExceptionType.Validation, "Remote ID must be greater than zero.");
+        }
+        try
+        {
+            var tags = await _dbContext.Tags_Remotes
+                .Where(tr => tr.Remote_ID == remoteId)
+                .Select(tr => tr.Tag)
+                .ToListAsync();
+            return tags.Select(TagMapper.ToResponse).ToList();
+        }
+        catch (Exception ex)
+        {
+            throw new HandledException(ExceptionType.Database, "Failed to retrieve tags by remote ID", ex);
+        }
+    }
+
+    public async Task<bool> RemoveTagFromRemoteAsync(int remoteId, int tagId)
+    {
+        if (remoteId <= 0 || tagId <= 0)
+        {
+            throw new HandledException(ExceptionType.Validation, "IDs must be greater than zero.");
+        }
+        try
+        {
+            var tagRemote = await _dbContext.Tags_Remotes.FirstOrDefaultAsync(tr => tr.Remote_ID == remoteId && tr.Tag_ID == tagId);
+            if (tagRemote == null) return false;
+
+            _dbContext.Tags_Remotes.Remove(tagRemote);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new HandledException(ExceptionType.Database, "Failed to remove tag from remote", ex);
         }
     }
 }

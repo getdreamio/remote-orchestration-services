@@ -6,11 +6,11 @@ namespace DreamMF.RemoteOrchestration.Core.Providers;
 
 public class StorageService
 {
-    private readonly AzureBlobStorageProvider _azureBlobStorageProvider;
+    private readonly IAzureBlobStorageProvider _azureBlobStorageProvider;
     private readonly S3StorageProvider _s3StorageProvider;
     private readonly string _storageType;
 
-    public StorageService(AzureBlobStorageProvider azureBlobStorageProvider, S3StorageProvider s3StorageProvider, IConfiguration configuration)
+    public StorageService(IAzureBlobStorageProvider azureBlobStorageProvider, S3StorageProvider s3StorageProvider, IConfiguration configuration)
     {
         _azureBlobStorageProvider = azureBlobStorageProvider;
         _s3StorageProvider = s3StorageProvider;

@@ -86,5 +86,47 @@ public static class TagRoutes
         .Produces<HandledResponseModel>(400)
         .Produces<HandledResponseModel>(500)
         .WithMetadata(new EndpointNameMetadata("Add tag to host"));
+
+        app.MapGet("/tags/host/{hostId}", async (int hostId, TagService tagService) =>
+        {
+            var tags = await tagService.GetTagsByHostIdAsync(hostId);
+            return tags != null ? Results.Ok(tags) : Results.NotFound();
+        })
+        .WithTags(GroupName)
+        .Produces<List<TagResponse>>(StatusCodes.Status200OK)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
+        .WithMetadata(new EndpointNameMetadata("Get tags by host ID"));
+
+        app.MapDelete("/tags/host/{hostId}/remove/{tagId}", async (int hostId, int tagId, TagService tagService) =>
+        {
+            var success = await tagService.RemoveTagFromHostAsync(hostId, tagId);
+            return success ? Results.NoContent() : Results.NotFound();
+        })
+        .WithTags(GroupName)
+        .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status404NotFound)
+        .WithMetadata(new EndpointNameMetadata("Remove tag from host"));
+
+        app.MapGet("/tags/remote/{remoteId}", async (int remoteId, TagService tagService) =>
+        {
+            var tags = await tagService.GetTagsByRemoteIdAsync(remoteId);
+            return tags != null ? Results.Ok(tags) : Results.NotFound();
+        })
+        .WithTags(GroupName)
+        .Produces<List<TagResponse>>(StatusCodes.Status200OK)
+        .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(500)
+        .WithMetadata(new EndpointNameMetadata("Get tags by remote ID"));
+
+        app.MapDelete("/tags/remote/{remoteId}/remove/{tagId}", async (int remoteId, int tagId, TagService tagService) =>
+        {
+            var success = await tagService.RemoveTagFromRemoteAsync(remoteId, tagId);
+            return success ? Results.NoContent() : Results.NotFound();
+        })
+        .WithTags(GroupName)
+        .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status404NotFound)
+        .WithMetadata(new EndpointNameMetadata("Remove tag from remote"));
     }
 }

@@ -9,9 +9,9 @@ namespace DreamMF.RemoteOrchestration.Core.Services;
 
 public class HostService
 {
-    private readonly RemoteOrchestrationDbContext _dbContext;
+    private readonly IRemoteOrchestrationDbContext _dbContext;
 
-    public HostService(RemoteOrchestrationDbContext dbContext)
+    public HostService(IRemoteOrchestrationDbContext dbContext)
     {
         _dbContext = dbContext;
     }

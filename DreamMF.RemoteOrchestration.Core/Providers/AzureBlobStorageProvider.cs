@@ -2,7 +2,14 @@ using Azure.Storage.Blobs;
 
 namespace DreamMF.RemoteOrchestration.Core.Providers;
 
-public class AzureBlobStorageProvider
+public interface IAzureBlobStorageProvider
+{
+    Task UploadAsync(string containerName, string blobName, Stream content);
+    Task<Stream> DownloadAsync(string containerName, string blobName);
+    Task DeleteAsync(string containerName, string blobName);
+}
+
+public class AzureBlobStorageProvider : IAzureBlobStorageProvider
 {
     private readonly BlobServiceClient _blobServiceClient;
 
