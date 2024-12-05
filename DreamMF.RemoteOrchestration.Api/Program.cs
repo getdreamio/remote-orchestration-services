@@ -82,15 +82,7 @@ app.UseAuthorization();
 
 app.UseCors("AllowAll");
 
-app.UseExceptionHandler(errorApp =>
-{
-    errorApp.Run(async context =>
-    {
-        context.Response.StatusCode = 500;
-        await context.Response.WriteAsync("An error occurred.");
-    });
-});
-
+app.MapIndexRoutes();
 app.MapHealthRoutes();
 app.MapRemoteRoutes();
 app.MapHostRoutes();

@@ -25,6 +25,10 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
     public DbSet<Tags_Host> Tags_Hosts { get; set; } = null!;
     public DbSet<Host_Remote> Host_Remotes { get; set; } = null!;
 
+    public RemoteOrchestrationDbContext(DbContextOptions<RemoteOrchestrationDbContext> options) : base(options)
+    {
+    }
+
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         return base.SaveChangesAsync(cancellationToken);
@@ -32,6 +36,9 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite("Data Source=remote_orchestration.db");
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlite("Data Source=remote_orchestration.db");
+        }
     }
 }
