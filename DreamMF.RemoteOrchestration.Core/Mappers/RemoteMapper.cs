@@ -19,7 +19,7 @@ public static class RemoteMapper
     {
         return new RemoteResponse
         {
-            Id = entity.Id,
+            Id = entity.Remote_ID,
             Name = entity.Name,
             StorageType = entity.StorageType,
             Configuration = entity.Configuration

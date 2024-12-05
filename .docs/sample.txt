@@ -1,0 +1,10 @@
+// Create Host
+
+{
+  "name": "Test Host",
+  "url": "http://localhost:3000",
+  "key": "128376412834761234",
+  "environment": "local",
+  "created_Date": "2024-12-05T16:44:56.096Z",
+  "updated_Date": "2024-12-05T16:44:56.096Z"
+}

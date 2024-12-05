@@ -100,7 +100,7 @@ public class HostService
             .Where(hr => hr.Host_ID == hostId)
             .Select(hr => hr.Remote_ID);
         return _dbContext.Remotes
-            .Where(r => remotes.Contains(r.Id))
+            .Where(r => remotes.Contains(r.Remote_ID))
             .Select(r => r.ToResponse())
             .ToList();
     }
@@ -111,8 +111,8 @@ public class HostService
         {
             throw new HandledException(ExceptionType.Validation, "IDs must be greater than zero.");
         }
-        if (!await _dbContext.Hosts.AnyAsync(h => h.Id == hostId) ||
-            !await _dbContext.Remotes.AnyAsync(r => r.Id == remoteId))
+        if (!await _dbContext.Hosts.AnyAsync(h => h.Host_ID == hostId) ||
+            !await _dbContext.Remotes.AnyAsync(r => r.Remote_ID == remoteId))
         {
             return false;
         }

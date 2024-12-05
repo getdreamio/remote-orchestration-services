@@ -116,7 +116,7 @@ public class TagService
         }
         try
         {
-            if (!await _dbContext.Remotes.AnyAsync(r => r.Id == remoteId) ||
+            if (!await _dbContext.Remotes.AnyAsync(r => r.Remote_ID == remoteId) ||
                 !await _dbContext.Tags.AnyAsync(t => t.Tag_ID == tagId))
             {
                 return false;

@@ -1,9 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace DreamMF.RemoteOrchestration.Database.Entities;
 
 public class Version
 {
+    [Key]
     public int Version_ID { get; set; }
     public int Remote_ID { get; set; }
     public string Value { get; set; } = string.Empty;
-    public DateTime Created_Date { get; set; }
+    public DateTimeOffset Created_Date { get; set; }
+    public DateTimeOffset Updated_Date { get; set; }
 }

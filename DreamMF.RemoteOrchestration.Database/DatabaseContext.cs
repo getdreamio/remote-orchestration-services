@@ -19,6 +19,7 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
 {
     public DbSet<Host> Hosts { get; set; } = null!;
     public DbSet<Remote> Remotes { get; set; } = null!;
+    
     public DbSet<Configuration> Configurations { get; set; } = null!;
     public DbSet<Tag> Tags { get; set; } = null!;
     public DbSet<Tags_Remote> Tags_Remotes { get; set; } = null!;
@@ -27,11 +28,12 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
 
     public RemoteOrchestrationDbContext(DbContextOptions<RemoteOrchestrationDbContext> options) : base(options)
     {
+        EnsureDatabaseCreated();
     }
 
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    private void EnsureDatabaseCreated()
     {
-        return base.SaveChangesAsync(cancellationToken);
+        Database.Migrate();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -40,5 +42,60 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
         {
             optionsBuilder.UseSqlite("Data Source=remote_orchestration.db");
         }
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Host>(entity =>
+        {
+            entity.HasKey(e => e.Host_ID);
+        });
+
+        modelBuilder.Entity<Remote>(entity =>
+        {
+            entity.HasKey(e => e.Remote_ID);
+        });
+
+        modelBuilder.Entity<Configuration>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        modelBuilder.Entity<Tag>(entity =>
+        {
+            entity.HasKey(e => e.Tag_ID);
+        });
+
+        modelBuilder.Entity<Tags_Remote>(entity =>
+        {
+            entity.HasKey(e => e.Tag_Remote_ID);
+        });
+
+        modelBuilder.Entity<Tags_Host>(entity =>
+        {
+            entity.HasKey(e => e.Tag_Host_ID);
+        });
+
+        modelBuilder.Entity<Host_Remote>(entity =>
+        {
+            entity.HasKey(e => e.Host_Remote_ID);
+        });
+
+        modelBuilder.Entity<Audit_Remote>(entity =>
+        {
+            entity.HasKey(e => e.Audit_ID);
+        });
+
+        modelBuilder.Entity<Audit_Host>(entity =>
+        {
+            entity.HasKey(e => e.Audit_ID);
+        });
+
+        base.OnModelCreating(modelBuilder);
     }
 }

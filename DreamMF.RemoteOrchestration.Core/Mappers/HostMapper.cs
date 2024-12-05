@@ -22,7 +22,7 @@ public static class HostMapper
     {
         return new HostResponse
         {
-            Id = entity.Id,
+            Id = entity.Host_ID,
             Name = entity.Name,
             Url = entity.Url,
             Key = entity.Key,
