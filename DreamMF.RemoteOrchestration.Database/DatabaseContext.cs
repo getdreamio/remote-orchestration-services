@@ -19,7 +19,6 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
 {
     public DbSet<Host> Hosts { get; set; } = null!;
     public DbSet<Remote> Remotes { get; set; } = null!;
-    
     public DbSet<Configuration> Configurations { get; set; } = null!;
     public DbSet<Tag> Tags { get; set; } = null!;
     public DbSet<Tags_Remote> Tags_Remotes { get; set; } = null!;
