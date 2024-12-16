@@ -19,7 +19,7 @@ The service architecture is designed to support scalability and reliability. It 
 ## Getting Started
 
 ### Prerequisites
-- Node.js
+- C# Dotnet
 - Azure or AWS account for storage
 
 ### Installation
@@ -33,7 +33,7 @@ The service architecture is designed to support scalability and reliability. It 
    ```
 3. Install dependencies:
    ```bash
-   npm install
+   dotnet restore
    ```
 
 ## Usage
