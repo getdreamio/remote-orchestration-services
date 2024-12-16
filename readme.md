@@ -40,7 +40,7 @@ The service architecture is designed to support scalability and reliability. It 
 1. Configure your Azure Blob Storage or AWS S3 bucket details in the configuration file.
 2. Start the service:
    ```bash
-   npm start
+   dotnet run
    ```
 3. Access the service via the provided endpoint.
 
