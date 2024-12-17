@@ -1,8 +1,10 @@
 import React from 'react';
-import { Button, Table, message, Empty } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Button, Table, message, Empty, Tag, Typography, Tooltip } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import { useHosts, useDeleteHost } from '@/hooks/useHosts';
 import HostModal from '@/components/hosts/host-modal';
+
+const { Text } = Typography;
 
 const HostsPage: React.FC = () => {
     const { data: hosts, isLoading } = useHosts();
@@ -24,21 +26,94 @@ const HostsPage: React.FC = () => {
         }
     };
 
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        message.success('Key copied to clipboard');
+    };
+
+    const getEnvironmentColor = (environment: string) => {
+        switch (environment.toLowerCase()) {
+            case 'development':
+                return 'blue';
+            case 'staging':
+                return 'orange';
+            case 'production':
+                return 'green';
+            default:
+                return 'default';
+        }
+    };
+
     const columns = [
         {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
+            sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+            render: (name: string, record: any) => (
+                <div>
+                    <div>{name}</div>
+                    <Text type="secondary" className="text-sm">
+                        {record.description}
+                    </Text>
+                </div>
+            ),
         },
         {
-            title: 'Hostname',
-            dataIndex: 'hostname',
-            key: 'hostname',
+            title: 'URL',
+            dataIndex: 'url',
+            key: 'url',
+            render: (url: string) => (
+                <a href={url} target="_blank" rel="noopener noreferrer">
+                    {url}
+                </a>
+            ),
         },
         {
-            title: 'Port',
-            dataIndex: 'port',
-            key: 'port',
+            title: 'Access Key',
+            dataIndex: 'key',
+            key: 'key',
+            render: (key: string) => (
+                <div className="flex items-center gap-2">
+                    <Text className="font-mono text-sm" ellipsis>
+                        {key.substring(0, 8)}...{key.substring(key.length - 8)}
+                    </Text>
+                    <Tooltip title="Copy full key">
+                        <Button
+                            type="text"
+                            icon={<CopyOutlined />}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                copyToClipboard(key);
+                            }}
+                        />
+                    </Tooltip>
+                </div>
+            ),
+        },
+        {
+            title: 'Environment',
+            dataIndex: 'environment',
+            key: 'environment',
+            render: (environment: string) => (
+                <Tag color={getEnvironmentColor(environment)}>
+                    {environment.toUpperCase()}
+                </Tag>
+            ),
+            filters: [
+                { text: 'Development', value: 'development' },
+                { text: 'Staging', value: 'staging' },
+                { text: 'Production', value: 'production' },
+            ],
+            onFilter: (value: string, record: any) => 
+                record.environment.toLowerCase() === value.toLowerCase(),
+        },
+        {
+            title: 'Created',
+            dataIndex: 'created_Date',
+            key: 'created_Date',
+            render: (date: string) => new Date(date).toLocaleDateString(),
+            sorter: (a: any, b: any) => new Date(a.created_Date).getTime() - new Date(b.created_Date).getTime(),
         },
         {
             title: 'Actions',

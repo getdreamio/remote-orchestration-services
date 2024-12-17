@@ -4,16 +4,19 @@ import { config } from '@/config/env';
 interface Host {
     host_ID: number;
     name: string;
-    hostname: string;
-    port: number;
+    description: string;
+    url: string;
+    key: string;
+    environment: string;
     created_Date: string;
     updated_Date: string;
 }
 
 interface HostRequest {
     name: string;
-    hostname: string;
-    port: number;
+    description: string;
+    url: string;
+    environment: string;
 }
 
 const fetchHosts = async (): Promise<Host[]> => {

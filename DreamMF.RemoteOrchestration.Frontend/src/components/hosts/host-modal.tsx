@@ -1,6 +1,10 @@
 import React from 'react';
-import { Modal, Form, Input, Button, message } from 'antd';
+import { Modal, Form, Input, Button, message, Select, Typography } from 'antd';
 import { useCreateHost, useUpdateHost } from '@/hooks/useHosts';
+import { CopyOutlined } from '@ant-design/icons';
+
+const { TextArea } = Input;
+const { Text } = Typography;
 
 interface HostModalProps {
     isOpen: boolean;
@@ -8,8 +12,10 @@ interface HostModalProps {
     editingHost?: {
         host_ID: number;
         name: string;
-        hostname: string;
-        port: number;
+        description: string;
+        url: string;
+        key: string;
+        environment: string;
     };
 }
 
@@ -32,7 +38,7 @@ const HostModal: React.FC<HostModalProps> = ({ isOpen, onClose, editingHost }) =
                 await updateHost.mutateAsync({ id: editingHost.host_ID, host: values });
                 message.success('Host updated successfully');
             } else {
-                await createHost.mutateAsync(values);
+                const result = await createHost.mutateAsync(values);
                 message.success('Host created successfully');
             }
             onClose();
@@ -42,41 +48,84 @@ const HostModal: React.FC<HostModalProps> = ({ isOpen, onClose, editingHost }) =
         }
     };
 
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        message.success('Key copied to clipboard');
+    };
+
     return (
         <Modal
             title={editingHost ? 'Edit Host' : 'Create Host'}
             open={isOpen}
             onCancel={onClose}
             footer={null}
+            width={600}
         >
             <Form
                 form={form}
                 layout="vertical"
                 onFinish={handleSubmit}
-                initialValues={{ port: 22 }}
             >
                 <Form.Item
                     label="Name"
                     name="name"
                     rules={[{ required: true, message: 'Please input the host name!' }]}
                 >
-                    <Input />
+                    <Input placeholder="e.g., Production Server 1" />
                 </Form.Item>
 
                 <Form.Item
-                    label="Hostname"
-                    name="hostname"
-                    rules={[{ required: true, message: 'Please input the hostname!' }]}
+                    label="Description"
+                    name="description"
+                    rules={[{ required: true, message: 'Please input the description!' }]}
                 >
-                    <Input />
+                    <TextArea 
+                        rows={3} 
+                        placeholder="Describe the purpose and details of this host"
+                    />
                 </Form.Item>
 
                 <Form.Item
-                    label="Port"
-                    name="port"
-                    rules={[{ required: true, message: 'Please input the port!' }]}
+                    label="URL"
+                    name="url"
+                    rules={[
+                        { required: true, message: 'Please input the URL!' },
+                        { type: 'url', message: 'Please enter a valid URL!' }
+                    ]}
                 >
-                    <Input type="number" />
+                    <Input placeholder="e.g., https://example.com" />
+                </Form.Item>
+
+                {editingHost && (
+                    <Form.Item label="Access Key">
+                        <div className="flex items-center gap-2 bg-gray-50 p-2 rounded">
+                            <Text className="flex-1 font-mono text-sm" ellipsis>
+                                {editingHost.key}
+                            </Text>
+                            <Button
+                                type="text"
+                                icon={<CopyOutlined />}
+                                onClick={() => copyToClipboard(editingHost.key)}
+                            >
+                                Copy
+                            </Button>
+                        </div>
+                        <Text type="secondary" className="text-xs mt-1">
+                            This key is automatically generated and cannot be modified
+                        </Text>
+                    </Form.Item>
+                )}
+
+                <Form.Item
+                    label="Environment"
+                    name="environment"
+                    rules={[{ required: true, message: 'Please select the environment!' }]}
+                >
+                    <Select>
+                        <Select.Option value="development">Development</Select.Option>
+                        <Select.Option value="staging">Staging</Select.Option>
+                        <Select.Option value="production">Production</Select.Option>
+                    </Select>
                 </Form.Item>
 
                 <Form.Item className="mb-0 flex justify-end">
