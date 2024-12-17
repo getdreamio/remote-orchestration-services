@@ -23,7 +23,9 @@ public static class RemoteRoutes
         .Produces<List<RemoteResponse>>(StatusCodes.Status200OK)
         .Produces<HandledResponseModel>(400)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("List all remotes"));
+        .WithMetadata(new EndpointNameMetadata("List all remotes"))
+        .WithSummary("Get All Remotes")
+        .WithDescription("Retrieves a list of all registered remote instances");
 
         app.MapGet("/remotes/{id}", async (int id, RemoteService remoteService) =>
         {
@@ -33,8 +35,11 @@ public static class RemoteRoutes
         .WithTags(GroupName)
         .Produces<RemoteResponse>(StatusCodes.Status200OK)
         .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(404)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Get remote by ID"));
+        .WithMetadata(new EndpointNameMetadata("Get remote by ID"))
+        .WithSummary("Get Remote by ID")
+        .WithDescription("Retrieves a specific remote instance by its unique identifier");
 
         app.MapPost("/remotes", async (RemoteRequest request, RemoteService remoteService) =>
         {
@@ -45,7 +50,9 @@ public static class RemoteRoutes
         .Produces<RemoteResponse>(StatusCodes.Status201Created)
         .Produces<HandledResponseModel>(400)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Create a new remote"));
+        .WithMetadata(new EndpointNameMetadata("Create a new remote"))
+        .WithSummary("Create a New Remote")
+        .WithDescription("Creates a new remote instance with the provided details");
 
         app.MapPut("/remotes/{id}", async (int id, RemoteRequest request, RemoteService remoteService) =>
         {
@@ -55,8 +62,11 @@ public static class RemoteRoutes
         .WithTags(GroupName)
         .Produces(StatusCodes.Status204NoContent)
         .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(404)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Update a remote"));
+        .WithMetadata(new EndpointNameMetadata("Update a remote"))
+        .WithSummary("Update a Remote")
+        .WithDescription("Updates an existing remote instance with the provided details");
 
         app.MapDelete("/remotes/{id}", async (int id, RemoteService remoteService) =>
         {
@@ -66,7 +76,10 @@ public static class RemoteRoutes
         .WithTags(GroupName)
         .Produces(StatusCodes.Status200OK)
         .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(404)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Delete a remote by ID"));
+        .WithMetadata(new EndpointNameMetadata("Delete a remote by ID"))
+        .WithSummary("Delete a Remote by ID")
+        .WithDescription("Deletes a specific remote instance by its unique identifier");
     }
 }

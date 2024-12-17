@@ -22,7 +22,9 @@ public static class HostRoutes
         .Produces<List<HostResponse>>(StatusCodes.Status200OK)
         .Produces<HandledResponseModel>(400)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("List all hosts"));
+        .WithMetadata(new EndpointNameMetadata("List all hosts"))
+        .WithSummary("Get All Hosts")
+        .WithDescription("Retrieves a list of all registered host instances");
 
         app.MapGet("/hosts/{id}", async (int id, HostService hostService) =>
         {
@@ -32,8 +34,11 @@ public static class HostRoutes
         .WithTags(GroupName)
         .Produces<HostResponse>(StatusCodes.Status200OK)
         .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(404)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Get host by ID"));
+        .WithMetadata(new EndpointNameMetadata("Get host by ID"))
+        .WithSummary("Get Host by ID")
+        .WithDescription("Retrieves a specific host instance by its unique identifier");
 
         app.MapPost("/hosts", async (HostRequest request, HostService hostService) =>
         {
@@ -42,7 +47,9 @@ public static class HostRoutes
         })
         .WithTags(GroupName)
         .Produces<HostResponse>(StatusCodes.Status201Created)
-        .WithMetadata(new EndpointNameMetadata("Create a new host"));
+        .WithMetadata(new EndpointNameMetadata("Create a new host"))
+        .WithSummary("Create a New Host")
+        .WithDescription("Creates a new host instance with the provided details");
 
         app.MapPut("/hosts/{id}", async (int id, HostRequest request, HostService hostService) =>
         {
@@ -53,7 +60,9 @@ public static class HostRoutes
         .Produces(StatusCodes.Status204NoContent)
         .Produces<HandledResponseModel>(400)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Update a host"));
+        .WithMetadata(new EndpointNameMetadata("Update a host"))
+        .WithSummary("Update a Host")
+        .WithDescription("Updates an existing host instance with the provided details");
 
         app.MapDelete("/hosts/{id}", async (int id, HostService hostService) =>
         {
@@ -64,7 +73,9 @@ public static class HostRoutes
         .Produces(StatusCodes.Status200OK)
         .Produces<HandledResponseModel>(400)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Delete a host by ID"));
+        .WithMetadata(new EndpointNameMetadata("Delete a host by ID"))
+        .WithSummary("Delete a Host by ID")
+        .WithDescription("Deletes a specific host instance by its unique identifier");
 
         app.MapGet("/hosts/{id}/remotes", async (int id, HostService hostService) =>
         {
@@ -73,7 +84,9 @@ public static class HostRoutes
         })
         .WithTags(GroupName)
         .Produces<List<RemoteResponse>>(StatusCodes.Status200OK)
-        .WithMetadata(new EndpointNameMetadata("List remotes by host ID"));
+        .WithMetadata(new EndpointNameMetadata("List remotes by host ID"))
+        .WithSummary("List Remotes by Host ID")
+        .WithDescription("Retrieves a list of remotes associated with a specific host instance");
 
         app.MapPost("/hosts/{id}/attach", async (int id, int remoteId, HostService hostService) =>
         {
@@ -84,7 +97,9 @@ public static class HostRoutes
         .Produces(StatusCodes.Status204NoContent)
         .Produces<HandledResponseModel>(400)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Attach remote to host"));
+        .WithMetadata(new EndpointNameMetadata("Attach remote to host"))
+        .WithSummary("Attach Remote to Host")
+        .WithDescription("Associates a remote instance with a specific host instance");
 
         app.MapPost("/hosts/assign", async (int hostId, int remoteId, HostService hostService) =>
         {
@@ -95,7 +110,9 @@ public static class HostRoutes
         .Produces(StatusCodes.Status200OK)
         .Produces<HandledResponseModel>(400)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Assign a remote to a host"));
+        .WithMetadata(new EndpointNameMetadata("Assign a remote to a host"))
+        .WithSummary("Assign a Remote to a Host")
+        .WithDescription("Assigns a remote instance to a specific host instance");
 
         app.MapGet("/hosts/environment/{environment}", async (string environment, HostService hostService) =>
         {
@@ -106,6 +123,8 @@ public static class HostRoutes
         .Produces<List<HostResponse>>(StatusCodes.Status200OK)
         .Produces<HandledResponseModel>(400)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("List hosts by environment"));
+        .WithMetadata(new EndpointNameMetadata("List hosts by environment"))
+        .WithSummary("List Hosts by Environment")
+        .WithDescription("Retrieves a list of host instances associated with a specific environment");
     }
 }

@@ -20,7 +20,9 @@ public static class TagRoutes
         .Produces<List<TagResponse>>(StatusCodes.Status200OK)
         .Produces<HandledResponseModel>(400)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("List all tags"));
+        .WithMetadata(new EndpointNameMetadata("List all tags"))
+        .WithSummary("Get All Tags")
+        .WithDescription("Retrieves a list of all registered tags");
 
         app.MapGet("/tags/{id}", async (int id, TagService tagService) =>
         {
@@ -30,8 +32,11 @@ public static class TagRoutes
         .WithTags(GroupName)
         .Produces<TagResponse>(StatusCodes.Status200OK)
         .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(404)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Get tag by ID"));
+        .WithMetadata(new EndpointNameMetadata("Get tag by ID"))
+        .WithSummary("Get Tag by ID")
+        .WithDescription("Retrieves a specific tag by its unique identifier");
 
         app.MapPost("/tags", async (TagRequest request, TagService tagService) =>
         {
@@ -42,7 +47,9 @@ public static class TagRoutes
         .Produces<TagResponse>(StatusCodes.Status201Created)
         .Produces<HandledResponseModel>(400)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Create a new tag"));
+        .WithMetadata(new EndpointNameMetadata("Create a new tag"))
+        .WithSummary("Create a New Tag")
+        .WithDescription("Creates a new tag with the provided information");
 
         app.MapPut("/tags/{id}", async (int id, TagRequest request, TagService tagService) =>
         {
@@ -52,8 +59,11 @@ public static class TagRoutes
         .WithTags(GroupName)
         .Produces(StatusCodes.Status204NoContent)
         .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(404)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Update a tag"));
+        .WithMetadata(new EndpointNameMetadata("Update a tag"))
+        .WithSummary("Update a Tag")
+        .WithDescription("Updates an existing tag with the provided information");
 
         app.MapDelete("/tags/{id}", async (int id, TagService tagService) =>
         {
@@ -63,7 +73,9 @@ public static class TagRoutes
         .WithTags(GroupName)
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status404NotFound)
-        .WithMetadata(new EndpointNameMetadata("Delete a tag"));
+        .WithMetadata(new EndpointNameMetadata("Delete a tag"))
+        .WithSummary("Delete a Tag")
+        .WithDescription("Deletes a tag by its unique identifier");
 
         app.MapPost("/tags/remote/{remoteId}/add/{tagId}", async (int remoteId, int tagId, TagService tagService) =>
         {
@@ -74,7 +86,9 @@ public static class TagRoutes
         .Produces(StatusCodes.Status204NoContent)
         .Produces<HandledResponseModel>(400)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Add tag to remote"));
+        .WithMetadata(new EndpointNameMetadata("Add tag to remote"))
+        .WithSummary("Add Tag to Remote")
+        .WithDescription("Adds a tag to a remote entity");
 
         app.MapPost("/tags/host/{hostId}/add/{tagId}", async (int hostId, int tagId, TagService tagService) =>
         {
@@ -85,7 +99,9 @@ public static class TagRoutes
         .Produces(StatusCodes.Status204NoContent)
         .Produces<HandledResponseModel>(400)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Add tag to host"));
+        .WithMetadata(new EndpointNameMetadata("Add tag to host"))
+        .WithSummary("Add Tag to Host")
+        .WithDescription("Adds a tag to a host entity");
 
         app.MapGet("/tags/host/{hostId}", async (int hostId, TagService tagService) =>
         {
@@ -95,8 +111,11 @@ public static class TagRoutes
         .WithTags(GroupName)
         .Produces<List<TagResponse>>(StatusCodes.Status200OK)
         .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(404)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Get tags by host ID"));
+        .WithMetadata(new EndpointNameMetadata("Get tags by host ID"))
+        .WithSummary("Get Tags by Host ID")
+        .WithDescription("Retrieves a list of tags associated with a host entity");
 
         app.MapDelete("/tags/host/{hostId}/remove/{tagId}", async (int hostId, int tagId, TagService tagService) =>
         {
@@ -106,7 +125,9 @@ public static class TagRoutes
         .WithTags(GroupName)
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status404NotFound)
-        .WithMetadata(new EndpointNameMetadata("Remove tag from host"));
+        .WithMetadata(new EndpointNameMetadata("Remove tag from host"))
+        .WithSummary("Remove Tag from Host")
+        .WithDescription("Removes a tag from a host entity");
 
         app.MapGet("/tags/remote/{remoteId}", async (int remoteId, TagService tagService) =>
         {
@@ -116,8 +137,11 @@ public static class TagRoutes
         .WithTags(GroupName)
         .Produces<List<TagResponse>>(StatusCodes.Status200OK)
         .Produces<HandledResponseModel>(400)
+        .Produces<HandledResponseModel>(404)
         .Produces<HandledResponseModel>(500)
-        .WithMetadata(new EndpointNameMetadata("Get tags by remote ID"));
+        .WithMetadata(new EndpointNameMetadata("Get tags by remote ID"))
+        .WithSummary("Get Tags by Remote ID")
+        .WithDescription("Retrieves a list of tags associated with a remote entity");
 
         app.MapDelete("/tags/remote/{remoteId}/remove/{tagId}", async (int remoteId, int tagId, TagService tagService) =>
         {
@@ -127,6 +151,8 @@ public static class TagRoutes
         .WithTags(GroupName)
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status404NotFound)
-        .WithMetadata(new EndpointNameMetadata("Remove tag from remote"));
+        .WithMetadata(new EndpointNameMetadata("Remove tag from remote"))
+        .WithSummary("Remove Tag from Remote")
+        .WithDescription("Removes a tag from a remote entity");
     }
 }
