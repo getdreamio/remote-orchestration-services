@@ -1,17 +1,95 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
-import type { Host } from '@/types/host';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { config } from '@/config/env';
+
+interface Host {
+    host_ID: number;
+    name: string;
+    hostname: string;
+    port: number;
+    created_Date: string;
+    updated_Date: string;
+}
+
+interface HostRequest {
+    name: string;
+    hostname: string;
+    port: number;
+}
 
 const fetchHosts = async (): Promise<Host[]> => {
-    const response = await fetch('/api/hosts');
+    const response = await fetch(`${config.backendUrl}/hosts`);
     if (!response.ok) {
-        throw new Error('Failed to fetch hosts');
+        throw new Error('Network response was not ok');
     }
     return response.json();
 };
 
 export const useHosts = () => {
-    return useSuspenseQuery<Host[]>({
+    return useQuery({
         queryKey: ['hosts'],
         queryFn: fetchHosts
+    });
+};
+
+export const useCreateHost = () => {
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationFn: async (host: HostRequest) => {
+            const response = await fetch(`${config.backendUrl}/hosts`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(host),
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['hosts'] });
+        },
+    });
+};
+
+export const useUpdateHost = () => {
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationFn: async ({ id, host }: { id: number; host: HostRequest }) => {
+            const response = await fetch(`${config.backendUrl}/hosts/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(host),
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['hosts'] });
+        },
+    });
+};
+
+export const useDeleteHost = () => {
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationFn: async (id: number) => {
+            const response = await fetch(`${config.backendUrl}/hosts/${id}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['hosts'] });
+        },
     });
 };

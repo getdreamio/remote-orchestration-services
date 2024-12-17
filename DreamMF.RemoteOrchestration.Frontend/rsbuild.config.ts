@@ -6,6 +6,9 @@ export default defineConfig({
     source: {
         entry: {
             index: './src/index.tsx'
+        },
+        define: {
+            'process.env.BACKEND_URL': JSON.stringify(process.env.BACKEND_URL)
         }
     },
     output: {
@@ -19,5 +22,9 @@ export default defineConfig({
     },
     server: {
         port: 3000
+    },
+    html: {
+        template: './public/index.html',
+        favicon: './public/favicon.ico'
     }
 });

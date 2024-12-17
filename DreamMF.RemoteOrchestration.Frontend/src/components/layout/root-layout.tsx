@@ -1,5 +1,5 @@
 import { Link, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Settings, Users, Server } from 'lucide-react';
+import { LayoutDashboard, Settings, Users, Server, Database, Tag } from 'lucide-react';
 
 const RootLayout = () => {
     return (
@@ -8,7 +8,13 @@ const RootLayout = () => {
                 {/* Sidebar */}
                 <aside className="hidden lg:flex h-screen w-64 flex-col fixed left-0 top-0 border-r bg-card">
                     <div className="p-6">
-                        <h2 className="text-lg font-semibold">Dashboard</h2>
+                        <div className="flex items-center gap-2">
+                            <img src="/favicon-32x32.png" alt="Dream.MF Logo" className="w-6 h-6" />
+                            <div>
+                                <h2 className="text-lg font-semibold leading-tight">Dream.MF</h2>
+                                <p className="text-xs text-muted-foreground">Remote Orchestration Services</p>
+                            </div>
+                        </div>
                     </div>
                     <nav className="flex-1 p-4 space-y-2">
                         <Link
@@ -24,6 +30,20 @@ const RootLayout = () => {
                         >
                             <Server className="h-5 w-5" />
                             <span>Hosts</span>
+                        </Link>
+                        <Link
+                            to="/remotes"
+                            className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent"
+                        >
+                            <Database className="h-5 w-5" />
+                            <span>Remotes</span>
+                        </Link>
+                        <Link
+                            to="/tags"
+                            className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent"
+                        >
+                            <Tag className="h-5 w-5" />
+                            <span>Tags</span>
                         </Link>
                         <Link
                             to="/users"
