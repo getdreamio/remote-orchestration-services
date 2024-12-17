@@ -1,10 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DreamMF.RemoteOrchestration.Database.Entities;
 
 public class Host
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Host_ID { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Url { get; set; } = string.Empty;

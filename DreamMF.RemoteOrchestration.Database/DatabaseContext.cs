@@ -53,46 +53,55 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
         modelBuilder.Entity<Host>(entity =>
         {
             entity.HasKey(e => e.Host_ID);
+            entity.ToTable("Host");
         });
 
         modelBuilder.Entity<Remote>(entity =>
         {
             entity.HasKey(e => e.Remote_ID);
+            entity.ToTable("Remote");
         });
 
         modelBuilder.Entity<Configuration>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.ToTable("Configuration");
         });
 
         modelBuilder.Entity<Tag>(entity =>
         {
             entity.HasKey(e => e.Tag_ID);
+            entity.ToTable("Tag");
         });
 
         modelBuilder.Entity<Tags_Remote>(entity =>
         {
             entity.HasKey(e => e.Tag_Remote_ID);
+            entity.ToTable("Tags_Remote");
         });
 
         modelBuilder.Entity<Tags_Host>(entity =>
         {
             entity.HasKey(e => e.Tag_Host_ID);
+            entity.ToTable("Tags_Host");
         });
 
         modelBuilder.Entity<Host_Remote>(entity =>
         {
             entity.HasKey(e => e.Host_Remote_ID);
+            entity.ToTable("Host_Remote");
         });
 
         modelBuilder.Entity<Audit_Remote>(entity =>
         {
             entity.HasKey(e => e.Audit_ID);
+            entity.ToTable("Audit_Remote");
         });
 
         modelBuilder.Entity<Audit_Host>(entity =>
         {
             entity.HasKey(e => e.Audit_ID);
+            entity.ToTable("Audit_Host");
         });
 
         base.OnModelCreating(modelBuilder);

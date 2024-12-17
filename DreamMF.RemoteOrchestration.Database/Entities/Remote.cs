@@ -1,10 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DreamMF.RemoteOrchestration.Database.Entities;
 
 public class Remote
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Remote_ID { get; set; }
     public string Name { get; set; } = string.Empty;
     public string StorageType { get; set; } = string.Empty; // e.g., AzureBlob, AWSS3
