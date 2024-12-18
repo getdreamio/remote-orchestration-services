@@ -8,6 +8,14 @@ interface Remote {
     configuration: string;
     created_Date: string;
     updated_Date: string;
+    modules?: RemoteModule[]
+}
+
+export interface RemoteModule {
+    id: number;
+    name: string;
+    created_Date: string;
+    updated_Date: string;
 }
 
 interface RemoteRequest {
