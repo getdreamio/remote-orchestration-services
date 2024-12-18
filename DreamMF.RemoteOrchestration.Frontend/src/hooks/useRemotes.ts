@@ -4,6 +4,7 @@ import { config } from '@/config/env';
 interface Remote {
     id: number;
     name: string;
+    url?: string;
     storageType: string;
     configuration: string;
     created_Date: string;
@@ -12,50 +13,17 @@ interface Remote {
 }
 
 export interface RemoteModule {
-    id: number;
+    id?: number;
     name: string;
-    description: string;
-    url: string;
-    key: string;
-    environment: string;
-    repository?: string;
-    contactName?: string;
-    contactEmail?: string;
-    documentationUrl?: string;
-    tags?: string[];
-    createdAt?: string;
-    updatedAt?: string;
+    created_Date?: string;
+    updated_Date?: string;
 }
 
-export type RemoteRequest = Omit<RemoteModule, 'id' | 'key' | 'createdAt' | 'updatedAt'>;
-
-interface RemoteModuleCount {
-    remoteId: number;
-    count: number;
+interface RemoteRequest {
+    name: string;
+    storageType: string;
+    configuration: string;
 }
-
-interface RemoteSubRemoteCount {
-    remoteId: number;
-    count: number;
-}
-
-// Fetch module counts for all remotes
-const fetchRemoteModuleCounts = async (): Promise<RemoteModuleCount[]> => {
-    const response = await fetch(`${config.backendUrl}/api/remotes/module-counts`);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
-};
-
-// Fetch sub-remote counts for all remotes
-const fetchRemoteSubRemoteCounts = async (): Promise<RemoteSubRemoteCount[]> => {
-    const response = await fetch(`${config.backendUrl}/api/remotes/sub-remote-counts`);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
-};
 
 export const useRemotes = () => {
     return useQuery<Remote[]>({
@@ -80,7 +48,8 @@ export const useRemote = (id: number) => {
             }
             return response.json();
         },
-        enabled: !!id
+        enabled: !!id,
+        throwOnError: true
     });
 };
 
@@ -112,6 +81,7 @@ export const useUpdateRemote = () => {
 
     return useMutation({
         mutationFn: async ({ id, remote }: { id: number; remote: RemoteRequest }) => {
+            console.log(remote);
             const response = await fetch(`${config.backendUrl}/api/remotes/${id}`, {
                 method: 'PUT',
                 headers: {
@@ -144,19 +114,5 @@ export const useDeleteRemote = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['remotes'] });
         },
-    });
-};
-
-export const useRemoteModuleCounts = () => {
-    return useQuery({
-        queryKey: ['remotes', 'module-counts'],
-        queryFn: fetchRemoteModuleCounts,
-    });
-};
-
-export const useRemoteSubRemoteCounts = () => {
-    return useQuery({
-        queryKey: ['remotes', 'sub-remote-counts'],
-        queryFn: fetchRemoteSubRemoteCounts,
     });
 };

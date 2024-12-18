@@ -7,6 +7,13 @@ import { useRemoteHostCounts } from '@/hooks/useHosts';
 import { formatDate } from '@/lib/date-utils';
 import { useRemoteSubRemoteCounts } from '@/hooks/useRemotes';
 
+interface Remote {
+    id: number;
+    name: string;
+    storageType: string;
+    created_Date: string;
+}
+
 const RemotesPage: React.FC = () => {
     const navigate = useNavigate();
     const { data: remotes, isLoading } = useRemotes();
@@ -75,15 +82,8 @@ const RemotesPage: React.FC = () => {
         {
             title: 'Actions',
             key: 'actions',
-            render: (_: any, record: any) => (
-                <span>
-                    <Button
-                        type="link"
-                        icon={<EditOutlined />}
-                        onClick={() => navigate(`/remotes/${record.id}`)}
-                    >
-                        Edit
-                    </Button>
+            render: (_: any, record: Remote) => (
+                <span onClick={(e) => e.stopPropagation()}>
                     <Popconfirm
                         title="Are you sure you want to delete this remote?"
                         onConfirm={() => handleDelete(record.id)}
@@ -116,6 +116,10 @@ const RemotesPage: React.FC = () => {
                 dataSource={remotes}
                 loading={isLoading}
                 rowKey="id"
+                onRow={(record: Remote) => ({
+                    onClick: () => navigate(`/remotes/${record.id}`),
+                    style: { cursor: 'pointer' }
+                })}
             />
         </div>
     );
