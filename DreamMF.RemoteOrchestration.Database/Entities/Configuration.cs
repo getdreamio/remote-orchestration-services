@@ -7,7 +7,9 @@ public class Configuration
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public int Configuration_ID { get; set; }
     public string Key { get; set; } = string.Empty;
     public string Value { get; set; } = string.Empty;
+    public DateTimeOffset Created_Date { get; set; }
+    public DateTimeOffset Updated_Date { get; set; }
 }

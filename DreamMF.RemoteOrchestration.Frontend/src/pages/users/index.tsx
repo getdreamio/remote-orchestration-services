@@ -32,7 +32,7 @@ const UsersPage: React.FC = () => {
                 </Button>
             </div>
 
-            <Card>
+            <Card className="bg-gray-50 dark:bg-transparent">
                 <List
                     itemLayout="horizontal"
                     dataSource={mockUsers}

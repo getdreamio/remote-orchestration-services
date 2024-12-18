@@ -68,7 +68,7 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
 
         modelBuilder.Entity<Configuration>(entity =>
         {
-            entity.HasKey(e => e.Id);
+            entity.HasKey(e => e.Configuration_ID);
             entity.ToTable("Configuration");
         });
 

@@ -80,7 +80,7 @@ const EditTagPage: React.FC = () => {
             <Title level={2} className="mb-6">Edit Tag</Title>
             
             <div className="space-y-6">
-                <Card className="max-w-2xl">
+                <Card className="max-w-2xl bg-gray-50 dark:bg-gray-800">
                     <Form
                         form={form}
                         layout="vertical"
@@ -118,7 +118,7 @@ const EditTagPage: React.FC = () => {
                     </Form>
                 </Card>
 
-                <Card>
+                <Card className="bg-gray-50 dark:bg-gray-800">
                     <Tabs defaultActiveKey="hosts">
                         <TabPane tab="Associated Hosts" key="hosts">
                             <Table

@@ -61,6 +61,7 @@ builder.Services.AddHealthChecks()
 builder.Services.AddScoped<HostService>();
 builder.Services.AddScoped<RemoteService>();
 builder.Services.AddScoped<TagService>();
+builder.Services.AddScoped<ConfigurationService>();
 
 var app = builder.Build();
 
@@ -83,6 +84,7 @@ app.UseAuthorization();
 app.UseCors("AllowAll");
 
 app.MapIndexRoutes();
+app.MapConfigurationRoutes();
 app.MapHealthRoutes();
 app.MapRemoteRoutes();
 app.MapHostRoutes();

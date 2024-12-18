@@ -1,5 +1,6 @@
 -- SQL script to create tables based on the entities
 
+DROP TABLE IF EXISTS demo;
 DROP TABLE IF EXISTS Host;
 DROP TABLE IF EXISTS Remote;
 DROP TABLE IF EXISTS Tag;
@@ -70,12 +71,6 @@ CREATE TABLE [User] (
     Updated_Date DATETIMEOFFSET NOT NULL
 );
 
-CREATE TABLE Configuration (
-    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-    [Key] VARCHAR(255) NOT NULL,
-    Value VARCHAR(255) NOT NULL
-);
-
 CREATE TABLE Host (
     Host_ID INTEGER PRIMARY KEY AUTOINCREMENT,
     Name VARCHAR(255) NOT NULL,
@@ -137,6 +132,16 @@ CREATE TABLE Tags_Remote (
     Updated_Date DATETIMEOFFSET NOT NULL,
     FOREIGN KEY (Remote_ID) REFERENCES Remote(Remote_ID),
     FOREIGN KEY (Tag_ID) REFERENCES Tag(Tag_ID)
+);
+
+
+CREATE TABLE Configuration
+(
+    [Configuration_ID] INTEGER PRIMARY KEY AUTOINCREMENT,
+    [Key] VARCHAR(500) NOT NULL,
+    [Value] VARCHAR(1000) NOT NULL,
+    Created_Date DATETIMEOFFSET NOT NULL,
+    Updated_Date DATETIMEOFFSET NOT NULL
 );
 
 -- Insert default tags
