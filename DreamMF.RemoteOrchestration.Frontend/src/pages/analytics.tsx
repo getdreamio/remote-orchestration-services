@@ -60,7 +60,7 @@ const AnalyticsPage: React.FC = () => {
             <h1 className="text-2xl font-semibold">Analytics</h1>
             
             {/* Top Remotes by Usage */}
-            <Card title="Most Used Remotes" className="shadow-sm">
+            <Card title="Most Used Remotes" className="shadow-sm bg-gray-50 dark:bg-gray-800">
                 <div className="h-[400px]">
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={sortedByUsage}>
@@ -85,7 +85,7 @@ const AnalyticsPage: React.FC = () => {
             </Card>
 
             {/* Daily Activity */}
-            <Card title="Daily Activity" className="shadow-sm">
+            <Card title="Daily Activity" className="shadow-sm bg-gray-50 dark:bg-gray-800">
                 <div className="h-[400px]">
                     <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={dailyStats}>
@@ -119,7 +119,7 @@ const AnalyticsPage: React.FC = () => {
             </Card>
 
             {/* Remote Details Table */}
-            <Card title="Remote Analytics Details" className="shadow-sm">
+            <Card title="Remote Analytics Details" className="shadow-sm bg-gray-50 dark:bg-gray-800">
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-border">
                         <thead>

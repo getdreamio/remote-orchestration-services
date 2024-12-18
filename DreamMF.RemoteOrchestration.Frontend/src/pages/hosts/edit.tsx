@@ -86,7 +86,7 @@ const EditHostPage: React.FC = () => {
             <div className="flex items-center gap-4 mb-6">
                 <Title level={4} className="!mb-0">Edit Host: {host.name}</Title>
             </div>
-            <Card>
+            <Card className="bg-gray-50 dark:bg-gray-800">
                 <Tabs activeKey={activeTab} onChange={setActiveTab}>
                     <TabPane tab="General" key="general">
                         <HostForm

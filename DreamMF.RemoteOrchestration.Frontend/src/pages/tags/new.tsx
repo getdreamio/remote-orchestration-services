@@ -23,7 +23,7 @@ const NewTagPage: React.FC = () => {
     return (
         <div className="p-6">
             <Title level={2} className="mb-6">New Tag</Title>
-            <Card className="max-w-2xl">
+            <Card className="max-w-2xl bg-gray-50 dark:bg-gray-800">
                 <Form
                     form={form}
                     layout="vertical"

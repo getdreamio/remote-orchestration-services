@@ -43,7 +43,7 @@ const LoginPage: React.FC = () => {
                     </Text>
                 </div>
 
-                <Card className="mt-8">
+                <Card className="mt-8 bg-gray-50 dark:bg-transparent">
                     <div className="space-y-6">
                         <div className="grid grid-cols-2 gap-3">
                             <button

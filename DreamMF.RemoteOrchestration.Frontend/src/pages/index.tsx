@@ -45,58 +45,37 @@ const DashboardPage: React.FC = () => {
             <Row gutter={[16, 16]}>
                 <Col xs={24} sm={8}>
                     <Card 
-                        hoverable 
-                        className="border-l-4 border-l-blue-500 dark:border-l-blue-400 transition-all hover:scale-[1.02]"
+                        className="border-l-4 border-l-blue-500 dark:border-l-blue-400 bg-gray-50 dark:bg-gray-800"
                         onClick={() => navigate('/hosts')}
                     >
                         <Statistic
-                            title={
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-lg font-semibold">Total Hosts</span>
-                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Active web applications</span>
-                                </div>
-                            }
+                            title={<div className="text-lg font-semibold">Total Hosts</div>}
                             value={hosts?.length || 0}
-                            prefix={<ServerIcon className="h-5 w-5 text-blue-500 dark:text-blue-400" />}
-                            suffix={<ArrowRightIcon className="h-4 w-4 ml-2 opacity-50" />}
+                            prefix={<ServerIcon className="mr-2" />}
                         />
                     </Card>
                 </Col>
                 <Col xs={24} sm={8}>
                     <Card 
-                        hoverable 
-                        className="border-l-4 border-l-purple-500 dark:border-l-purple-400 transition-all hover:scale-[1.02]"
+                        className="border-l-4 border-l-purple-500 dark:border-l-purple-400 bg-gray-50 dark:bg-gray-800"
                         onClick={() => navigate('/tags')}
                     >
                         <Statistic
-                            title={
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-lg font-semibold">Total Tags</span>
-                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Metadata labels in use</span>
-                                </div>
-                            }
+                            title={<div className="text-lg font-semibold">Total Tags</div>}
                             value={tags?.length || 0}
-                            prefix={<TagIcon className="h-5 w-5 text-purple-500 dark:text-purple-400" />}
-                            suffix={<ArrowRightIcon className="h-4 w-4 ml-2 opacity-50" />}
+                            prefix={<TagIcon className="mr-2" />}
                         />
                     </Card>
                 </Col>
                 <Col xs={24} sm={8}>
                     <Card 
-                        hoverable 
-                        className="border-l-4 border-l-green-500 dark:border-l-green-400 transition-all hover:scale-[1.02]"
+                        className="border-l-4 border-l-green-500 dark:border-l-green-400 bg-gray-50 dark:bg-gray-800"
                         onClick={() => navigate('/remotes')}
                     >
                         <Statistic
-                            title={
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-lg font-semibold">Total Remotes</span>
-                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Federated modules deployed</span>
-                                </div>
-                            }
+                            title={<div className="text-lg font-semibold">Total Remotes</div>}
                             value={remotes?.length || 0}
-                            prefix={<DatabaseIcon className="h-5 w-5 text-green-500 dark:text-green-400" />}
-                            suffix={<ArrowRightIcon className="h-4 w-4 ml-2 opacity-50" />}
+                            prefix={<DatabaseIcon className="mr-2" />}
                         />
                     </Card>
                 </Col>
@@ -106,57 +85,41 @@ const DashboardPage: React.FC = () => {
                 <h2 className="text-xl font-semibold mb-4">Analytics Overview</h2>
                 <Row gutter={[16, 16]}>
                     <Col xs={24} sm={8}>
-                        <Card hoverable className="h-full" onClick={() => navigate('/analytics')}>
-                            <div className="flex flex-col gap-4">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-lg font-semibold">System Health</span>
-                                    <BarChart3Icon className="h-5 w-5 text-blue-500" />
-                                </div>
+                        <Card title="System Health" className="h-full bg-gray-50 dark:bg-gray-800">
+                            <div className="space-y-4">
                                 <Progress 
                                     type="circle" 
                                     percent={analyticsData.hostUptime} 
-                                    size={80}
+                                    size="small"
                                     strokeColor={{ '0%': '#108ee9', '100%': '#87d068' }}
                                 />
-                                <div className="text-sm text-muted-foreground dark:text-muted-foreground/70">
-                                    Average uptime across all services
-                                </div>
                             </div>
                         </Card>
                     </Col>
                     <Col xs={24} sm={8}>
-                        <Card hoverable className="h-full" onClick={() => navigate('/analytics')}>
-                            <div className="flex flex-col gap-4">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-lg font-semibold">Remote Usage</span>
-                                    <DatabaseIcon className="h-5 w-5 text-green-500" />
-                                </div>
+                    <Card 
+                        title="Remote Usage"
+                        className="h-full bg-gray-50 dark:bg-gray-800"
+                        extra={<Button type="link" onClick={() => navigate('/analytics')}>View Usage</Button>}>
+                            <div className="space-y-4">
                                 <Statistic
                                     value={analyticsData.totalRequests}
                                     suffix="requests"
                                 />
-                                <div className="text-sm text-muted-foreground dark:text-muted-foreground/70">
-                                    {analyticsData.avgResponseTime}ms average response time
-                                </div>
                             </div>
                         </Card>
                     </Col>
                     <Col xs={24} sm={8}>
-                        <Card hoverable className="h-full" onClick={() => navigate('/analytics')}>
-                            <div className="flex flex-col gap-4">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-lg font-semibold">Error Rate</span>
-                                    <AlertCircleIcon className="h-5 w-5 text-yellow-500" />
-                                </div>
+                        <Card 
+                            title="Error Rate"
+                            className="h-full bg-gray-50 dark:bg-gray-800"
+                            extra={<Button type="link" onClick={() => navigate('/analytics')}>View Analytics</Button>}>
+                            <div className="space-y-4">
                                 <Progress
                                     percent={analyticsData.errorRate}
                                     size="small"
-                                    status="exception"
                                     strokeColor="#f5222d"
                                 />
-                                <div className="text-sm text-muted-foreground dark:text-muted-foreground/70">
-                                    Across all services in last 24h
-                                </div>
                             </div>
                         </Card>
                     </Col>
@@ -164,13 +127,12 @@ const DashboardPage: React.FC = () => {
             </div>
 
             <div className="mt-8">
-                <h2 className="text-xl font-semibold mb-4">System Logs</h2>
+                <h2 className="text-xl font-semibold mb-4">System Logging</h2>
                 <Row gutter={[16, 16]}>
                     <Col xs={24}>
                         <Card 
-                            hoverable 
-                            className="h-full"
-                            onClick={() => navigate('/logging')}
+                            title="Recent Logs"
+                            className="h-full bg-gray-50 dark:bg-gray-800"
                             extra={<Button type="link" onClick={() => navigate('/logging')}>View All Logs</Button>}
                         >
                             <div className="space-y-4">
@@ -198,7 +160,7 @@ const DashboardPage: React.FC = () => {
                         <Card
                             title="Recent Hosts"
                             extra={<Button type="link" onClick={() => navigate('/hosts')}>View All</Button>}
-                            className="h-full"
+                            className="h-full bg-gray-50 dark:bg-gray-800"
                         >
                             <div className="space-y-3">
                                 {hosts?.slice(0, 3).map((host, i) => (
@@ -221,11 +183,11 @@ const DashboardPage: React.FC = () => {
                         <Card
                             title="Recent Tags"
                             extra={<Button type="link" onClick={() => navigate('/tags')}>View All</Button>}
-                            className="h-full"
+                            className="h-full bg-gray-50 dark:bg-gray-800"
                         >
                             <div className="space-y-3">
                                 {tags?.slice(0, 3).map((tag, i) => (
-                                    <div key={i} className="flex flex-col gap-1 p-2 rounded-md hover:bg-muted/50 cursor-pointer" onClick={() => navigate('/tags')}>
+                                    <div key={i} className="flex flex-col gap-1 p-2 rounded-md hover:bg-muted/50">
                                         <div className="flex items-center gap-2">
                                             <TagIcon className="h-4 w-4 text-purple-500 dark:text-purple-400" />
                                             <span className="font-medium">{tag.text}</span>
@@ -244,7 +206,7 @@ const DashboardPage: React.FC = () => {
                         <Card
                             title="Recent Remotes"
                             extra={<Button type="link" onClick={() => navigate('/remotes')}>View All</Button>}
-                            className="h-full"
+                            className="h-full bg-gray-50 dark:bg-gray-800"
                         >
                             <div className="space-y-3">
                                 {remotes?.slice(0, 3).map((remote, i) => (

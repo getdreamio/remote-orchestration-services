@@ -59,13 +59,13 @@ const SettingsPage = () => {
                     </div>
                 )}
 
-            <Card className='mb-4'>
+            <Card className='mb-4 bg-gray-50 dark:bg-gray-800'>
                 <DatabaseSettingsForm 
                     configurations={configurations}
                     onSave={handleSave}
                 />
             </Card>
-            <Card>
+            <Card className='bg-gray-50 dark:bg-gray-800'>
                 <StorageSettingsForm 
                     configurations={configurations}
                     onSave={handleSave}
