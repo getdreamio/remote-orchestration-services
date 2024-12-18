@@ -98,15 +98,6 @@ const EditTagPage: React.FC = () => {
                             <Input placeholder="e.g., environment" />
                         </Form.Item>
 
-                        <Form.Item
-                            label="Value"
-                            name="value"
-                            rules={[{ required: true, message: 'Please input the tag value!' }]}
-                            tooltip="The value assigned to this tag"
-                        >
-                            <Input placeholder="e.g., production" />
-                        </Form.Item>
-
                         <Form.Item className="mb-0 flex justify-end">
                             <Button className="mr-2" onClick={() => navigate('/tags')}>
                                 Cancel
