@@ -1,77 +1,68 @@
 import React from 'react';
-import { Card, Form, Input, Button, Switch, Divider, message } from 'antd';
-import { SaveOutlined } from '@ant-design/icons';
+import { Card, Tabs } from 'antd';
+import { Settings as SettingsIcon, Database, HardDrive } from 'lucide-react';
+import { useConfigurations, useUpdateConfiguration, useCreateConfiguration } from '@/hooks/useConfigurations';
+import { DatabaseSettingsForm } from '@/components/settings/database-settings-form';
+import { StorageSettingsForm } from '@/components/settings/storage-settings-form';
+
+const { TabPane } = Tabs;
 
 const SettingsPage: React.FC = () => {
-    const [form] = Form.useForm();
+    const { data: configurations, isLoading } = useConfigurations();
+    const { mutate: updateConfiguration } = useUpdateConfiguration();
+    const { mutate: createConfiguration } = useCreateConfiguration();
 
-    const onFinish = (values: any) => {
-        console.log('Settings saved:', values);
-        message.success('Settings saved successfully');
+    const handleSave = async (key: string, value: string) => {
+        const config = configurations?.find(c => c.key === key);
+        if (config) {
+            updateConfiguration({ id: config.id, key, value });
+        } else {
+            createConfiguration({ key, value });
+        }
     };
 
+    if (isLoading) {
+        return <div className="p-6">Loading...</div>;
+    }
+
     return (
-        <div>
-            <h1 className="text-2xl font-bold">Settings</h1>
-            
-            <Card>
-                <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={onFinish}
-                    initialValues={{
-                        defaultPort: 22,
-                        enableNotifications: true,
-                        autoRefresh: false,
-                    }}
+        <div className="max-w-6xl mx-auto p-6">
+            <div className="flex items-center gap-3 mb-6">
+                <SettingsIcon className="h-8 w-8 text-gray-500" />
+                <h1 className="text-2xl font-semibold">Settings</h1>
+            </div>
+
+            <Tabs defaultActiveKey="database" className="settings-tabs">
+                <TabPane
+                    tab={
+                        <span className="flex items-center gap-2">
+                            <Database className="h-4 w-4" />
+                            Database
+                        </span>
+                    }
+                    key="database"
                 >
-                    <h2 className="text-lg font-medium mb-4">General Settings</h2>
-                    
-                    <Form.Item
-                        label="Default SSH Port"
-                        name="defaultPort"
-                        rules={[{ required: true, message: 'Please input the default SSH port!' }]}
-                    >
-                        <Input type="number" style={{ maxWidth: 200 }} />
-                    </Form.Item>
+                    <DatabaseSettingsForm
+                        configurations={configurations}
+                        onSave={handleSave}
+                    />
+                </TabPane>
 
-                    <Form.Item
-                        label="Enable Notifications"
-                        name="enableNotifications"
-                        valuePropName="checked"
-                    >
-                        <Switch />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="Auto Refresh Data"
-                        name="autoRefresh"
-                        valuePropName="checked"
-                        extra="Automatically refresh data every 30 seconds"
-                    >
-                        <Switch />
-                    </Form.Item>
-
-                    <Divider />
-
-                    <h2 className="text-lg font-medium mb-4">API Configuration</h2>
-
-                    <Form.Item
-                        label="API Base URL"
-                        name="apiBaseUrl"
-                        initialValue={process.env.BACKEND_URL}
-                        extra="Changes will take effect after restart"
-                    >
-                        <Input style={{ maxWidth: 400 }} />
-                    </Form.Item>
-
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
-                            Save Settings
-                        </Button>
-                    </Form.Item>
-                </Form>
-            </Card>
+                <TabPane
+                    tab={
+                        <span className="flex items-center gap-2">
+                            <HardDrive className="h-4 w-4" />
+                            Storage
+                        </span>
+                    }
+                    key="storage"
+                >
+                    <StorageSettingsForm
+                        configurations={configurations}
+                        onSave={handleSave}
+                    />
+                </TabPane>
+            </Tabs>
         </div>
     );
 };

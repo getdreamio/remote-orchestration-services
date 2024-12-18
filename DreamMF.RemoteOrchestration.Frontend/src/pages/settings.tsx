@@ -12,6 +12,9 @@ import {
     AWS_BUCKET_KEY_KEY 
 } from '../hooks/useConfigurations';
 import { SettingsCard } from '../components/settings/settings-card';
+import { StorageSettingsForm } from '../components/settings/storage-settings-form';
+import { DatabaseSettingsForm } from '../components/settings/database-settings-form';
+import { Card } from 'antd';
 
 const SettingsPage = () => {
     const { data: configurations, isLoading } = useConfigurations();
@@ -35,97 +38,39 @@ const SettingsPage = () => {
         }
     };
 
-    const storageType = getConfigValue(STORAGE_TYPE_KEY) as StorageType;
-
     if (isLoading) {
         return <div className="p-6">Loading...</div>;
     }
 
     return (
-        <div className="max-w-4xl mx-auto p-6 space-y-6">
-            <SettingsCard title="Storage Configuration">
-                <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Storage Type
-                        </label>
-                        <select
-                            className="w-full px-3 py-2 border rounded-md bg-background"
-                            value={storageType}
-                            onChange={(e) => handleSave(STORAGE_TYPE_KEY, e.target.value)}
-                        >
-                            <option value="AzureBlobStorage">Azure Blob Storage</option>
-                            <option value="AwsS3Bucket">AWS S3 Bucket</option>
-                        </select>
-                    </div>
-                </div>
-            </SettingsCard>
 
-            {storageType === 'AzureBlobStorage' && (
-                <SettingsCard title="Azure Blob Storage Settings">
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">
-                                Container Name
-                            </label>
-                            <input
-                                type="text"
-                                className="w-full px-3 py-2 border rounded-md bg-background"
-                                value={getConfigValue(AZURE_CONTAINER_NAME_KEY)}
-                                onChange={(e) => handleSave(AZURE_CONTAINER_NAME_KEY, e.target.value)}
-                                placeholder="Enter container name"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">
-                                Blob Name
-                            </label>
-                            <input
-                                type="text"
-                                className="w-full px-3 py-2 border rounded-md bg-background"
-                                value={getConfigValue(AZURE_BLOB_NAME_KEY)}
-                                onChange={(e) => handleSave(AZURE_BLOB_NAME_KEY, e.target.value)}
-                                placeholder="Enter blob name"
-                            />
-                        </div>
-                    </div>
-                </SettingsCard>
-            )}
-
-            {storageType === 'AwsS3Bucket' && (
-                <SettingsCard title="AWS S3 Bucket Settings">
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">
-                                Bucket Name
-                            </label>
-                            <input
-                                type="text"
-                                className="w-full px-3 py-2 border rounded-md bg-background"
-                                value={getConfigValue(AWS_BUCKET_NAME_KEY)}
-                                onChange={(e) => handleSave(AWS_BUCKET_NAME_KEY, e.target.value)}
-                                placeholder="Enter bucket name"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">
-                                Bucket Key
-                            </label>
-                            <input
-                                type="text"
-                                className="w-full px-3 py-2 border rounded-md bg-background"
-                                value={getConfigValue(AWS_BUCKET_KEY_KEY)}
-                                onChange={(e) => handleSave(AWS_BUCKET_KEY_KEY, e.target.value)}
-                                placeholder="Enter bucket key"
-                            />
-                        </div>
-                    </div>
-                </SettingsCard>
-            )}
+        <div>
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold">Configuration</h1>
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                <p>Note: Make sure to keep your storage credentials secure. Changes to storage settings will take effect immediately.</p>
+                <p>Note: Changes to database settings will require a restart of the application to take effect. Make sure your database server is properly configured and accessible.</p>
+            </div>
 
             {(isUpdating || isCreating) && (
-                <div className="text-sm text-muted-foreground">Saving changes...</div>
-            )}
+                    <div className="fixed bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-md shadow-lg">
+                        Saving changes...
+                    </div>
+                )}
+
+            <Card className='mb-4'>
+                <DatabaseSettingsForm 
+                    configurations={configurations}
+                    onSave={handleSave}
+                />
+            </Card>
+            <Card>
+                <StorageSettingsForm 
+                    configurations={configurations}
+                    onSave={handleSave}
+                />
+            </Card>
         </div>
     );
 }

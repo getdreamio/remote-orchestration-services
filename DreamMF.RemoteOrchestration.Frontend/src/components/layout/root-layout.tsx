@@ -32,7 +32,7 @@ const RootLayout = () => {
                                 to="/"
                                 className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50"
                             >
-                                <LayoutDashboard className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+                                <LayoutDashboard className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                                 <div className="flex flex-col">
                                     <span>Dashboard</span>
                                     <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Summary of organization</span>
