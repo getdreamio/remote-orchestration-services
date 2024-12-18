@@ -225,6 +225,9 @@ const EditRemotePage: React.FC = () => {
                             </div>
                         </Form>
                     </TabPane>
+                    <TabPane tab="Sub-Remotes" key="remotes">
+                        Coming soon....
+                    </TabPane>
                     <TabPane tab="Versions" key="versions">
                         <Table
                             rowSelection={rowSelection}

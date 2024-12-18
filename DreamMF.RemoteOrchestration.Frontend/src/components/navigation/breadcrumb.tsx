@@ -11,6 +11,19 @@ const routeLabels: Record<string, string> = {
     'analytics': 'Analytics',
 };
 
+const getSegmentLabel = (segment: string, index: number, segments: string[]): string => {
+    if (routeLabels[segment]) return routeLabels[segment];
+    
+    // If it's a number and follows 'remotes' or 'hosts', treat it as an ID
+    if (!isNaN(Number(segment)) && index > 0) {
+        const previousSegment = segments[index - 1];
+        if (previousSegment === 'remotes') return 'Remote Details';
+        if (previousSegment === 'hosts') return 'Host Details';
+    }
+    
+    return segment;
+};
+
 export function Breadcrumb() {
     const location = useLocation();
     const pathSegments = location.pathname.split('/').filter(Boolean);
@@ -26,7 +39,7 @@ export function Breadcrumb() {
             {pathSegments.map((segment, index) => {
                 const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
                 const isLast = index === pathSegments.length - 1;
-                const label = routeLabels[segment] || segment;
+                const label = getSegmentLabel(segment, index, pathSegments);
 
                 return (
                     <div key={path} className="flex items-center">

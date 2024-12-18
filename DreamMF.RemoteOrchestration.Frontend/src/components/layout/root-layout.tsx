@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Settings, Users, Server, Database, Tag, BarChart, Shield, ToggleLeft, ScrollText } from 'lucide-react';
+import { LayoutDashboard, Settings, Users, Server, Database, Tag, BarChart, Shield, ToggleLeft, ScrollText, Network } from 'lucide-react';
 import { ThemeToggle } from '../theme/theme-toggle';
 import { UserMenu } from '../user/user-menu';
 import { Breadcrumb } from '../navigation/breadcrumb';
@@ -22,7 +22,7 @@ const RootLayout = () => {
                                     <img src="/favicon-32x32.png" alt="Dream.MF Logo" className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-semibold leading-tight">Dream.MF</h2>
+                                    <h2 className="text-lg leading-tight">Dream.MF [ROS]</h2>
                                     <p className="text-xs text-muted-foreground">Remote Orchestration Services</p>
                                 </div>
                             </div>
@@ -30,75 +30,109 @@ const RootLayout = () => {
                         <nav className="flex-1 p-4 space-y-2">
                             <Link
                                 to="/"
-                                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50"
                             >
-                                <LayoutDashboard className="h-5 w-5" />
-                                <span>Dashboard</span>
+                                <LayoutDashboard className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+                                <div className="flex flex-col">
+                                    <span>Dashboard</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Summary of organization</span>
+                                </div>
                             </Link>
                             <Link
                                 to="/hosts"
-                                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50"
                             >
-                                <Server className="h-5 w-5" />
-                                <span>Hosts</span>
+                                <Server className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+                                <div className="flex flex-col">
+                                    <span>Hosts</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Your web applications</span>
+                                </div>
                             </Link>
                             <Link
                                 to="/remotes"
-                                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50"
                             >
-                                <Database className="h-5 w-5" />
-                                <span>Remotes</span>
+                                <Database className="h-5 w-5 text-green-500 dark:text-green-400" />
+                                <div className="flex flex-col">
+                                    <span>Remotes</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Your federated modules</span>
+                                </div>
                             </Link>
                             <Link
                                 to="/tags"
-                                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50"
                             >
-                                <Tag className="h-5 w-5" />
-                                <span>Tagging</span>
+                                <Tag className="h-5 w-5 text-purple-500 dark:text-purple-400" />
+                                <div className="flex flex-col">
+                                    <span>Tagging</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Metadata about hosts and remotes</span>
+                                </div>
                             </Link>
-                            <hr className="my-2 border-border" />
                             <div
-                                className="flex items-center space-x-3 p-2 rounded-lg text-muted-foreground cursor-not-allowed"
-                                title="Coming in 1.1"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 cursor-not-allowed opacity-50"
                             >
-                                <Shield className="h-5 w-5" />
-                                <span>Access Control</span>
-                            </div>
-                            <div
-                                className="flex items-center space-x-3 p-2 rounded-lg text-muted-foreground cursor-not-allowed"
-                                title="Coming in 1.1"
-                            >
-                                <ToggleLeft className="h-5 w-5" />
-                                <span>Feature Toggles</span>
-                            </div>
-                            <div
-                                className="flex items-center space-x-3 p-2 rounded-lg text-muted-foreground cursor-not-allowed"
-                                title="Coming in 1.1"
-                            >
-                                <ScrollText className="h-5 w-5" />
-                                <span>Logging</span>
+                                <Network className="h-5 w-5 text-orange-500 dark:text-orange-400" />
+                                <div className="flex flex-col">
+                                    <span>Relationships</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">How all hosts and remotes are related</span>
+                                </div>
                             </div>
                             <hr className="my-2 border-border" />
                             <div
-                                className="flex items-center space-x-3 p-2 rounded-lg text-muted-foreground cursor-not-allowed"
-                                title="Coming in 1.1"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 cursor-not-allowed opacity-50"
                             >
-                                <BarChart className="h-5 w-5" />
-                                <span>Analytics</span>
+                                <Shield className="h-5 w-5 text-red-500 dark:text-red-400" />
+                                <div className="flex flex-col">
+                                    <span>Access Control</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Permissions for using remotes</span>
+                                </div>
                             </div>
                             <div
-                                className="flex items-center space-x-3 p-2 rounded-lg text-muted-foreground cursor-not-allowed"
-                                title="Coming in 1.1"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 cursor-not-allowed opacity-50"
                             >
-                                <Users className="h-5 w-5" />
-                                <span>User Management</span>
+                                <ToggleLeft className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
+                                <div className="flex flex-col">
+                                    <span>Feature Toggles</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Enable/Disable remote features</span>
+                                </div>
+                            </div>
+                            <div
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 cursor-not-allowed opacity-50"
+                            >
+                                <ScrollText className="h-5 w-5 text-indigo-500 dark:text-indigo-400" />
+                                <div className="flex flex-col">
+                                    <span>Logging</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">See info and errors within your modules</span>
+                                </div>
+                            </div>
+                            <hr className="my-2 border-border" />
+                            <div
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 cursor-not-allowed opacity-50"
+                            >
+                                <BarChart className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+                                <div className="flex flex-col">
+                                    <span>Usage & Analytics</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Usage and activity for hosts and remotes</span>
+                                </div>
+                            </div>
+                            <div
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 cursor-not-allowed opacity-50"
+                            >
+                                <Users className="h-5 w-5 text-violet-500 dark:text-violet-400" />
+                                <div className="flex flex-col">
+                                    <span>User Management</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">User access and permissions within ROS</span>
+                                </div>
                             </div>
                             <Link
                                 to="/settings"
-                                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50"
                             >
-                                <Settings className="h-5 w-5" />
-                                <span>Settings</span>
+                                <Settings className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                                <div className="flex flex-col">
+                                    <span>Configuration</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Storage and database settings</span>
+                                </div>
                             </Link>
                         </nav>
                         <div className="p-4 text-xs text-muted-foreground border-t">
