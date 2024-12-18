@@ -20,7 +20,7 @@ interface HostRequest {
 }
 
 const fetchHosts = async (): Promise<Host[]> => {
-    const response = await fetch(`${config.backendUrl}/hosts`);
+    const response = await fetch(`${config.backendUrl}/api/hosts`);
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -28,7 +28,7 @@ const fetchHosts = async (): Promise<Host[]> => {
 };
 
 const fetchHost = async (id: number): Promise<Host> => {
-    const response = await fetch(`${config.backendUrl}/hosts/${id}`);
+    const response = await fetch(`${config.backendUrl}/api/hosts/${id}`);
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -52,10 +52,10 @@ export const useGetHost = (id: number) => {
 
 export const useCreateHost = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: async (host: HostRequest) => {
-            const response = await fetch(`${config.backendUrl}/hosts`, {
+            const response = await fetch(`${config.backendUrl}/api/hosts`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -75,10 +75,10 @@ export const useCreateHost = () => {
 
 export const useUpdateHost = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: async ({ id, host }: { id: number; host: HostRequest }) => {
-            const response = await fetch(`${config.backendUrl}/hosts/${id}`, {
+            const response = await fetch(`${config.backendUrl}/api/hosts/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -97,10 +97,10 @@ export const useUpdateHost = () => {
 
 export const useDeleteHost = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: async (id: number) => {
-            const response = await fetch(`${config.backendUrl}/hosts/${id}`, {
+            const response = await fetch(`${config.backendUrl}/api/hosts/${id}`, {
                 method: 'DELETE',
             });
             if (!response.ok) {
