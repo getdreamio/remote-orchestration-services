@@ -86,5 +86,6 @@ app.MapIndexRoutes();
 app.MapHealthRoutes();
 app.MapRemoteRoutes();
 app.MapHostRoutes();
+app.MapTagRoutes();
 
 app.Run();

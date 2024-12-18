@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { config } from '@/config/env';
 
 interface Host {
-    host_ID: number;
+    id: number;
     name: string;
     description: string;
     url: string;

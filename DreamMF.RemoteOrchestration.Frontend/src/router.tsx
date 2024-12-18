@@ -14,9 +14,7 @@ import AnalyticsPage from './pages/analytics';
 import NotFoundPage from './pages/not-found';
 import LoginPage from './pages/auth/login';
 import LogoutPage from './pages/auth/logout';
-import TagPage from './pages/tags/index';
-import NewTagPage from './pages/tags/new';
-import EditTagPage from './pages/tags/edit';
+import TagsPage from './pages/tags';
 import ErrorDisplay from './components/error/error-display';
 
 export const router = createBrowserRouter([
@@ -36,8 +34,9 @@ export const router = createBrowserRouter([
         errorElement: <ErrorDisplay message="An unexpected error occurred" />,
         children: [
             {
-                index: true,
+                path: '/',
                 element: <DashboardPage />,
+                errorElement: <ErrorDisplay message="Error loading dashboard" />,
             },
             {
                 path: 'remotes',
@@ -65,15 +64,8 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'tags',
-                element: <TagPage />,
-            },
-            {
-                path: 'tags/new',
-                element: <NewTagPage />,
-            },
-            {
-                path: 'tags/:id',
-                element: <EditTagPage />,
+                element: <TagsPage />,
+                errorElement: <ErrorDisplay message="Error loading tags" />,
             },
             {
                 path: 'users',

@@ -2,5 +2,6 @@ namespace DreamMF.RemoteOrchestration.Core.Models;
 
 public class TagRequest
 {
-    public string Text { get; set; } = string.Empty;
+    public string Key { get; set; } = string.Empty;
+    public string Value { get; set; } = string.Empty;
 }

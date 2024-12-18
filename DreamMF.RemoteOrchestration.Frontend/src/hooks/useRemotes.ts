@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { config } from '@/config/env';
 
 interface Remote {
-    remote_ID: number;
+    id: number;
     name: string;
     storageType: string;
     configuration: string;

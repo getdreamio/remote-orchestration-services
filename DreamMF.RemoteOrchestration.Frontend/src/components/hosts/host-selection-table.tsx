@@ -5,7 +5,7 @@ import { useHosts } from '@/hooks/useHosts';
 import { formatDate } from '@/lib/date-utils';
 
 interface Host {
-    host_ID: number;
+    id: number;
     name: string;
     description: string;
     url: string;
@@ -81,7 +81,7 @@ export function HostSelectionTable({ selectedHostIds, onSelectionChange }: HostS
             rowSelection={rowSelection}
             columns={columns}
             dataSource={hosts}
-            rowKey="host_ID"
+            rowKey="id"
             loading={isLoading}
             size="middle"
             pagination={{ pageSize: 5 }}

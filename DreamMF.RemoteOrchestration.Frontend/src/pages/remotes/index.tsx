@@ -43,13 +43,13 @@ const RemotesPage: React.FC = () => {
                     <Button
                         type="link"
                         icon={<EditOutlined />}
-                        onClick={() => navigate(`/remotes/${record.remote_ID}/edit`)}
+                        onClick={() => navigate(`/remotes/${record.id}/edit`)}
                     >
                         Edit
                     </Button>
                     <Popconfirm
                         title="Are you sure you want to delete this remote?"
-                        onConfirm={() => handleDelete(record.remote_ID)}
+                        onConfirm={() => handleDelete(record.id)}
                         okText="Yes"
                         cancelText="No"
                     >
@@ -78,7 +78,7 @@ const RemotesPage: React.FC = () => {
                 columns={columns}
                 dataSource={remotes}
                 loading={isLoading}
-                rowKey="remote_ID"
+                rowKey="id"
             />
         </div>
     );

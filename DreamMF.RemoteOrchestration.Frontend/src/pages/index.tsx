@@ -53,8 +53,8 @@ const DashboardPage: React.FC = () => {
                             extra={<a href="/hosts">View All</a>}
                         >
                             <div className="space-y-2">
-                                {hosts?.slice(0, 3).map((host) => (
-                                    <div key={host.host_ID} className="flex flex-col gap-1">
+                                {hosts?.slice(0, 3).map((host, i) => (
+                                    <div key={i} className="flex flex-col gap-1">
                                         <div className="flex items-center gap-2">
                                             <ServerIcon className="h-4 w-4" />
                                             <span>{host.name}</span>
@@ -75,8 +75,8 @@ const DashboardPage: React.FC = () => {
                             extra={<a href="/tags">View All</a>}
                         >
                             <div className="space-y-2">
-                                {tags?.slice(0, 3).map((tag) => (
-                                    <div key={tag.tag_ID} className="flex flex-col gap-1">
+                                {tags?.slice(0, 3).map((tag, i) => (
+                                    <div key={i} className="flex flex-col gap-1">
                                         <div className="flex items-center gap-2">
                                             <TagIcon className="h-4 w-4" />
                                             <span>{tag.text}</span>
@@ -97,8 +97,8 @@ const DashboardPage: React.FC = () => {
                             extra={<a href="/remotes">View All</a>}
                         >
                             <div className="space-y-2">
-                                {remotes?.slice(0, 3).map((remote) => (
-                                    <div key={remote.remote_ID} className="flex flex-col gap-1">
+                                {remotes?.slice(0, 3).map((remote, i) => (
+                                    <div key={i} className="flex flex-col gap-1">
                                         <div className="flex items-center gap-2">
                                             <DatabaseIcon className="h-4 w-4" />
                                             <span>{remote.name}</span>

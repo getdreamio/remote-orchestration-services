@@ -12,7 +12,7 @@ const HostsPage: React.FC = () => {
     const deleteHost = useDeleteHost();
 
     const handleEdit = (host: any) => {
-        navigate(`/hosts/${host.host_ID}`);
+        navigate(`/hosts/${host.id}`);
     };
 
     const handleDelete = async (id: number) => {
@@ -124,7 +124,7 @@ const HostsPage: React.FC = () => {
                         type="text"
                         danger
                         icon={<DeleteOutlined />}
-                        onClick={() => handleDelete(record.host_ID)}
+                        onClick={() => handleDelete(record.id)}
                     />
                 </div>
             ),
@@ -147,7 +147,7 @@ const HostsPage: React.FC = () => {
                 columns={columns}
                 dataSource={hosts}
                 loading={isLoading}
-                rowKey="host_ID"
+                rowKey="id"
             />
         </div>
     );
