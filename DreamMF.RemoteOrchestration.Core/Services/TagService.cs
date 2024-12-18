@@ -76,8 +76,6 @@ public class TagService
             var existingTag = await _dbContext.Tags.FindAsync(id);
             if (existingTag == null) return false;
 
-            existingTag.Text = request.Text;
-
             await _dbContext.SaveChangesAsync();
             return true;
         }
