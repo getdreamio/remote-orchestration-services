@@ -105,6 +105,11 @@ const EditHostPage: React.FC = () => {
                             }}
                         />
                     </TabPane>
+                    <TabPane tab="Remotes" key="remotes">
+                        <div className="py-4">
+                            Coming soon...
+                        </div>
+                    </TabPane>
                     <TabPane tab="Versions" key="versions">
                         <div className="py-4">
                             <Table

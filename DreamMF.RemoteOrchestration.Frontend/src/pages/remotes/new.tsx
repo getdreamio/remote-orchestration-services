@@ -145,14 +145,6 @@ const NewRemotePage: React.FC = () => {
                                 <Input disabled placeholder="URL will be generated on the backend" />
                             </Form.Item>
 
-                            <Form.Item label="Tags">
-                                <TagInput
-                                    tags={tags}
-                                    onChange={setTags}
-                                    existingTags={formattedExistingTags}
-                                />
-                            </Form.Item>
-
                             <div className="space-y-2">
                                 <label className="block">Modules</label>
                                 <div className="flex gap-2">
@@ -191,6 +183,14 @@ const NewRemotePage: React.FC = () => {
                                 </div>
                             </div>
 
+                            <Form.Item label="Tags">
+                                <TagInput
+                                    tags={tags}
+                                    onChange={setTags}
+                                    existingTags={formattedExistingTags}
+                                />
+                            </Form.Item>
+
                             <div className="flex justify-end space-x-2 pt-4">
                                 <Button onClick={() => navigate('/remotes')}>
                                     Cancel
@@ -200,15 +200,6 @@ const NewRemotePage: React.FC = () => {
                                 </Button>
                             </div>
                         </Form>
-                    </TabPane>
-                    <TabPane tab="Versions" key="versions">
-                        <Table
-                            rowSelection={rowSelection}
-                            columns={columns}
-                            dataSource={versions}
-                            rowKey="id"
-                            pagination={false}
-                        />
                     </TabPane>
                 </Tabs>
             </Card>

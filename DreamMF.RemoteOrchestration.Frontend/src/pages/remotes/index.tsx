@@ -43,7 +43,7 @@ const RemotesPage: React.FC = () => {
                     <Button
                         type="link"
                         icon={<EditOutlined />}
-                        onClick={() => navigate(`/remotes/${record.id}/edit`)}
+                        onClick={() => navigate(`/remotes/${record.id}`)}
                     >
                         Edit
                     </Button>

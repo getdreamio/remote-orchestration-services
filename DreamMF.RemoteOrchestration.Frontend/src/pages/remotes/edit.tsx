@@ -167,14 +167,6 @@ const EditRemotePage: React.FC = () => {
                                 <Input value={remote?.url} disabled />
                             </Form.Item>
 
-                            <Form.Item label="Tags">
-                                <TagInput
-                                    tags={tags}
-                                    onChange={setTags}
-                                    existingTags={formattedExistingTags}
-                                />
-                            </Form.Item>
-
                             <div className="space-y-2">
                                 <label className="block">Modules</label>
                                 <div className="flex gap-2">
@@ -212,6 +204,14 @@ const EditRemotePage: React.FC = () => {
                                     ))}
                                 </div>
                             </div>
+
+                            <Form.Item label="Tags">
+                                <TagInput
+                                    tags={tags}
+                                    onChange={setTags}
+                                    existingTags={formattedExistingTags}
+                                />
+                            </Form.Item>
 
                             <div className="flex justify-end space-x-2 pt-4">
                                 <Button onClick={() => navigate('/remotes')}>

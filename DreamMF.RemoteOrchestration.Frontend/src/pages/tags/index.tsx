@@ -38,7 +38,7 @@ const TagsPage: React.FC = () => {
                     <Button
                         type="link"
                         icon={<EditOutlined />}
-                        onClick={() => navigate(`/tags/${record.tag_ID}/edit`)}
+                        onClick={() => navigate(`/tags/${record.tag_ID}`)}
                     >
                         Edit
                     </Button>
