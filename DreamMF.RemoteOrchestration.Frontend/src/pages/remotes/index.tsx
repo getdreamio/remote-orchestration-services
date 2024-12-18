@@ -1,17 +1,26 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Table, Popconfirm, message } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useRemotes, useDeleteRemote, useRemoteModuleCounts } from '@/hooks/useRemotes';
+import { Card, Typography, Table, Button, Tag, Tooltip, Popconfirm } from 'antd';
+import { 
+    PlusOutlined, 
+    EditOutlined, 
+    DeleteOutlined, 
+    DesktopOutlined, 
+    AppstoreOutlined,
+    BranchesOutlined 
+} from '@ant-design/icons';
+import { useRemotes, useDeleteRemote, useRemoteModuleCounts, useRemoteSubRemoteCounts } from '@/hooks/useRemotes';
 import { useRemoteHostCounts } from '@/hooks/useHosts';
 import { formatDate } from '@/lib/date-utils';
-import { useRemoteSubRemoteCounts } from '@/hooks/useRemotes';
+
+const { Title } = Typography;
 
 interface Remote {
     id: number;
     name: string;
     storageType: string;
     created_Date: string;
+    updated_Date: string;
 }
 
 const RemotesPage: React.FC = () => {
@@ -25,9 +34,8 @@ const RemotesPage: React.FC = () => {
     const handleDelete = async (id: number) => {
         try {
             await deleteRemote.mutateAsync(id);
-            message.success('Remote deleted successfully');
         } catch (error) {
-            message.error('Failed to delete remote');
+            console.error('Failed to delete remote:', error);
         }
     };
 
@@ -36,61 +44,110 @@ const RemotesPage: React.FC = () => {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
+            render: (text: string) => <span className="font-medium">{text}</span>,
+            sorter: (a: Remote, b: Remote) => a.name.localeCompare(b.name),
+        },
+        {
+            title: 'Scope',
+            dataIndex: 'scope',
+            key: 'scope',
+            render: (scope: string) => <Tag>{scope}</Tag>,
+            filters: [
+                { text: 'Global', value: 'global' },
+                { text: 'Local', value: 'local' },
+            ],
+            onFilter: (value: string | number | boolean, record: Remote) =>
+                record.scope.toLowerCase() === value.toString().toLowerCase(),
         },
         {
             title: 'Modules',
             key: 'modules',
-            render: (_: any, record: any) => {
+            render: (_: any, record: Remote) => {
                 const count = moduleCounts?.find(mc => mc.remoteId === record.id)?.count || 0;
                 return (
-                    <span>{count}</span>
+                    <Tooltip title={`${count} module${count === 1 ? '' : 's'}`}>
+                        <div className="flex items-center gap-1">
+                            <AppstoreOutlined />
+                            <span>{count}</span>
+                        </div>
+                    </Tooltip>
                 );
+            },
+            sorter: (a: Remote, b: Remote) => {
+                const countA = moduleCounts?.find(mc => mc.remoteId === a.id)?.count || 0;
+                const countB = moduleCounts?.find(mc => mc.remoteId === b.id)?.count || 0;
+                return countA - countB;
             },
         },
         {
             title: 'Sub-Remotes',
             key: 'subRemotes',
-            render: (_: any, record: any) => {
+            render: (_: any, record: Remote) => {
                 const count = subRemoteCounts?.find(src => src.remoteId === record.id)?.count || 0;
                 return (
-                    <span>{count}</span>
+                    <Tooltip title={`${count} sub-remote${count === 1 ? '' : 's'}`}>
+                        <div className="flex items-center gap-1">
+                            <BranchesOutlined />
+                            <span>{count}</span>
+                        </div>
+                    </Tooltip>
                 );
+            },
+            sorter: (a: Remote, b: Remote) => {
+                const countA = subRemoteCounts?.find(src => src.remoteId === a.id)?.count || 0;
+                const countB = subRemoteCounts?.find(src => src.remoteId === b.id)?.count || 0;
+                return countA - countB;
             },
         },
         {
             title: 'Hosts',
             key: 'hosts',
-            render: (_: any, record: any) => {
+            render: (_: any, record: Remote) => {
                 const count = hostCounts?.find(hc => hc.remoteId === record.id)?.count || 0;
                 return (
-                    <span>{count}</span>
+                    <Tooltip title={`${count} host${count === 1 ? '' : 's'}`}>
+                        <div className="flex items-center gap-1">
+                            <DesktopOutlined />
+                            <span>{count}</span>
+                        </div>
+                    </Tooltip>
                 );
             },
-        },
-        {
-            title: 'Created Date',
-            dataIndex: 'created_Date',
-            key: 'created_Date',
-            render: (date: string) => new Date(date).toLocaleDateString(),
+            sorter: (a: Remote, b: Remote) => {
+                const countA = hostCounts?.find(hc => hc.remoteId === a.id)?.count || 0;
+                const countB = hostCounts?.find(hc => hc.remoteId === b.id)?.count || 0;
+                return countA - countB;
+            },
         },
         {
             title: 'Last Updated',
             dataIndex: 'updated_Date',
             key: 'updated_Date',
-            render: (date: string) => new Date(date).toLocaleDateString(),
+            render: (date: string) => formatDate(date),
+            sorter: (a: Remote, b: Remote) => {
+                if (!a.updated_Date || !b.updated_Date) return 0;
+                return new Date(a.updated_Date).getTime() - new Date(b.updated_Date).getTime();
+            },
         },
         {
             title: 'Actions',
             key: 'actions',
             render: (_: any, record: Remote) => (
                 <span onClick={(e) => e.stopPropagation()}>
+                    <Button
+                        type="text"
+                        icon={<EditOutlined />}
+                        onClick={() => navigate(`/remotes/${record.id}`)}
+                    >
+                        Edit
+                    </Button>
                     <Popconfirm
                         title="Are you sure you want to delete this remote?"
                         onConfirm={() => handleDelete(record.id)}
                         okText="Yes"
                         cancelText="No"
                     >
-                        <Button type="link" danger icon={<DeleteOutlined />}>
+                        <Button type="text" danger icon={<DeleteOutlined />}>
                             Delete
                         </Button>
                     </Popconfirm>
@@ -108,19 +165,15 @@ const RemotesPage: React.FC = () => {
                     icon={<PlusOutlined />}
                     onClick={() => navigate('/remotes/new')}
                 >
-                    Add Remote
+                    New Remote
                 </Button>
             </div>
-            <Table
-                columns={columns}
-                dataSource={remotes}
-                loading={isLoading}
-                rowKey="id"
-                onRow={(record: Remote) => ({
-                    onClick: () => navigate(`/remotes/${record.id}`),
-                    style: { cursor: 'pointer' }
-                })}
-            />
+                <Table
+                    columns={columns}
+                    dataSource={remotes}
+                    rowKey="id"
+                    loading={isLoading}
+                />
         </div>
     );
 };

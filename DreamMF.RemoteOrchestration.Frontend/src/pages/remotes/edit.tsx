@@ -204,11 +204,11 @@ const EditRemotePage: React.FC = () => {
                                     </Button>
                                 </div>
                                 <div className="space-y-2">
-                                    {modules.map((module) => (
-                                        <div key={module} className="flex justify-between items-center p-2 bg-card rounded">
+                                    {modules.map((module, i) => (
+                                        <div key={i} className="flex justify-between items-center p-2 bg-card rounded">
                                             <div className="flex items-center gap-2">
                                                 <CodeOutlined className="text-muted-foreground" />
-                                                <span>{module}</span>
+                                                <span>{module.name}</span>
                                             </div>
                                             <Button
                                                 type="text"

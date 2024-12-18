@@ -144,19 +144,19 @@ const HostsPage: React.FC = () => {
             render: (_: any, record: any) => (
                 <div className="flex gap-2">
                     <Button
-                        type="link"
+                        type="text"
                         icon={<EditOutlined />}
                         onClick={() => navigate(`/hosts/${record.id}`)}
                     >
                         Edit
                     </Button>
                     <Popconfirm
-                        title="Are you sure you want to delete this remote?"
+                        title="Are you sure you want to delete this host?"
                         onConfirm={() => handleDelete(record.id)}
                         okText="Yes"
                         cancelText="No"
                     >
-                        <Button type="link" danger icon={<DeleteOutlined />}>
+                        <Button type="text" danger icon={<DeleteOutlined />}>
                             Delete
                         </Button>
                     </Popconfirm>

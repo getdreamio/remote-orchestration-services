@@ -9,7 +9,6 @@ interface Remote {
     configuration: string;
     created_Date: string;
     updated_Date: string;
-    modules?: RemoteModule[]
 }
 
 export interface RemoteModule {
@@ -25,6 +24,34 @@ interface RemoteRequest {
     configuration: string;
 }
 
+interface RemoteModuleCount {
+    remoteId: number;
+    count: number;
+}
+
+interface RemoteSubRemoteCount {
+    remoteId: number;
+    count: number;
+}
+
+// Fetch module counts for all remotes
+const fetchRemoteModuleCounts = async (): Promise<RemoteModuleCount[]> => {
+    const response = await fetch(`${config.backendUrl}/api/remotes/module-counts`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+};
+
+// Fetch sub-remote counts for all remotes
+const fetchRemoteSubRemoteCounts = async (): Promise<RemoteSubRemoteCount[]> => {
+    const response = await fetch(`${config.backendUrl}/api/remotes/sub-remote-counts`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+};
+
 export const useRemotes = () => {
     return useQuery<Remote[]>({
         queryKey: ['remotes'],
@@ -34,7 +61,7 @@ export const useRemotes = () => {
                 throw new Error('Network response was not ok');
             }
             return response.json();
-        }
+        },
     });
 };
 
@@ -92,6 +119,7 @@ export const useUpdateRemote = () => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
+            return response.json();
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['remotes'] });
@@ -114,5 +142,19 @@ export const useDeleteRemote = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['remotes'] });
         },
+    });
+};
+
+export const useRemoteModuleCounts = () => {
+    return useQuery({
+        queryKey: ['remotes', 'module-counts'],
+        queryFn: fetchRemoteModuleCounts,
+    });
+};
+
+export const useRemoteSubRemoteCounts = () => {
+    return useQuery({
+        queryKey: ['remotes', 'sub-remote-counts'],
+        queryFn: fetchRemoteSubRemoteCounts,
     });
 };
