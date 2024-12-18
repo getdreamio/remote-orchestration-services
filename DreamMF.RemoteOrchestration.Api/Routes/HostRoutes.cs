@@ -107,7 +107,7 @@ public static class HostRoutes
 
     private static async Task<IResult> GetHost(int id, HostService hostService)
     {
-        var hosts = await hostService.GetAllHostsAsync();
+        var hosts = await hostService.GetHostByIdAsync(id);
         return Results.Ok(hosts);
     }
 

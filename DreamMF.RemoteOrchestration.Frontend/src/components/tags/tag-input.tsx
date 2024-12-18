@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Select, Tag, Tooltip } from 'antd';
 import { TagOutlined } from '@ant-design/icons';
 
@@ -38,7 +38,7 @@ export const TagInput: React.FC<TagInputProps> = ({ tags, onChange, existingTags
     return (
         <div className="space-y-2">
             <div className="flex flex-wrap gap-2">
-                {tags && tags.map((tag) => {
+                {tags?.map((tag) => {
                     const tagElement = (
                         <Tag
                             key={`${tag.key}:${tag.value}`}
@@ -66,7 +66,7 @@ export const TagInput: React.FC<TagInputProps> = ({ tags, onChange, existingTags
                     </Tag>
                 )}
             </div>
-            
+
             {inputVisible && (
                 <div className="flex gap-2 items-start">
                     <div className="flex-1">
@@ -105,8 +105,8 @@ export const TagInput: React.FC<TagInputProps> = ({ tags, onChange, existingTags
                                         {tag.value}
                                     </Select.Option>
                                 ))}
-                            <Select.Option 
-                                value={selectedValue} 
+                            <Select.Option
+                                value={selectedValue}
                                 disabled={existingTags.some(t => t.key === selectedKey && t.value === selectedValue)}
                             >
                                 Add new value: {selectedValue}
@@ -114,6 +114,7 @@ export const TagInput: React.FC<TagInputProps> = ({ tags, onChange, existingTags
                         </Select>
                     </div>
                     <button
+                        type="button"
                         onClick={handleAdd}
                         disabled={!selectedKey || !selectedValue}
                         className="px-4 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -121,6 +122,7 @@ export const TagInput: React.FC<TagInputProps> = ({ tags, onChange, existingTags
                         Add
                     </button>
                     <button
+                        type="button"
                         onClick={() => {
                             setInputVisible(false);
                             setSelectedKey('');

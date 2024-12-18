@@ -12,11 +12,12 @@ interface Host {
     updated_Date: string;
 }
 
-interface HostRequest {
+export interface HostRequest {
     name: string;
     description: string;
     url: string;
     environment: string;
+    tags: string[];
 }
 
 const fetchHosts = async (): Promise<Host[]> => {

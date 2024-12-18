@@ -2,18 +2,17 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { config } from '@/config/env';
 import { message } from 'antd';
 
-interface Tag {
+export interface Tag {
     id: number;
     key: string;
     created_Date: string;
     updated_Date: string;
 }
-
-interface TagRequest {
+export interface TagRequest {
     key: string;
 }
 
-interface TagAssociation {
+export interface TagAssociation {
     id: number;
     name: string;
     type: 'host' | 'remote';
