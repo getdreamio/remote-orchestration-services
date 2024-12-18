@@ -1,14 +1,20 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Form, Input, Button, Card, message } from 'antd';
-import { useTag, useUpdateTag } from '@/hooks/useTags';
+import { Form, Input, Button, Card, Typography, Spin, Table, Tabs, Popconfirm } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
+import { useTag, useUpdateTag, useTagAssociations, useRemoveTagAssociation } from '@/hooks/useTags';
+
+const { Title } = Typography;
+const { TabPane } = Tabs;
 
 const EditTagPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [form] = Form.useForm();
-    const { data: tag, isLoading } = useTag(Number(id));
+    const { data: tag, isLoading: isTagLoading } = useTag(Number(id));
+    const { data: associations, isLoading: isAssociationsLoading } = useTagAssociations(Number(id));
     const updateTag = useUpdateTag();
+    const removeAssociation = useRemoveTagAssociation();
 
     React.useEffect(() => {
         if (tag) {
@@ -19,44 +25,122 @@ const EditTagPage: React.FC = () => {
     const onFinish = async (values: any) => {
         try {
             await updateTag.mutateAsync({ id: Number(id), tag: values });
-            message.success('Tag updated successfully');
             navigate('/tags');
         } catch (error) {
-            message.error('Failed to update tag');
+            // Error is handled by the mutation
         }
     };
 
-    if (isLoading) {
-        return <div>Loading...</div>;
+    const handleRemoveAssociation = async (itemId: number, type: 'host' | 'remote') => {
+        await removeAssociation.mutateAsync({
+            tagId: Number(id),
+            itemId,
+            type
+        });
+    };
+
+    const columns = [
+        {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+        },
+        {
+            title: 'Actions',
+            key: 'actions',
+            width: 100,
+            render: (_: any, record: any) => (
+                <Popconfirm
+                    title="Remove Tag Association"
+                    description="Are you sure you want to remove this tag from this item?"
+                    onConfirm={() => handleRemoveAssociation(record.id, record.type)}
+                    okText="Yes"
+                    cancelText="No"
+                >
+                    <Button 
+                        type="text"
+                        danger
+                        icon={<DeleteOutlined />}
+                    />
+                </Popconfirm>
+            ),
+        },
+    ];
+
+    if (isTagLoading || isAssociationsLoading) {
+        return (
+            <div className="flex h-[calc(100vh-64px)] items-center justify-center">
+                <Spin size="large" />
+            </div>
+        );
     }
 
     return (
-        <div>
-            <h1>Edit Tag</h1>
-            <Card>
-                <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={onFinish}
-                >
-                    <Form.Item
-                        label="Text"
-                        name="text"
-                        rules={[{ required: true, message: 'Please input the tag text!' }]}
+        <div className="p-6">
+            <Title level={2} className="mb-6">Edit Tag</Title>
+            
+            <div className="space-y-6">
+                <Card className="max-w-2xl">
+                    <Form
+                        form={form}
+                        layout="vertical"
+                        onFinish={onFinish}
                     >
-                        <Input />
-                    </Form.Item>
+                        <Form.Item
+                            label="Key"
+                            name="key"
+                            rules={[
+                                { required: true, message: 'Please input the tag key!' },
+                                { pattern: /^[a-zA-Z0-9_-]+$/, message: 'Key can only contain letters, numbers, underscores and hyphens' }
+                            ]}
+                            tooltip="The key identifies the tag. It can contain letters, numbers, underscores and hyphens."
+                        >
+                            <Input placeholder="e.g., environment" />
+                        </Form.Item>
 
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit">
-                            Update Tag
-                        </Button>
-                        <Button style={{ marginLeft: 8 }} onClick={() => navigate('/tags')}>
-                            Cancel
-                        </Button>
-                    </Form.Item>
-                </Form>
-            </Card>
+                        <Form.Item
+                            label="Value"
+                            name="value"
+                            rules={[{ required: true, message: 'Please input the tag value!' }]}
+                            tooltip="The value assigned to this tag"
+                        >
+                            <Input placeholder="e.g., production" />
+                        </Form.Item>
+
+                        <Form.Item className="mb-0 flex justify-end">
+                            <Button className="mr-2" onClick={() => navigate('/tags')}>
+                                Cancel
+                            </Button>
+                            <Button type="primary" htmlType="submit">
+                                Update Tag
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </Card>
+
+                <Card>
+                    <Tabs defaultActiveKey="hosts">
+                        <TabPane tab="Associated Hosts" key="hosts">
+                            <Table
+                                dataSource={associations?.hosts.map(host => ({ ...host, type: 'host' }))}
+                                columns={columns}
+                                rowKey="id"
+                                pagination={false}
+                                locale={{ emptyText: 'No hosts are using this tag' }}
+                            />
+                        </TabPane>
+                        <TabPane tab="Associated Remotes" key="remotes">
+                            <Table
+                                dataSource={associations?.remotes.map(remote => ({ ...remote, type: 'remote' }))}
+                                columns={columns}
+                                rowKey="id"
+                                pagination={false}
+                                locale={{ emptyText: 'No remotes are using this tag' }}
+                            />
+                        </TabPane>
+                    </Tabs>
+                </Card>
+            </div>
         </div>
     );
 };

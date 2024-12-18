@@ -1,9 +1,11 @@
 import { LogOut, User } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function UserMenu() {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -31,8 +33,8 @@ export function UserMenu() {
                     <div className="py-1">
                         <button
                             onClick={() => {
-                                // Handle logout
                                 setIsOpen(false);
+                                navigate('/logout');
                             }}
                             className="flex w-full items-center px-4 py-2 text-sm text-gray-700 dark:text-foreground hover:bg-gray-100 dark:hover:bg-[#334155]"
                         >

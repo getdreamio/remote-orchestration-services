@@ -1,7 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Card, message } from 'antd';
+import { Form, Input, Button, Card, Typography } from 'antd';
 import { useCreateTag } from '@/hooks/useTags';
+
+const { Title } = Typography;
 
 const NewTagPage: React.FC = () => {
     const navigate = useNavigate();
@@ -19,28 +21,41 @@ const NewTagPage: React.FC = () => {
     };
 
     return (
-        <div>
-            <h1>New Tag</h1>
-            <Card>
+        <div className="p-6">
+            <Title level={2} className="mb-6">New Tag</Title>
+            <Card className="max-w-2xl">
                 <Form
                     form={form}
                     layout="vertical"
                     onFinish={onFinish}
                 >
                     <Form.Item
-                        label="Text"
-                        name="text"
-                        rules={[{ required: true, message: 'Please input the tag text!' }]}
+                        label="Key"
+                        name="key"
+                        rules={[
+                            { required: true, message: 'Please input the tag key!' },
+                            { pattern: /^[a-zA-Z0-9_-]+$/, message: 'Key can only contain letters, numbers, underscores and hyphens' }
+                        ]}
+                        tooltip="The key identifies the tag. It can contain letters, numbers, underscores and hyphens."
                     >
-                        <Input />
+                        <Input placeholder="e.g., environment" />
                     </Form.Item>
 
-                    <Form.Item>
+                    <Form.Item
+                        label="Value"
+                        name="value"
+                        rules={[{ required: true, message: 'Please input the tag value!' }]}
+                        tooltip="The value assigned to this tag"
+                    >
+                        <Input placeholder="e.g., production" />
+                    </Form.Item>
+
+                    <Form.Item className="mb-0 flex justify-end">
+                        <Button className="mr-2" onClick={() => navigate('/tags')}>
+                            Cancel
+                        </Button>
                         <Button type="primary" htmlType="submit">
                             Create Tag
-                        </Button>
-                        <Button style={{ marginLeft: 8 }} onClick={() => navigate('/tags')}>
-                            Cancel
                         </Button>
                     </Form.Item>
                 </Form>

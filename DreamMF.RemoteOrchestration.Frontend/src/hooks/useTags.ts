@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { config } from '@/config/env';
+import { message } from 'antd';
 
 interface Tag {
     tag_ID: number;
@@ -10,6 +11,12 @@ interface Tag {
 
 interface TagRequest {
     text: string;
+}
+
+interface TagAssociation {
+    id: number;
+    name: string;
+    type: 'host' | 'remote';
 }
 
 export const useTags = () => {
@@ -30,6 +37,20 @@ export const useTag = (id: number) => {
         queryKey: ['tags', id],
         queryFn: async () => {
             const response = await fetch(`${config.backendUrl}/tags/${id}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        },
+        enabled: !!id
+    });
+};
+
+export const useTagAssociations = (id: number) => {
+    return useQuery<TagAssociation[]>({
+        queryKey: ['tag-associations', id],
+        queryFn: async () => {
+            const response = await fetch(`${config.backendUrl}/tags/${id}/associations`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -66,7 +87,7 @@ export const useUpdateTag = () => {
     const queryClient = useQueryClient();
     
     return useMutation({
-        mutationFn: async ({ id, tag }: { id: number; tag: TagRequest }) => {
+        mutationFn: async ({ id, tag }: { id: number; tag: Partial<TagRequest> }) => {
             const response = await fetch(`${config.backendUrl}/tags/${id}`, {
                 method: 'PUT',
                 headers: {
@@ -77,9 +98,14 @@ export const useUpdateTag = () => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
+            return response.json();
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tags'] });
+            message.success('Tag updated successfully');
+        },
+        onError: () => {
+            message.error('Failed to update tag');
         },
     });
 };
@@ -98,6 +124,28 @@ export const useDeleteTag = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tags'] });
+        },
+    });
+};
+
+export const useRemoveTagAssociation = () => {
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationFn: async ({ tagId, itemId, type }: { tagId: number; itemId: number; type: 'host' | 'remote' }) => {
+            const response = await fetch(`${config.backendUrl}/tags/${tagId}/associations/${type}/${itemId}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to remove tag from ${type}`);
+            }
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['tag-associations', variables.tagId] });
+            message.success(`Tag removed from ${variables.type} successfully`);
+        },
+        onError: (_, variables) => {
+            message.error(`Failed to remove tag from ${variables.type}`);
         },
     });
 };

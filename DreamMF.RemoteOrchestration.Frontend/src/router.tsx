@@ -1,74 +1,91 @@
 import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import RootLayout from './components/layout/root-layout';
-
-// Pages
 import DashboardPage from './pages/index';
-import HostsPage from './pages/hosts';
-import EditHostPage from './pages/hosts/edit';
-import NewHostPage from './pages/hosts/new';
-import RemotesPage from './pages/remotes';
-import EditRemotePage from './pages/remotes/edit';
+import RemotesPage from './pages/remotes/index';
 import NewRemotePage from './pages/remotes/new';
-import TagsPage from './pages/tags';
-import EditTagPage from './pages/tags/edit';
-import NewTagPage from './pages/tags/new';
-import AnalyticsPage from './pages/analytics';
+import EditRemotePage from './pages/remotes/edit';
+import HostsPage from './pages/hosts/index';
+import NewHostPage from './pages/hosts/new';
+import EditHostPage from './pages/hosts/edit';
+import UsersPage from './pages/users/index';
 import SettingsPage from './pages/settings';
+import AnalyticsPage from './pages/analytics';
 import NotFoundPage from './pages/not-found';
+import LoginPage from './pages/auth/login';
+import LogoutPage from './pages/auth/logout';
+import TagPage from './pages/tags/index';
+import NewTagPage from './pages/tags/new';
+import EditTagPage from './pages/tags/edit';
+import ErrorDisplay from './components/error/error-display';
 
 export const router = createBrowserRouter([
     {
+        path: '/login',
+        element: <LoginPage />,
+        errorElement: <ErrorDisplay message="Error loading login page" />,
+    },
+    {
+        path: '/logout',
+        element: <LogoutPage />,
+        errorElement: <ErrorDisplay message="Error during logout" />,
+    },
+    {
         path: '/',
         element: <RootLayout />,
+        errorElement: <ErrorDisplay message="An unexpected error occurred" />,
         children: [
             {
-                path: '/',
+                index: true,
                 element: <DashboardPage />,
             },
             {
-                path: '/hosts',
-                element: <HostsPage />,
-            },
-            {
-                path: '/hosts/new',
-                element: <NewHostPage />,
-            },
-            {
-                path: '/hosts/:id/edit',
-                element: <EditHostPage />,
-            },
-            {
-                path: '/remotes',
+                path: 'remotes',
                 element: <RemotesPage />,
             },
             {
-                path: '/remotes/new',
+                path: 'remotes/new',
                 element: <NewRemotePage />,
             },
             {
-                path: '/remotes/:id/edit',
+                path: 'remotes/:id',
                 element: <EditRemotePage />,
             },
             {
-                path: '/tags',
-                element: <TagsPage />,
+                path: 'hosts',
+                element: <HostsPage />,
             },
             {
-                path: '/tags/new',
+                path: 'hosts/new',
+                element: <NewHostPage />,
+            },
+            {
+                path: 'hosts/:id',
+                element: <EditHostPage />,
+            },
+            {
+                path: 'tags',
+                element: <TagPage />,
+            },
+            {
+                path: 'tags/new',
                 element: <NewTagPage />,
             },
             {
-                path: '/tags/:id/edit',
+                path: 'tags/:id',
                 element: <EditTagPage />,
             },
             {
-                path: '/analytics',
-                element: <AnalyticsPage />,
+                path: 'users',
+                element: <UsersPage />,
             },
             {
-                path: '/settings',
+                path: 'settings',
                 element: <SettingsPage />,
+            },
+            {
+                path: 'analytics',
+                element: <AnalyticsPage />,
             },
             {
                 path: '*',
