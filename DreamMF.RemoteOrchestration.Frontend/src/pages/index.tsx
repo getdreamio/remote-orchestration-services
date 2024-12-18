@@ -1,115 +1,265 @@
 import React from 'react';
-import { Card, Row, Col, Statistic } from 'antd';
+import { Card, Row, Col, Statistic, Button, Progress } from 'antd';
 import { useHosts } from '@/hooks/useHosts';
 import { useTags } from '@/hooks/useTags';
 import { useRemotes } from '@/hooks/useRemotes';
-import { ServerIcon, TagIcon, DatabaseIcon, ClockIcon } from 'lucide-react';
+import { ServerIcon, TagIcon, DatabaseIcon, ClockIcon, ArrowRightIcon, BarChart3Icon, AlertCircleIcon, CheckCircleIcon, XCircleIcon } from 'lucide-react';
 import { formatDate } from '@/lib/date-utils';
+import { useNavigate } from 'react-router-dom';
+
+// Mock data for analytics and logs (replace with real data later)
+const analyticsData = {
+    hostUptime: 99.8,
+    remoteUsage: 85.2,
+    errorRate: 0.3,
+    totalRequests: 15482,
+    avgResponseTime: 120,
+};
+
+const recentLogs = [
+    { type: 'success', message: 'Remote module deployment successful', timestamp: new Date().toISOString() },
+    { type: 'error', message: 'Host connection timeout', timestamp: new Date(Date.now() - 3600000).toISOString() },
+    { type: 'info', message: 'Configuration updated', timestamp: new Date(Date.now() - 7200000).toISOString() },
+];
 
 const DashboardPage: React.FC = () => {
+    const navigate = useNavigate();
     const { data: hosts } = useHosts();
     const { data: tags } = useTags();
     const { data: remotes } = useRemotes();
+
+    const getLogIcon = (type: string) => {
+        switch (type) {
+            case 'success':
+                return <CheckCircleIcon className="h-4 w-4 text-green-500" />;
+            case 'error':
+                return <XCircleIcon className="h-4 w-4 text-red-500" />;
+            default:
+                return <AlertCircleIcon className="h-4 w-4 text-blue-500" />;
+        }
+    };
 
     return (
         <div>
             <h1 className="text-2xl font-semibold mb-6">Dashboard</h1>
             <Row gutter={[16, 16]}>
                 <Col xs={24} sm={8}>
-                    <Card>
+                    <Card 
+                        hoverable 
+                        className="border-l-4 border-l-blue-500 dark:border-l-blue-400 transition-all hover:scale-[1.02]"
+                        onClick={() => navigate('/hosts')}
+                    >
                         <Statistic
-                            title="Total Hosts"
+                            title={
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-lg font-semibold">Total Hosts</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Active web applications</span>
+                                </div>
+                            }
                             value={hosts?.length || 0}
-                            prefix={<ServerIcon className="h-5 w-5" />}
+                            prefix={<ServerIcon className="h-5 w-5 text-blue-500 dark:text-blue-400" />}
+                            suffix={<ArrowRightIcon className="h-4 w-4 ml-2 opacity-50" />}
                         />
                     </Card>
                 </Col>
                 <Col xs={24} sm={8}>
-                    <Card>
+                    <Card 
+                        hoverable 
+                        className="border-l-4 border-l-purple-500 dark:border-l-purple-400 transition-all hover:scale-[1.02]"
+                        onClick={() => navigate('/tags')}
+                    >
                         <Statistic
-                            title="Total Tags"
+                            title={
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-lg font-semibold">Total Tags</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Metadata labels in use</span>
+                                </div>
+                            }
                             value={tags?.length || 0}
-                            prefix={<TagIcon className="h-5 w-5" />}
+                            prefix={<TagIcon className="h-5 w-5 text-purple-500 dark:text-purple-400" />}
+                            suffix={<ArrowRightIcon className="h-4 w-4 ml-2 opacity-50" />}
                         />
                     </Card>
                 </Col>
                 <Col xs={24} sm={8}>
-                    <Card>
+                    <Card 
+                        hoverable 
+                        className="border-l-4 border-l-green-500 dark:border-l-green-400 transition-all hover:scale-[1.02]"
+                        onClick={() => navigate('/remotes')}
+                    >
                         <Statistic
-                            title="Total Remotes"
+                            title={
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-lg font-semibold">Total Remotes</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Federated modules deployed</span>
+                                </div>
+                            }
                             value={remotes?.length || 0}
-                            prefix={<DatabaseIcon className="h-5 w-5" />}
+                            prefix={<DatabaseIcon className="h-5 w-5 text-green-500 dark:text-green-400" />}
+                            suffix={<ArrowRightIcon className="h-4 w-4 ml-2 opacity-50" />}
                         />
                     </Card>
                 </Col>
             </Row>
 
             <div className="mt-8">
-                <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
+                <h2 className="text-xl font-semibold mb-4">Analytics Overview</h2>
+                <Row gutter={[16, 16]}>
+                    <Col xs={24} sm={8}>
+                        <Card hoverable className="h-full" onClick={() => navigate('/analytics')}>
+                            <div className="flex flex-col gap-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-lg font-semibold">System Health</span>
+                                    <BarChart3Icon className="h-5 w-5 text-blue-500" />
+                                </div>
+                                <Progress 
+                                    type="circle" 
+                                    percent={analyticsData.hostUptime} 
+                                    size={80}
+                                    strokeColor={{ '0%': '#108ee9', '100%': '#87d068' }}
+                                />
+                                <div className="text-sm text-muted-foreground dark:text-muted-foreground/70">
+                                    Average uptime across all services
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                    <Col xs={24} sm={8}>
+                        <Card hoverable className="h-full" onClick={() => navigate('/analytics')}>
+                            <div className="flex flex-col gap-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-lg font-semibold">Remote Usage</span>
+                                    <DatabaseIcon className="h-5 w-5 text-green-500" />
+                                </div>
+                                <Statistic
+                                    value={analyticsData.totalRequests}
+                                    suffix="requests"
+                                />
+                                <div className="text-sm text-muted-foreground dark:text-muted-foreground/70">
+                                    {analyticsData.avgResponseTime}ms average response time
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                    <Col xs={24} sm={8}>
+                        <Card hoverable className="h-full" onClick={() => navigate('/analytics')}>
+                            <div className="flex flex-col gap-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-lg font-semibold">Error Rate</span>
+                                    <AlertCircleIcon className="h-5 w-5 text-yellow-500" />
+                                </div>
+                                <Progress
+                                    percent={analyticsData.errorRate}
+                                    size="small"
+                                    status="exception"
+                                    strokeColor="#f5222d"
+                                />
+                                <div className="text-sm text-muted-foreground dark:text-muted-foreground/70">
+                                    Across all services in last 24h
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
+
+            <div className="mt-8">
+                <h2 className="text-xl font-semibold mb-4">System Logs</h2>
+                <Row gutter={[16, 16]}>
+                    <Col xs={24}>
+                        <Card 
+                            hoverable 
+                            className="h-full"
+                            onClick={() => navigate('/logging')}
+                            extra={<Button type="link" onClick={() => navigate('/logging')}>View All Logs</Button>}
+                        >
+                            <div className="space-y-4">
+                                {recentLogs.map((log, i) => (
+                                    <div key={i} className="flex items-start gap-3 p-3 rounded-md hover:bg-muted/50">
+                                        {getLogIcon(log.type)}
+                                        <div className="flex-1">
+                                            <div className="font-medium">{log.message}</div>
+                                            <div className="text-xs text-muted-foreground dark:text-muted-foreground/70">
+                                                {formatDate(log.timestamp)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
+
+            <div className="mt-8">
+                <h2 className="text-xl font-semibold mb-4">Recent Changes</h2>
                 <Row gutter={[16, 16]}>
                     <Col xs={24} sm={8}>
                         <Card
                             title="Recent Hosts"
-                            extra={<a href="/hosts">View All</a>}
+                            extra={<Button type="link" onClick={() => navigate('/hosts')}>View All</Button>}
+                            className="h-full"
                         >
-                            <div className="space-y-2">
+                            <div className="space-y-3">
                                 {hosts?.slice(0, 3).map((host, i) => (
-                                    <div key={i} className="flex flex-col gap-1">
+                                    <div key={i} className="flex flex-col gap-1 p-2 rounded-md hover:bg-muted/50 cursor-pointer" onClick={() => navigate(`/hosts/${host.id}`)}>
                                         <div className="flex items-center gap-2">
-                                            <ServerIcon className="h-4 w-4" />
-                                            <span>{host.name}</span>
+                                            <ServerIcon className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+                                            <span className="font-medium">{host.name}</span>
                                         </div>
-                                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                        <div className="flex items-center gap-1 text-xs text-muted-foreground dark:text-muted-foreground/70">
                                             <ClockIcon className="h-3 w-3" />
-                                            <span>{formatDate(host.updated_Date)}</span>
+                                            <span>Updated {formatDate(host.updated_Date)}</span>
                                         </div>
                                     </div>
                                 ))}
-                                {!hosts?.length && <p className="text-gray-500">No hosts found</p>}
+                                {!hosts?.length && <p className="text-muted-foreground dark:text-muted-foreground/70">No hosts found</p>}
                             </div>
                         </Card>
                     </Col>
                     <Col xs={24} sm={8}>
                         <Card
                             title="Recent Tags"
-                            extra={<a href="/tags">View All</a>}
+                            extra={<Button type="link" onClick={() => navigate('/tags')}>View All</Button>}
+                            className="h-full"
                         >
-                            <div className="space-y-2">
+                            <div className="space-y-3">
                                 {tags?.slice(0, 3).map((tag, i) => (
-                                    <div key={i} className="flex flex-col gap-1">
+                                    <div key={i} className="flex flex-col gap-1 p-2 rounded-md hover:bg-muted/50 cursor-pointer" onClick={() => navigate('/tags')}>
                                         <div className="flex items-center gap-2">
-                                            <TagIcon className="h-4 w-4" />
-                                            <span>{tag.text}</span>
+                                            <TagIcon className="h-4 w-4 text-purple-500 dark:text-purple-400" />
+                                            <span className="font-medium">{tag.text}</span>
                                         </div>
-                                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                        <div className="flex items-center gap-1 text-xs text-muted-foreground dark:text-muted-foreground/70">
                                             <ClockIcon className="h-3 w-3" />
-                                            <span>{formatDate(tag.updated_Date)}</span>
+                                            <span>Updated {formatDate(tag.updated_Date)}</span>
                                         </div>
                                     </div>
                                 ))}
-                                {!tags?.length && <p className="text-gray-500">No tags found</p>}
+                                {!tags?.length && <p className="text-muted-foreground dark:text-muted-foreground/70">No tags found</p>}
                             </div>
                         </Card>
                     </Col>
                     <Col xs={24} sm={8}>
                         <Card
                             title="Recent Remotes"
-                            extra={<a href="/remotes">View All</a>}
+                            extra={<Button type="link" onClick={() => navigate('/remotes')}>View All</Button>}
+                            className="h-full"
                         >
-                            <div className="space-y-2">
+                            <div className="space-y-3">
                                 {remotes?.slice(0, 3).map((remote, i) => (
-                                    <div key={i} className="flex flex-col gap-1">
+                                    <div key={i} className="flex flex-col gap-1 p-2 rounded-md hover:bg-muted/50 cursor-pointer" onClick={() => navigate(`/remotes/${remote.id}`)}>
                                         <div className="flex items-center gap-2">
-                                            <DatabaseIcon className="h-4 w-4" />
-                                            <span>{remote.name}</span>
+                                            <DatabaseIcon className="h-4 w-4 text-green-500 dark:text-green-400" />
+                                            <span className="font-medium">{remote.name}</span>
                                         </div>
-                                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                        <div className="flex items-center gap-1 text-xs text-muted-foreground dark:text-muted-foreground/70">
                                             <ClockIcon className="h-3 w-3" />
-                                            <span>{formatDate(remote.updated_Date)}</span>
+                                            <span>Updated {formatDate(remote.updated_Date)}</span>
                                         </div>
                                     </div>
                                 ))}
-                                {!remotes?.length && <p className="text-gray-500">No remotes found</p>}
+                                {!remotes?.length && <p className="text-muted-foreground dark:text-muted-foreground/70">No remotes found</p>}
                             </div>
                         </Card>
                     </Col>

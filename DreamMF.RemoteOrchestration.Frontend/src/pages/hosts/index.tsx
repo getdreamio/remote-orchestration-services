@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Table, message, Tag, Typography, Tooltip } from 'antd';
+import { Button, Table, message, Tag, Typography, Tooltip, Popconfirm } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import { useHosts, useDeleteHost } from '@/hooks/useHosts';
 import { useNavigate } from 'react-router-dom';
@@ -116,16 +116,22 @@ const HostsPage: React.FC = () => {
             render: (_: any, record: any) => (
                 <div className="flex gap-2">
                     <Button
-                        type="text"
+                        type="link"
                         icon={<EditOutlined />}
-                        onClick={() => handleEdit(record)}
-                    />
-                    <Button
-                        type="text"
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() => handleDelete(record.id)}
-                    />
+                        onClick={() => navigate(`/hosts/${record.id}`)}
+                    >
+                        Edit
+                    </Button>
+                    <Popconfirm
+                        title="Are you sure you want to delete this remote?"
+                        onConfirm={() => handleDelete(record.id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button type="link" danger icon={<DeleteOutlined />}>
+                            Delete
+                        </Button>
+                    </Popconfirm>
                 </div>
             ),
         },
