@@ -23,7 +23,7 @@ const mockHosts: Host[] = [
 ];
 
 export const handlers = [
-    http.get('/api/hosts', async () => {
+    http.get('/hosts', async () => {
         return HttpResponse.json(mockHosts, { status: 200 });
     })
 ];

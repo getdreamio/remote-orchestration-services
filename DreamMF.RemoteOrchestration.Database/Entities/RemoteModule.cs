@@ -3,12 +3,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DreamMF.RemoteOrchestration.Database.Entities;
 
-public class Module
+public class RemoteModule
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Remote_Module_ID { get; set; }
+    public int Remote_ID { get; set; }
     public int Module_ID { get; set; }
-    public string Name { get; set; } = string.Empty;
     public DateTimeOffset Created_Date { get; set; }
     public DateTimeOffset Updated_Date { get; set; }
+
+    [ForeignKey("Remote_ID")]
+    public Remote? Remote { get; set; }
+    
+    [ForeignKey("Module_ID")]
+    public Module? Module { get; set; }
 }
