@@ -47,10 +47,12 @@ const EditRemotePage: React.FC = () => {
         try {
             await updateRemote.mutateAsync({
                 id: id!,
-                ...values,
-                modules,
-                tags,
-                activeVersion: selectedVersion,
+                remote: {
+                    ...values,
+                    modules,
+                    tags,
+                    activeVersion: selectedVersion,
+                }
             });
             message.success('Remote updated successfully');
             navigate('/remotes');
@@ -177,9 +179,9 @@ const EditRemotePage: React.FC = () => {
                                         onKeyPress={handleModuleKeyPress}
                                         placeholder="Add a module and press Enter"
                                     />
-                                    <Button 
-                                        type="primary" 
-                                        onClick={addModule} 
+                                    <Button
+                                        type="primary"
+                                        onClick={addModule}
                                         icon={<PlusOutlined />}
                                     >
                                         Add

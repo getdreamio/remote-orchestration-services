@@ -1,8 +1,8 @@
 import React from 'react';
 import { Form, Input, Button, message, Select, Typography } from 'antd';
-import { useCreateHost, useUpdateHost } from '@/hooks/useHosts';
+import { type HostRequest, useCreateHost, useUpdateHost } from '@/hooks/useHosts';
 import { CopyOutlined } from '@ant-design/icons';
-import { TagInput, TagItem } from '@/components/tags/tag-input';
+import { TagInput, type TagItem } from '@/components/tags/tag-input';
 import { useTags } from '@/hooks/useTags';
 
 const { TextArea } = Input;
@@ -25,27 +25,18 @@ const HostForm: React.FC<HostFormProps> = ({ onSuccess, editingHost }) => {
     const [form] = Form.useForm();
     const createHost = useCreateHost();
     const updateHost = useUpdateHost();
-    const [tags, setTags] = React.useState<TagItem[]>(editingHost?.tags || []);
     const { data: existingTags = [] } = useTags();
 
     const formattedExistingTags = existingTags.map(tag => ({
         key: 'tag',
-        value: tag.text
+        value: tag.key
     }));
 
-    React.useEffect(() => {
-        if (editingHost) {
-            form.setFieldsValue(editingHost);
-        } else {
-            form.resetFields();
-        }
-    }, [editingHost, form]);
-
-    const handleSubmit = async (values: any) => {
+    const handleSubmit = async (values: HostRequest) => {
         try {
             const hostData = {
                 ...values,
-                tags: tags.map(tag => tag.value)
+                tags: values.tags?.map(tag => tag.value) || []
             };
 
             if (editingHost) {
@@ -73,6 +64,9 @@ const HostForm: React.FC<HostFormProps> = ({ onSuccess, editingHost }) => {
             layout="vertical"
             onFinish={handleSubmit}
             className="max-w-2xl py-4"
+            initialValues={editingHost}
+            key={editingHost?.id}
+            preserve={false}
         >
             <Form.Item
                 label="Name"
@@ -87,8 +81,8 @@ const HostForm: React.FC<HostFormProps> = ({ onSuccess, editingHost }) => {
                 name="description"
                 rules={[{ required: true, message: 'Please input the description!' }]}
             >
-                <TextArea 
-                    rows={3} 
+                <TextArea
+                    rows={3}
                     placeholder="Describe the purpose and details of this host"
                 />
             </Form.Item>
@@ -131,10 +125,13 @@ const HostForm: React.FC<HostFormProps> = ({ onSuccess, editingHost }) => {
                 </Select>
             </Form.Item>
 
-            <Form.Item label="Tags">
+            <Form.Item
+                label="Tags"
+                name="tags"
+            >
                 <TagInput
-                    value={tags}
-                    onChange={setTags}
+                    value={form.getFieldValue('tags') || []}
+                    onChange={(newTags) => form.setFieldsValue({ tags: newTags })}
                     suggestions={formattedExistingTags}
                     placeholder="Add tags..."
                 />

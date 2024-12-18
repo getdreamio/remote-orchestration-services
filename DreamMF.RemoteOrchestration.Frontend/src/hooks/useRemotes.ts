@@ -20,7 +20,7 @@ export const useRemotes = () => {
     return useQuery<Remote[]>({
         queryKey: ['remotes'],
         queryFn: async () => {
-            const response = await fetch(`${config.backendUrl}/remotes`);
+            const response = await fetch(`${config.backendUrl}/api/remotes`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -33,7 +33,7 @@ export const useRemote = (id: number) => {
     return useQuery<Remote>({
         queryKey: ['remotes', id],
         queryFn: async () => {
-            const response = await fetch(`${config.backendUrl}/remotes/${id}`);
+            const response = await fetch(`${config.backendUrl}/api/remotes/${id}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -45,10 +45,10 @@ export const useRemote = (id: number) => {
 
 export const useCreateRemote = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: async (remote: RemoteRequest) => {
-            const response = await fetch(`${config.backendUrl}/remotes`, {
+            const response = await fetch(`${config.backendUrl}/api/remotes`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -68,10 +68,10 @@ export const useCreateRemote = () => {
 
 export const useUpdateRemote = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: async ({ id, remote }: { id: number; remote: RemoteRequest }) => {
-            const response = await fetch(`${config.backendUrl}/remotes/${id}`, {
+            const response = await fetch(`${config.backendUrl}/api/remotes/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -90,10 +90,10 @@ export const useUpdateRemote = () => {
 
 export const useDeleteRemote = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: async (id: number) => {
-            const response = await fetch(`${config.backendUrl}/remotes/${id}`, {
+            const response = await fetch(`${config.backendUrl}/api/remotes/${id}`, {
                 method: 'DELETE',
             });
             if (!response.ok) {
