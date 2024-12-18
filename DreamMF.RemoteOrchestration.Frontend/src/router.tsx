@@ -13,8 +13,9 @@ import NewRemotePage from './pages/remotes/new';
 import TagsPage from './pages/tags';
 import EditTagPage from './pages/tags/edit';
 import NewTagPage from './pages/tags/new';
-import { SettingsPage } from './pages/settings-page';
-import { NotFoundPage } from './pages/not-found';
+import AnalyticsPage from './pages/analytics';
+import SettingsPage from './pages/settings';
+import NotFoundPage from './pages/not-found';
 
 export const router = createBrowserRouter([
     {
@@ -62,7 +63,11 @@ export const router = createBrowserRouter([
                 element: <EditTagPage />,
             },
             {
-                path: 'settings',
+                path: '/analytics',
+                element: <AnalyticsPage />,
+            },
+            {
+                path: '/settings',
                 element: <SettingsPage />,
             },
             {

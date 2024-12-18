@@ -1,20 +1,18 @@
 import React from 'react';
-import { Button, Table, message, Empty, Tag, Typography, Tooltip } from 'antd';
+import { Button, Table, message, Tag, Typography, Tooltip } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import { useHosts, useDeleteHost } from '@/hooks/useHosts';
-import HostModal from '@/components/hosts/host-modal';
+import { useNavigate } from 'react-router-dom';
 
 const { Text } = Typography;
 
 const HostsPage: React.FC = () => {
+    const navigate = useNavigate();
     const { data: hosts, isLoading } = useHosts();
     const deleteHost = useDeleteHost();
-    const [modalOpen, setModalOpen] = React.useState(false);
-    const [editingHost, setEditingHost] = React.useState<any>(null);
 
     const handleEdit = (host: any) => {
-        setEditingHost(host);
-        setModalOpen(true);
+        navigate(`/hosts/${host.host_ID}`);
     };
 
     const handleDelete = async (id: number) => {
@@ -102,7 +100,7 @@ const HostsPage: React.FC = () => {
                 { text: 'Staging', value: 'staging' },
                 { text: 'Production', value: 'production' },
             ],
-            onFilter: (value: string, record: any) => 
+            onFilter: (value: string, record: any) =>
                 record.environment.toLowerCase() === value.toLowerCase(),
         },
         {
@@ -121,59 +119,35 @@ const HostsPage: React.FC = () => {
                         type="text"
                         icon={<EditOutlined />}
                         onClick={() => handleEdit(record)}
-                    >
-                        Edit
-                    </Button>
+                    />
                     <Button
                         type="text"
                         danger
                         icon={<DeleteOutlined />}
                         onClick={() => handleDelete(record.host_ID)}
-                    >
-                        Delete
-                    </Button>
+                    />
                 </div>
             ),
         },
     ];
 
-    const handleCloseModal = () => {
-        setModalOpen(false);
-        setEditingHost(null);
-    };
-
     return (
         <div>
             <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-semibold">Hosts</h1>
+                <h1 className="text-2xl font-bold">Hosts</h1>
                 <Button
                     type="primary"
                     icon={<PlusOutlined />}
-                    onClick={() => setModalOpen(true)}
+                    onClick={() => navigate('/hosts/new')}
                 >
-                    Add Host
+                    New Host
                 </Button>
             </div>
-
             <Table
                 columns={columns}
                 dataSource={hosts}
                 loading={isLoading}
                 rowKey="host_ID"
-                locale={{
-                    emptyText: (
-                        <Empty
-                            description="No hosts found"
-                            image={Empty.PRESENTED_IMAGE_SIMPLE}
-                        />
-                    ),
-                }}
-            />
-
-            <HostModal
-                isOpen={modalOpen}
-                onClose={handleCloseModal}
-                editingHost={editingHost}
             />
         </div>
     );

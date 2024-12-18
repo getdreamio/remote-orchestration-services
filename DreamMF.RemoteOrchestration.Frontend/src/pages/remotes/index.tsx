@@ -65,7 +65,7 @@ const RemotesPage: React.FC = () => {
     return (
         <div>
             <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h1>Remotes</h1>
+                <h1 className="text-2xl font-bold">Remotes</h1>
                 <Button
                     type="primary"
                     icon={<PlusOutlined />}

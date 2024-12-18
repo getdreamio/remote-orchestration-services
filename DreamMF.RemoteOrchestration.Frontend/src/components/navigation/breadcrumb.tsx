@@ -8,6 +8,7 @@ const routeLabels: Record<string, string> = {
     'tags': 'Tags',
     'users': 'Users',
     'settings': 'Settings',
+    'analytics': 'Analytics',
 };
 
 export function Breadcrumb() {

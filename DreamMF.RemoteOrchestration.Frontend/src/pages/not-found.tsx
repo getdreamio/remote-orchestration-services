@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Home } from 'lucide-react';
 
-export function NotFoundPage() {
+const NotFoundPage = () => {
     const navigate = useNavigate();
 
     return (
@@ -20,3 +20,5 @@ export function NotFoundPage() {
         </div>
     );
 }
+
+export default NotFoundPage;

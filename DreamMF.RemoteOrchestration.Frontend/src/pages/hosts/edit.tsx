@@ -1,20 +1,61 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card, Typography, Spin } from 'antd';
+import { Card, Typography, Spin, Tabs, Table } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import HostModal from '@/components/hosts/host-modal';
+import HostForm from '@/components/hosts/host-form';
 import { useGetHost } from '@/hooks/useHosts';
+import { formatDate } from '@/lib/date-utils';
 
 const { Title } = Typography;
+const { TabPane } = Tabs;
+
+interface Version {
+    id: string;
+    version: string;
+    createdAt: string;
+    isActive: boolean;
+}
 
 const EditHostPage: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { data: host, isLoading } = useGetHost(Number(id));
+    const [activeTab, setActiveTab] = useState('general');
+    const [versions] = useState<Version[]>([]);
+    const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
 
-    const handleClose = () => {
+    const handleSuccess = () => {
         navigate('/hosts');
     };
+
+    const columns = [
+        {
+            title: 'Version',
+            dataIndex: 'version',
+            key: 'version',
+        },
+        {
+            title: 'Created At',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            render: (date: string) => {
+                try {
+                    return date ? formatDate(date) : '-';
+                } catch (error) {
+                    return '-';
+                }
+            }
+        },
+        {
+            title: 'Status',
+            key: 'status',
+            render: (_: any, record: Version) => (
+                <span className={record.isActive ? 'text-green-500' : 'text-gray-500'}>
+                    {record.isActive ? 'Active' : 'Inactive'}
+                </span>
+            ),
+        },
+    ];
 
     if (isLoading) {
         return (
@@ -30,7 +71,7 @@ const EditHostPage: React.FC = () => {
                 <div className="text-center">
                     <Title level={4}>Host not found</Title>
                     <button
-                        onClick={handleClose}
+                        onClick={() => navigate('/hosts')}
                         className="text-blue-600 hover:text-blue-800"
                     >
                         Back to Hosts
@@ -43,28 +84,41 @@ const EditHostPage: React.FC = () => {
     return (
         <div className="p-6">
             <div className="flex items-center gap-4 mb-6">
-                <button
-                    onClick={handleClose}
-                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-                >
-                    <ArrowLeftOutlined />
-                    Back to Hosts
-                </button>
                 <Title level={4} className="!mb-0">Edit Host: {host.name}</Title>
             </div>
             <Card>
-                <HostModal
-                    isOpen={true}
-                    onClose={handleClose}
-                    editingHost={{
-                        host_ID: host.id,
-                        name: host.name,
-                        description: host.description,
-                        url: host.url,
-                        key: host.key,
-                        environment: host.environment
-                    }}
-                />
+                <Tabs activeKey={activeTab} onChange={setActiveTab}>
+                    <TabPane tab="General" key="general">
+                        <HostForm
+                            onSuccess={handleSuccess}
+                            editingHost={{
+                                id: host.id,
+                                name: host.name,
+                                description: host.description,
+                                url: host.url,
+                                key: host.key,
+                                environment: host.environment,
+                                tags: host.tags?.map(tag => ({
+                                    key: 'tag',
+                                    value: tag
+                                }))
+                            }}
+                        />
+                    </TabPane>
+                    <TabPane tab="Versions" key="versions">
+                        <div className="py-4">
+                            <Table
+                                columns={columns}
+                                dataSource={versions}
+                                rowKey="id"
+                                onRow={(record: Version) => ({
+                                    onClick: () => setSelectedVersion(record.id),
+                                    className: selectedVersion === record.id ? 'bg-blue-50' : '',
+                                })}
+                            />
+                        </div>
+                    </TabPane>
+                </Tabs>
             </Card>
         </div>
     );

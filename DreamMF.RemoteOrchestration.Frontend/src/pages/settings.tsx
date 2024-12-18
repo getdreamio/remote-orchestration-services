@@ -13,7 +13,7 @@ import {
 } from '../hooks/useConfigurations';
 import { SettingsCard } from '../components/settings/settings-card';
 
-export function SettingsPage() {
+const SettingsPage = () => {
     const { data: configurations, isLoading } = useConfigurations();
     const { mutate: updateConfiguration, isPending: isUpdating } = useUpdateConfiguration();
     const { mutate: createConfiguration, isPending: isCreating } = useCreateConfiguration();
@@ -129,3 +129,5 @@ export function SettingsPage() {
         </div>
     );
 }
+
+export default SettingsPage;

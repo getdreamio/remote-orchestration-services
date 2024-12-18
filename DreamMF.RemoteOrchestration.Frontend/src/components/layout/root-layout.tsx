@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Settings, Users, Server, Database, Tag } from 'lucide-react';
+import { LayoutDashboard, Settings, Users, Server, Database, Tag, BarChart } from 'lucide-react';
 import { ThemeToggle } from '../theme/theme-toggle';
 import { UserMenu } from '../user/user-menu';
 import { Breadcrumb } from '../navigation/breadcrumb';
@@ -62,6 +62,13 @@ const RootLayout = () => {
                             <span>Users</span>
                         </Link>
                         <Link
+                            to="/analytics"
+                            className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent"
+                        >
+                            <BarChart className="h-5 w-5" />
+                            <span>Analytics</span>
+                        </Link>
+                        <Link
                             to="/settings"
                             className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent"
                         >
@@ -70,7 +77,7 @@ const RootLayout = () => {
                         </Link>
                     </nav>
                     <div className="p-4 text-xs text-muted-foreground border-t">
-                        © 2025 Dream.MF - All rights reserved.
+                        2025 Dream.MF - All rights reserved.
                     </div>
                 </aside>
 

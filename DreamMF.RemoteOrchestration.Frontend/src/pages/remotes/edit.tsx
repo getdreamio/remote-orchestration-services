@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Form, Input, Button, Card, message, Tabs, Table, Input as AntInput } from 'antd';
+import { Form, Input, Button, Card, message, Tabs, Table, Input as AntInput, Typography } from 'antd';
 import { useUpdateRemote, useRemote } from '@/hooks/useRemotes';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, CodeOutlined } from '@ant-design/icons';
 import { formatDate } from '@/lib/date-utils';
+import { TagInput, TagItem } from '@/components/tags/tag-input';
+import { useTags } from '@/hooks/useTags';
 
+const { Title } = Typography;
 const { TabPane } = Tabs;
 
 interface Version {
@@ -20,8 +23,10 @@ const EditRemotePage: React.FC = () => {
     const [form] = Form.useForm();
     const updateRemote = useUpdateRemote();
     const { data: remote, isLoading, error } = useRemote(id!);
+    const { data: existingTags = [] } = useTags();
     const [activeTab, setActiveTab] = useState('general');
     const [modules, setModules] = useState<string[]>([]);
+    const [tags, setTags] = useState<TagItem[]>([]);
     const [newModule, setNewModule] = useState('');
     const [versions] = useState<Version[]>([]); // This would be populated from your API
     const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
@@ -33,6 +38,7 @@ const EditRemotePage: React.FC = () => {
                 scope: remote.scope,
             });
             setModules(remote.modules || []);
+            setTags(remote.tags || []);
             setSelectedVersion(remote.activeVersion || null);
         }
     }, [remote, form]);
@@ -43,6 +49,7 @@ const EditRemotePage: React.FC = () => {
                 id: id!,
                 ...values,
                 modules,
+                tags,
                 activeVersion: selectedVersion,
             });
             message.success('Remote updated successfully');
@@ -61,6 +68,16 @@ const EditRemotePage: React.FC = () => {
 
     const removeModule = (moduleToRemove: string) => {
         setModules(modules.filter(m => m !== moduleToRemove));
+    };
+
+    const handleModuleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (newModule && !modules.includes(newModule)) {
+                setModules([...modules, newModule]);
+                setNewModule('');
+            }
+        }
     };
 
     const columns = [
@@ -100,6 +117,12 @@ const EditRemotePage: React.FC = () => {
         },
     };
 
+    // Convert the existing tags to the format expected by TagInput
+    const formattedExistingTags = existingTags.map(tag => ({
+        key: 'tag',
+        value: tag.text
+    }));
+
     if (isLoading) {
         return <div>Loading...</div>;
     }
@@ -110,7 +133,9 @@ const EditRemotePage: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-semibold">Edit Remote</h1>
+            <div className="flex items-center gap-4 mb-6">
+                <Title level={4} className="!mb-0">Edit Remote: {remote.name}</Title>
+            </div>
             <Card>
                 <Tabs activeKey={activeTab} onChange={setActiveTab}>
                     <TabPane tab="General" key="general">
@@ -142,25 +167,43 @@ const EditRemotePage: React.FC = () => {
                                 <Input value={remote?.url} disabled />
                             </Form.Item>
 
+                            <Form.Item label="Tags">
+                                <TagInput
+                                    tags={tags}
+                                    onChange={setTags}
+                                    existingTags={formattedExistingTags}
+                                />
+                            </Form.Item>
+
                             <div className="space-y-2">
                                 <label className="block">Modules</label>
                                 <div className="flex gap-2">
                                     <AntInput
+                                        prefix={<CodeOutlined className="text-muted-foreground" />}
                                         value={newModule}
                                         onChange={(e) => setNewModule(e.target.value)}
-                                        placeholder="Add a module"
+                                        onKeyPress={handleModuleKeyPress}
+                                        placeholder="Add a module and press Enter"
                                     />
-                                    <Button type="primary" onClick={addModule} icon={<PlusOutlined />}>
+                                    <Button 
+                                        type="primary" 
+                                        onClick={addModule} 
+                                        icon={<PlusOutlined />}
+                                    >
                                         Add
                                     </Button>
                                 </div>
                                 <div className="space-y-2">
                                     {modules.map((module) => (
                                         <div key={module} className="flex justify-between items-center p-2 bg-card rounded">
-                                            <span>{module}</span>
+                                            <div className="flex items-center gap-2">
+                                                <CodeOutlined className="text-muted-foreground" />
+                                                <span>{module}</span>
+                                            </div>
                                             <Button
                                                 type="text"
                                                 danger
+                                                icon={<DeleteOutlined />}
                                                 onClick={() => removeModule(module)}
                                             >
                                                 Remove

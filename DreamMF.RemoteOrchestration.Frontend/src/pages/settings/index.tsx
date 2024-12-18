@@ -12,7 +12,7 @@ const SettingsPage: React.FC = () => {
 
     return (
         <div>
-            <h1 className="text-2xl font-semibold mb-6">Settings</h1>
+            <h1 className="text-2xl font-bold">Settings</h1>
             
             <Card>
                 <Form

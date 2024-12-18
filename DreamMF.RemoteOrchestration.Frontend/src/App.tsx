@@ -6,7 +6,7 @@ import { AntThemeProvider } from './components/theme/ant-theme-provider';
 
 const App = () => {
     return (
-        <ThemeProvider defaultTheme="light" storageKey="dream-mf-theme">
+        <ThemeProvider>
             <AntThemeProvider>
                 <RouterProvider router={router} />
             </AntThemeProvider>

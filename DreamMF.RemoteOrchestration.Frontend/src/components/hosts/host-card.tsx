@@ -79,17 +79,6 @@ export const HostCard = ({ host }: HostCardProps) => {
                                 </ul>
                             </div>
                         </div>
-                        <div className="border-t my-4" />
-                        <div className="flex items-start space-x-2">
-                            <Tag className="h-5 w-5 text-muted-foreground" />
-                            <div className="flex flex-wrap gap-2">
-                                {host.tags.map((tag) => (
-                                    <Badge key={tag} variant="secondary" className="hover:bg-secondary/80">
-                                        {tag}
-                                    </Badge>
-                                ))}
-                            </div>
-                        </div>
                     </div>
                 </CardContent>
             )}
