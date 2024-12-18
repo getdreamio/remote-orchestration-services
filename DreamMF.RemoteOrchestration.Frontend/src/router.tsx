@@ -14,7 +14,7 @@ import AnalyticsPage from './pages/analytics';
 import NotFoundPage from './pages/not-found';
 import LoginPage from './pages/auth/login';
 import LogoutPage from './pages/auth/logout';
-import TagsPage from './pages/tags';
+import TagsPage from './pages/tags/index';
 import ErrorDisplay from './components/error/error-display';
 
 export const router = createBrowserRouter([

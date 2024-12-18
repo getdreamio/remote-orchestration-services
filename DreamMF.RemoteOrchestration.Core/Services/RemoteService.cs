@@ -1,8 +1,7 @@
+using DreamMF.RemoteOrchestration.Core.Mappers;
 using DreamMF.RemoteOrchestration.Core.Models;
 using DreamMF.RemoteOrchestration.Database;
 using DreamMF.RemoteOrchestration.Database.Entities;
-using DreamMF.RemoteOrchestration.Core.Mappers;
-using DreamMF.RemoteOrchestration.Core.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace DreamMF.RemoteOrchestration.Core.Services;
@@ -18,94 +17,121 @@ public class RemoteService
 
     public async Task<List<RemoteResponse>> GetAllRemotesAsync()
     {
-        try
-        {
-            var remotes = await _dbContext.Remotes.ToListAsync();
-            return remotes.Select(RemoteMapper.ToResponse).ToList();
-        }
-        catch (Exception ex)
-        {
-            throw new HandledException(ExceptionType.Database, "Failed to retrieve remotes", ex);
-        }
+        var remotes = await _dbContext.Remotes
+            .Include(r => r.RemoteModules)
+                .ThenInclude(rm => rm.Module)
+            .ToListAsync();
+
+        return remotes.Select(RemoteMapper.ToResponse).ToList();
     }
 
     public async Task<RemoteResponse?> GetRemoteByIdAsync(int id)
     {
-        if (id <= 0)
-        {
-            throw new HandledException(ExceptionType.Validation, "ID must be greater than zero.");
-        }
-        try
-        {
-            var remote = await _dbContext.Remotes.FindAsync(id);
-            return remote != null ? RemoteMapper.ToResponse(remote) : null;
-        }
-        catch (Exception ex)
-        {
-            throw new HandledException(ExceptionType.Database, "Failed to retrieve remote by ID", ex);
-        }
+        var remote = await _dbContext.Remotes
+            .Include(r => r.RemoteModules)
+                .ThenInclude(rm => rm.Module)
+            .FirstOrDefaultAsync(r => r.Remote_ID == id);
+
+        return remote != null ? RemoteMapper.ToResponse(remote) : null;
     }
 
     public async Task<RemoteResponse> CreateRemoteAsync(RemoteRequest request)
     {
-        if (request == null)
+        var remote = RemoteMapper.ToEntity(request);
+        
+        // Add modules
+        foreach (var moduleName in request.Modules)
         {
-            throw new HandledException(ExceptionType.Validation, "Request cannot be null.");
+            var module = await _dbContext.Modules.FirstOrDefaultAsync(m => m.Name == moduleName);
+            if (module == null)
+            {
+                module = new Module
+                {
+                    Name = moduleName,
+                    Created_Date = DateTimeOffset.UtcNow,
+                    Updated_Date = DateTimeOffset.UtcNow
+                };
+                _dbContext.Modules.Add(module);
+                await _dbContext.SaveChangesAsync();
+            }
+
+            remote.RemoteModules.Add(new RemoteModule
+            {
+                Module_ID = module.Module_ID,
+                Created_Date = DateTimeOffset.UtcNow,
+                Updated_Date = DateTimeOffset.UtcNow
+            });
         }
-        try
-        {
-            var remote = RemoteMapper.ToEntity(request);
-            _dbContext.Remotes.Add(remote);
-            await _dbContext.SaveChangesAsync();
-            return RemoteMapper.ToResponse(remote);
-        }
-        catch (Exception ex)
-        {
-            throw new HandledException(ExceptionType.Database, "Failed to create remote", ex);
-        }
+
+        _dbContext.Remotes.Add(remote);
+        await _dbContext.SaveChangesAsync();
+
+        return await GetRemoteByIdAsync(remote.Remote_ID);
     }
 
     public async Task<bool> UpdateRemoteAsync(int id, RemoteRequest request)
     {
-        if (id <= 0 || request == null)
-        {
-            throw new HandledException(ExceptionType.Validation, "Invalid input parameters.");
-        }
-        try
-        {
-            var existingRemote = await _dbContext.Remotes.FindAsync(id);
-            if (existingRemote == null) return false;
+        var remote = await _dbContext.Remotes
+            .Include(r => r.RemoteModules)
+                .ThenInclude(rm => rm.Module)
+            .FirstOrDefaultAsync(r => r.Remote_ID == id);
 
-            existingRemote.Name = request.Name;
-            existingRemote.Configuration = request.Configuration;
+        if (remote == null) return false;
 
-            await _dbContext.SaveChangesAsync();
-            return true;
-        }
-        catch (Exception ex)
+        remote.Name = request.Name;
+        remote.Scope = request.Scope;
+        remote.Updated_Date = DateTimeOffset.UtcNow;
+
+        // Update modules
+        var currentModuleNames = remote.RemoteModules.Select(rm => rm.Module.Name).ToList();
+        var modulesToAdd = request.Modules.Except(currentModuleNames);
+        var modulesToRemove = currentModuleNames.Except(request.Modules);
+
+        // Remove modules
+        foreach (var moduleName in modulesToRemove)
         {
-            throw new HandledException(ExceptionType.Database, "Failed to update remote", ex);
+            var moduleToRemove = remote.RemoteModules.FirstOrDefault(rm => rm.Module.Name == moduleName);
+            if (moduleToRemove != null)
+            {
+                remote.RemoteModules.Remove(moduleToRemove);
+            }
         }
+
+        // Add new modules
+        foreach (var moduleName in modulesToAdd)
+        {
+            var module = await _dbContext.Modules.FirstOrDefaultAsync(m => m.Name == moduleName);
+            if (module == null)
+            {
+                module = new Module
+                {
+                    Name = moduleName,
+                    Created_Date = DateTimeOffset.UtcNow,
+                    Updated_Date = DateTimeOffset.UtcNow
+                };
+                _dbContext.Modules.Add(module);
+                await _dbContext.SaveChangesAsync();
+            }
+
+            remote.RemoteModules.Add(new RemoteModule
+            {
+                Module_ID = module.Module_ID,
+                Created_Date = DateTimeOffset.UtcNow,
+                Updated_Date = DateTimeOffset.UtcNow
+            });
+        }
+
+        await _dbContext.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> DeleteRemoteAsync(int id)
     {
-        if (id <= 0)
-        {
-            throw new HandledException(ExceptionType.Validation, "ID must be greater than zero.");
-        }
-        try
-        {
-            var remote = await _dbContext.Remotes.FindAsync(id);
-            if (remote == null) return false;
+        var remote = await _dbContext.Remotes.FindAsync(id);
+        if (remote == null) return false;
 
-            _dbContext.Remotes.Remove(remote);
-            await _dbContext.SaveChangesAsync();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            throw new HandledException(ExceptionType.Database, "Failed to delete remote", ex);
-        }
+        _dbContext.Remotes.Remove(remote);
+        await _dbContext.SaveChangesAsync();
+        return true;
     }
 }
