@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Server, Key, HardDrive, Tag } from 'lucide-react';
+import { ChevronDown, ChevronUp, Server, Key, HardDrive, Tag, Globe, GitBranch, FileText, User } from 'lucide-react';
 
 interface Host {
     id: string;
@@ -12,6 +12,11 @@ interface Host {
     remotes: string[];
     storage: string;
     tags: string[];
+    url: string;
+    repository?: string;
+    documentationUrl?: string;
+    contactName?: string;
+    contactEmail?: string;
 }
 
 interface HostCardProps {
@@ -77,6 +82,43 @@ export const HostCard = ({ host }: HostCardProps) => {
                                         <li key={remote} className="text-sm text-muted-foreground">{remote}</li>
                                     ))}
                                 </ul>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                    <Globe className="h-4 w-4 text-muted-foreground" />
+                                    <a href={host.url} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                                        {host.url}
+                                    </a>
+                                </div>
+                                {host.repository && (
+                                    <div className="flex items-center gap-2">
+                                        <GitBranch className="h-4 w-4 text-muted-foreground" />
+                                        <a href={host.repository} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                                            Repository
+                                        </a>
+                                    </div>
+                                )}
+                                {host.documentationUrl && (
+                                    <div className="flex items-center gap-2">
+                                        <FileText className="h-4 w-4 text-muted-foreground" />
+                                        <a href={host.documentationUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">
+                                            Documentation
+                                        </a>
+                                    </div>
+                                )}
+                                {(host.contactName || host.contactEmail) && (
+                                    <div className="flex items-center gap-2">
+                                        <User className="h-4 w-4 text-muted-foreground" />
+                                        <span className="text-sm">
+                                            {host.contactName}
+                                            {host.contactEmail && (
+                                                <a href={`mailto:${host.contactEmail}`} className="ml-1 hover:underline">
+                                                    ({host.contactEmail})
+                                                </a>
+                                            )}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

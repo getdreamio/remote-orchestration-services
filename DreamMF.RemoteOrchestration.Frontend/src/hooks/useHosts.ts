@@ -8,17 +8,33 @@ interface Host {
     url: string;
     key: string;
     environment: string;
-    created_Date: string;
-    updated_Date: string;
+    repository?: string;
+    contactName?: string;
+    contactEmail?: string;
+    documentationUrl?: string;
+    tags?: string[];
+    createdAt?: string;
+    updatedAt?: string;
 }
 
-export interface HostRequest {
-    name: string;
-    description: string;
-    url: string;
-    environment: string;
-    tags: string[];
+interface HostRemote {
+    id: number;
+    hostId: number;
+    remoteId: number;
+    createdAt: string;
 }
+
+interface HostRemoteCount {
+    hostId: number;
+    count: number;
+}
+
+interface RemoteHostCount {
+    remoteId: number;
+    count: number;
+}
+
+export type HostRequest = Omit<Host, 'id' | 'createdAt' | 'updatedAt'>;
 
 const fetchHosts = async (): Promise<Host[]> => {
     const response = await fetch(`${config.backendUrl}/api/hosts`);
@@ -30,6 +46,57 @@ const fetchHosts = async (): Promise<Host[]> => {
 
 const fetchHost = async (id: number): Promise<Host> => {
     const response = await fetch(`${config.backendUrl}/api/hosts/${id}`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+};
+
+// Fetch remotes attached to a host
+const fetchHostRemotes = async (hostId: number): Promise<HostRemote[]> => {
+    const response = await fetch(`${config.backendUrl}/api/hosts/${hostId}/remotes`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+};
+
+// Attach a remote to a host
+const attachRemoteToHost = async ({ hostId, remoteId }: { hostId: number; remoteId: number }): Promise<void> => {
+    const response = await fetch(`${config.backendUrl}/api/hosts/${hostId}/remotes`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ remoteId }),
+    });
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+};
+
+// Detach a remote from a host
+const detachRemoteFromHost = async ({ hostId, remoteId }: { hostId: number; remoteId: number }): Promise<void> => {
+    const response = await fetch(`${config.backendUrl}/api/hosts/${hostId}/remotes/${remoteId}`, {
+        method: 'DELETE',
+    });
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+};
+
+// Fetch remote counts for all hosts
+const fetchHostRemoteCounts = async (): Promise<HostRemoteCount[]> => {
+    const response = await fetch(`${config.backendUrl}/api/hosts/remote-counts`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+};
+
+// Fetch host counts for all remotes
+const fetchRemoteHostCounts = async (): Promise<RemoteHostCount[]> => {
+    const response = await fetch(`${config.backendUrl}/api/remotes/host-counts`);
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -111,5 +178,49 @@ export const useDeleteHost = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['hosts'] });
         },
+    });
+};
+
+export const useHostRemotes = (hostId: number) => {
+    return useQuery({
+        queryKey: ['hosts', hostId, 'remotes'],
+        queryFn: () => fetchHostRemotes(hostId),
+        enabled: !!hostId,
+    });
+};
+
+export const useAttachRemote = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: attachRemoteToHost,
+        onSuccess: (_, { hostId }) => {
+            queryClient.invalidateQueries({ queryKey: ['hosts', hostId, 'remotes'] });
+        },
+    });
+};
+
+export const useDetachRemote = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: detachRemoteFromHost,
+        onSuccess: (_, { hostId }) => {
+            queryClient.invalidateQueries({ queryKey: ['hosts', hostId, 'remotes'] });
+        },
+    });
+};
+
+export const useHostRemoteCounts = () => {
+    return useQuery({
+        queryKey: ['hosts', 'remote-counts'],
+        queryFn: fetchHostRemoteCounts,
+    });
+};
+
+export const useRemoteHostCounts = () => {
+    return useQuery({
+        queryKey: ['remotes', 'host-counts'],
+        queryFn: fetchRemoteHostCounts,
     });
 };

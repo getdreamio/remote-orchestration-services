@@ -9,18 +9,35 @@ import { useNavigate } from 'react-router-dom';
 
 // Mock data for analytics and logs (replace with real data later)
 const analyticsData = {
-    hostUptime: 99.8,
-    remoteUsage: 85.2,
+    hostUptime: 99.9,
     errorRate: 0.3,
-    totalRequests: 15482,
+    errors24h: 42,
+    errors30d: 1240,
+    requests24h: 15482,
+    requests30d: 428650,
     avgResponseTime: 120,
+    s3ResponseTime: 42,
+    azureResponseTime: 38,
+    dbResponseTime: 12,
 };
 
-const recentLogs = [
-    { type: 'success', message: 'Remote module deployment successful', timestamp: new Date().toISOString() },
-    { type: 'error', message: 'Host connection timeout', timestamp: new Date(Date.now() - 3600000).toISOString() },
-    { type: 'info', message: 'Configuration updated', timestamp: new Date(Date.now() - 7200000).toISOString() },
-];
+const recentLogs = {
+    information: [
+        { timestamp: '2023-12-18 13:45:23', message: 'Remote service deployment completed successfully' },
+        { timestamp: '2023-12-18 13:42:15', message: 'Backup process initiated' },
+        { timestamp: '2023-12-18 13:40:00', message: 'System health check completed' }
+    ],
+    warnings: [
+        { timestamp: '2023-12-18 13:44:10', message: 'High memory usage detected on host-01' },
+        { timestamp: '2023-12-18 13:41:30', message: 'Slow response time from storage service' },
+        { timestamp: '2023-12-18 13:39:45', message: 'Database connection pool nearing capacity' }
+    ],
+    exceptions: [
+        { timestamp: '2023-12-18 13:43:05', message: 'Failed to connect to remote endpoint' },
+        { timestamp: '2023-12-18 13:40:55', message: 'Authentication token expired' },
+        { timestamp: '2023-12-18 13:38:20', message: 'Database query timeout' }
+    ]
+};
 
 const DashboardPage: React.FC = () => {
     const navigate = useNavigate();
@@ -36,6 +53,19 @@ const DashboardPage: React.FC = () => {
                 return <XCircleIcon className="h-4 w-4 text-red-500" />;
             default:
                 return <AlertCircleIcon className="h-4 w-4 text-blue-500" />;
+        }
+    };
+
+    const getEnvironmentBadgeColor = (environment: string) => {
+        switch (environment.toLowerCase()) {
+            case 'production':
+                return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+            case 'staging':
+                return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+            case 'development':
+                return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+            default:
+                return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
         }
     };
 
@@ -87,12 +117,32 @@ const DashboardPage: React.FC = () => {
                     <Col xs={24} sm={8}>
                         <Card title="System Health" className="h-full bg-gray-50 dark:bg-gray-800">
                             <div className="space-y-4">
-                                <Progress 
-                                    type="circle" 
-                                    percent={analyticsData.hostUptime} 
-                                    size="small"
-                                    strokeColor={{ '0%': '#108ee9', '100%': '#87d068' }}
-                                />
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div>
+                                        <Statistic
+                                            title="AWS S3"
+                                            value={analyticsData.s3ResponseTime || 42}
+                                            suffix="ms"
+                                            valueStyle={{ color: '#3f8600' }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <Statistic
+                                            title="Azure Blob"
+                                            value={analyticsData.azureResponseTime || 38}
+                                            suffix="ms"
+                                            valueStyle={{ color: '#3f8600' }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <Statistic
+                                            title="Database"
+                                            value={analyticsData.dbResponseTime || 12}
+                                            suffix="ms"
+                                            valueStyle={{ color: '#3f8600' }}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </Card>
                     </Col>
@@ -102,10 +152,26 @@ const DashboardPage: React.FC = () => {
                         className="h-full bg-gray-50 dark:bg-gray-800"
                         extra={<Button type="link" onClick={() => navigate('/analytics')}>View Usage</Button>}>
                             <div className="space-y-4">
-                                <Statistic
-                                    value={analyticsData.totalRequests}
-                                    suffix="requests"
-                                />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Statistic
+                                        title="24 Hour Total"
+                                        value={analyticsData.requests24h}
+                                        suffix="requests"
+                                    />
+                                    <Statistic
+                                        title="30 Day Total"
+                                        value={analyticsData.requests30d}
+                                        suffix="requests"
+                                    />
+                                </div>
+                                <div className="pt-2">
+                                    <Progress
+                                        percent={Math.round((analyticsData.requests24h / 20000) * 100)}
+                                        size="small"
+                                        strokeColor="#3f8600"
+                                        showInfo={false}
+                                    />
+                                </div>
                             </div>
                         </Card>
                     </Col>
@@ -115,11 +181,28 @@ const DashboardPage: React.FC = () => {
                             className="h-full bg-gray-50 dark:bg-gray-800"
                             extra={<Button type="link" onClick={() => navigate('/analytics')}>View Analytics</Button>}>
                             <div className="space-y-4">
-                                <Progress
-                                    percent={analyticsData.errorRate}
-                                    size="small"
-                                    strokeColor="#f5222d"
-                                />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Statistic
+                                        title="24 Hour Average"
+                                        value={analyticsData.errors24h}
+                                        suffix="errors"
+                                        valueStyle={{ color: analyticsData.errors24h > 50 ? '#cf1322' : '#3f8600' }}
+                                    />
+                                    <Statistic
+                                        title="30 Day Average"
+                                        value={Math.round(analyticsData.errors30d / 30)}
+                                        suffix="errors"
+                                        valueStyle={{ color: (analyticsData.errors30d / 30) > 50 ? '#cf1322' : '#3f8600' }}
+                                    />
+                                </div>
+                                <div className="pt-2">
+                                    <Progress
+                                        percent={Math.round((analyticsData.errors24h / 100) * 100)}
+                                        size="small"
+                                        strokeColor={analyticsData.errors24h > 50 ? '#cf1322' : '#3f8600'}
+                                        showInfo={false}
+                                    />
+                                </div>
                             </div>
                         </Card>
                     </Col>
@@ -135,18 +218,40 @@ const DashboardPage: React.FC = () => {
                             className="h-full bg-gray-50 dark:bg-gray-800"
                             extra={<Button type="link" onClick={() => navigate('/logging')}>View All Logs</Button>}
                         >
-                            <div className="space-y-4">
-                                {recentLogs.map((log, i) => (
-                                    <div key={i} className="flex items-start gap-3 p-3 rounded-md hover:bg-muted/50">
-                                        {getLogIcon(log.type)}
-                                        <div className="flex-1">
-                                            <div className="font-medium">{log.message}</div>
-                                            <div className="text-xs text-muted-foreground dark:text-muted-foreground/70">
-                                                {formatDate(log.timestamp)}
+                            <div className="grid grid-cols-3 gap-4">
+                                <div>
+                                    <h3 className="text-base font-medium mb-2 text-blue-600 dark:text-blue-400">Information</h3>
+                                    <div className="space-y-2">
+                                        {recentLogs.information.map((log, i) => (
+                                            <div key={i} className="text-sm">
+                                                <div className="text-gray-500 dark:text-gray-400 text-xs">{log.timestamp}</div>
+                                                <div className="text-gray-900 dark:text-gray-100">{log.message}</div>
                                             </div>
-                                        </div>
+                                        ))}
                                     </div>
-                                ))}
+                                </div>
+                                <div>
+                                    <h3 className="text-base font-medium mb-2 text-yellow-600 dark:text-yellow-400">Warnings</h3>
+                                    <div className="space-y-2">
+                                        {recentLogs.warnings.map((log, i) => (
+                                            <div key={i} className="text-sm">
+                                                <div className="text-gray-500 dark:text-gray-400 text-xs">{log.timestamp}</div>
+                                                <div className="text-gray-900 dark:text-gray-100">{log.message}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 className="text-base font-medium mb-2 text-red-600 dark:text-red-400">Exceptions</h3>
+                                    <div className="space-y-2">
+                                        {recentLogs.exceptions.map((log, i) => (
+                                            <div key={i} className="text-sm">
+                                                <div className="text-gray-500 dark:text-gray-400 text-xs">{log.timestamp}</div>
+                                                <div className="text-gray-900 dark:text-gray-100">{log.message}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                         </Card>
                     </Col>
@@ -165,9 +270,14 @@ const DashboardPage: React.FC = () => {
                             <div className="space-y-3">
                                 {hosts?.slice(0, 3).map((host, i) => (
                                     <div key={i} className="flex flex-col gap-1 p-2 rounded-md hover:bg-muted/50 cursor-pointer" onClick={() => navigate(`/hosts/${host.id}`)}>
-                                        <div className="flex items-center gap-2">
-                                            <ServerIcon className="h-4 w-4 text-blue-500 dark:text-blue-400" />
-                                            <span className="font-medium">{host.name}</span>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <ServerIcon className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+                                                <span className="font-medium">{host.name}</span>
+                                            </div>
+                                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getEnvironmentBadgeColor(host.environment)}`}>
+                                                {host.environment}
+                                            </span>
                                         </div>
                                         <div className="flex items-center gap-1 text-xs text-muted-foreground dark:text-muted-foreground/70">
                                             <ClockIcon className="h-3 w-3" />

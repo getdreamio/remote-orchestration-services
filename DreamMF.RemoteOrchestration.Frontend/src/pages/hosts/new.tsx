@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Typography, Tabs, Table } from 'antd';
+import { Card, Typography, Tabs, Table, Button } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import HostForm from '@/components/hosts/host-form';
 import { TagInput, TagItem } from '@/components/tags/tag-input';
@@ -71,20 +71,30 @@ const NewHostPage: React.FC = () => {
             <Card className="bg-gray-50 dark:bg-gray-800">
                 <Tabs activeKey={activeTab} onChange={setActiveTab}>
                     <TabPane tab="General" key="general">
-                        <HostForm onSuccess={handleSuccess} />
+                        <HostForm 
+                            onSuccess={handleSuccess} 
+                            mode="general"
+                            renderFooter={(isSubmitting) => (
+                                <div className="flex justify-end gap-2 mt-6">
+                                    <Button type="primary" htmlType="submit" loading={isSubmitting}>
+                                        Create Host
+                                    </Button>
+                                </div>
+                            )}
+                        />
                     </TabPane>
-                    <TabPane tab="Versions" key="versions">
-                        <div className="py-4">
-                            <Table
-                                columns={columns}
-                                dataSource={versions}
-                                rowKey="id"
-                                onRow={(record: Version) => ({
-                                    onClick: () => setSelectedVersion(record.id),
-                                    className: selectedVersion === record.id ? 'bg-blue-50' : '',
-                                })}
-                            />
-                        </div>
+                    <TabPane tab="Information" key="information">
+                        <HostForm 
+                            onSuccess={handleSuccess} 
+                            mode="information"
+                            renderFooter={(isSubmitting) => (
+                                <div className="flex justify-end gap-2 mt-6">
+                                    <Button type="primary" htmlType="submit" loading={isSubmitting}>
+                                        Create Host
+                                    </Button>
+                                </div>
+                            )}
+                        />
                     </TabPane>
                 </Tabs>
             </Card>

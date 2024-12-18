@@ -36,6 +36,10 @@ const EditRemotePage: React.FC = () => {
             form.setFieldsValue({
                 name: remote.name,
                 scope: remote.scope,
+                repository: remote.repository,
+                contactName: remote.contactName,
+                contactEmail: remote.contactEmail,
+                documentationUrl: remote.documentationUrl
             });
             setModules(remote.modules || []);
             setTags(remote.tags || []);
@@ -52,6 +56,10 @@ const EditRemotePage: React.FC = () => {
                     modules,
                     tags,
                     activeVersion: selectedVersion,
+                    repository: form.getFieldValue('repository'),
+                    contactName: form.getFieldValue('contactName'),
+                    contactEmail: form.getFieldValue('contactEmail'),
+                    documentationUrl: form.getFieldValue('documentationUrl')
                 }
             });
             message.success('Remote updated successfully');
@@ -138,13 +146,21 @@ const EditRemotePage: React.FC = () => {
             <div className="flex items-center gap-4 mb-6">
                 <Title level={4} className="!mb-0">Edit Remote: {remote.name}</Title>
             </div>
-            <Card className="bg-gray-50 dark:bg-transparent">
+            <Card className="bg-gray-50 dark:bg-gray-800">
                 <Tabs activeKey={activeTab} onChange={setActiveTab}>
                     <TabPane tab="General" key="general">
                         <Form
                             form={form}
                             layout="vertical"
                             onFinish={onFinish}
+                            initialValues={{
+                                name: remote.name,
+                                scope: remote.scope,
+                                repository: remote.repository,
+                                contactName: remote.contactName,
+                                contactEmail: remote.contactEmail,
+                                documentationUrl: remote.documentationUrl
+                            }}
                             className="space-y-4"
                         >
                             <Form.Item
@@ -166,7 +182,7 @@ const EditRemotePage: React.FC = () => {
                             <Form.Item
                                 label="URL"
                             >
-                                <Input value={remote?.url} disabled />
+                                <Input value={remote.url} disabled />
                             </Form.Item>
 
                             <div className="space-y-2">
@@ -189,10 +205,10 @@ const EditRemotePage: React.FC = () => {
                                 </div>
                                 <div className="space-y-2">
                                     {modules.map((module) => (
-                                        <div key={module.id} className="flex justify-between items-center p-2 bg-card rounded">
+                                        <div key={module} className="flex justify-between items-center p-2 bg-card rounded">
                                             <div className="flex items-center gap-2">
                                                 <CodeOutlined className="text-muted-foreground" />
-                                                <span>{module.name}</span>
+                                                <span>{module}</span>
                                             </div>
                                             <Button
                                                 type="text"
@@ -213,6 +229,68 @@ const EditRemotePage: React.FC = () => {
                                     onChange={setTags}
                                     existingTags={formattedExistingTags}
                                 />
+                            </Form.Item>
+
+                            <div className="flex justify-end space-x-2 pt-4">
+                                <Button onClick={() => navigate('/remotes')}>
+                                    Cancel
+                                </Button>
+                                <Button type="primary" htmlType="submit">
+                                    Save Changes
+                                </Button>
+                            </div>
+                        </Form>
+                    </TabPane>
+                    <TabPane tab="Information" key="information">
+                        <Form
+                            form={form}
+                            layout="vertical"
+                            onFinish={onFinish}
+                            initialValues={{
+                                name: remote.name,
+                                scope: remote.scope,
+                                repository: remote.repository,
+                                contactName: remote.contactName,
+                                contactEmail: remote.contactEmail,
+                                documentationUrl: remote.documentationUrl
+                            }}
+                            className="space-y-4"
+                        >
+                            <Form.Item
+                                label="Repository"
+                                name="repository"
+                                rules={[
+                                    { type: 'url', message: 'Please enter a valid repository URL!' }
+                                ]}
+                            >
+                                <Input placeholder="e.g., https://github.com/organization/repo" />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Contact Name"
+                                name="contactName"
+                            >
+                                <Input placeholder="e.g., John Smith" />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Contact Email"
+                                name="contactEmail"
+                                rules={[
+                                    { type: 'email', message: 'Please enter a valid email address!' }
+                                ]}
+                            >
+                                <Input placeholder="e.g., john.smith@company.com" />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Documentation URL"
+                                name="documentationUrl"
+                                rules={[
+                                    { type: 'url', message: 'Please enter a valid URL!' }
+                                ]}
+                            >
+                                <Input placeholder="e.g., https://docs.example.com" />
                             </Form.Item>
 
                             <div className="flex justify-end space-x-2 pt-4">

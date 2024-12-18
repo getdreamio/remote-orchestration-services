@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Table, message, Tag, Typography, Tooltip, Popconfirm } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
-import { useHosts, useDeleteHost } from '@/hooks/useHosts';
+import { PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined, ApiOutlined } from '@ant-design/icons';
+import { useHosts, useDeleteHost, useHostRemoteCounts } from '@/hooks/useHosts';
 import { useNavigate } from 'react-router-dom';
 
 const { Text } = Typography;
@@ -9,6 +9,7 @@ const { Text } = Typography;
 const HostsPage: React.FC = () => {
     const navigate = useNavigate();
     const { data: hosts, isLoading } = useHosts();
+    const { data: remoteCounts } = useHostRemoteCounts();
     const deleteHost = useDeleteHost();
 
     const handleEdit = (host: any) => {
@@ -41,6 +42,8 @@ const HostsPage: React.FC = () => {
                 return 'default';
         }
     };
+
+    const formatDate = (date: string) => new Date(date).toLocaleDateString();
 
     const columns = [
         {
@@ -104,10 +107,35 @@ const HostsPage: React.FC = () => {
                 record.environment.toLowerCase() === value.toLowerCase(),
         },
         {
+            title: 'Remotes',
+            key: 'remotes',
+            render: (_: any, record: any) => {
+                const count = remoteCounts?.find(rc => rc.hostId === record.id)?.count || 0;
+                return (
+                    <Tooltip title={`${count} remote${count === 1 ? '' : 's'} connected`}>
+                        <div className="flex items-center gap-1">
+                            <ApiOutlined />
+                            <span>{count}</span>
+                        </div>
+                    </Tooltip>
+                );
+            },
+        },
+        {
+            title: 'Last Updated',
+            dataIndex: 'updated_Date',
+            key: 'updated_Date',
+            render: (date: string) => formatDate(date),
+            sorter: (a: any, b: any) => {
+                if (!a.updated_Date || !b.updated_Date) return 0;
+                return new Date(a.updated_Date).getTime() - new Date(b.updated_Date).getTime();
+            },
+        },
+        {
             title: 'Created',
             dataIndex: 'created_Date',
             key: 'created_Date',
-            render: (date: string) => new Date(date).toLocaleDateString(),
+            render: (date: string) => formatDate(date),
             sorter: (a: any, b: any) => new Date(a.created_Date).getTime() - new Date(b.created_Date).getTime(),
         },
         {

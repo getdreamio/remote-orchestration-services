@@ -43,6 +43,10 @@ const NewRemotePage: React.FC = () => {
                 modules,
                 tags,
                 activeVersion: selectedVersion,
+                repository: form.getFieldValue('repository'),
+                contactName: form.getFieldValue('contactName'),
+                contactEmail: form.getFieldValue('contactEmail'),
+                documentationUrl: form.getFieldValue('documentationUrl')
             });
             message.success('Remote created successfully');
             navigate('/remotes');
@@ -112,9 +116,9 @@ const NewRemotePage: React.FC = () => {
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-4 mb-6">
-                <Title level={4} className="!mb-0">New Host</Title>
+                <Title level={4} className="!mb-0">New Remote</Title>
             </div>
-            <Card className="bg-gray-50 dark:bg-transparent">
+            <Card className="bg-gray-50 dark:bg-gray-800">
                 <Tabs activeKey={activeTab} onChange={setActiveTab}>
                     <TabPane tab="General" key="general">
                         <Form
@@ -199,6 +203,58 @@ const NewRemotePage: React.FC = () => {
                                     Create Remote
                                 </Button>
                             </div>
+                        </Form>
+                    </TabPane>
+
+                    <TabPane tab="Information" key="information">
+                        <Form
+                            form={form}
+                            layout="vertical"
+                            onFinish={onFinish}
+                            className="space-y-4"
+                        >
+                            <Form.Item
+                                label="Repository"
+                                name="repository"
+                                rules={[
+                                    { type: 'url', message: 'Please enter a valid repository URL!' }
+                                ]}
+                            >
+                                <Input placeholder="e.g., https://github.com/organization/repo" />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Contact Name"
+                                name="contactName"
+                            >
+                                <Input placeholder="e.g., John Smith" />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Contact Email"
+                                name="contactEmail"
+                                rules={[
+                                    { type: 'email', message: 'Please enter a valid email address!' }
+                                ]}
+                            >
+                                <Input placeholder="e.g., john.smith@company.com" />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Documentation URL"
+                                name="documentationUrl"
+                                rules={[
+                                    { type: 'url', message: 'Please enter a valid URL!' }
+                                ]}
+                            >
+                                <Input placeholder="e.g., https://docs.example.com" />
+                            </Form.Item>
+
+                            <Form.Item className="!mb-0">
+                                <Button type="primary" htmlType="submit">
+                                    Create Remote
+                                </Button>
+                            </Form.Item>
                         </Form>
                     </TabPane>
                 </Tabs>

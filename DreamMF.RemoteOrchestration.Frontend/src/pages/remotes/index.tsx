@@ -2,11 +2,17 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Table, Popconfirm, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useRemotes, useDeleteRemote } from '@/hooks/useRemotes';
+import { useRemotes, useDeleteRemote, useRemoteModuleCounts } from '@/hooks/useRemotes';
+import { useRemoteHostCounts } from '@/hooks/useHosts';
+import { formatDate } from '@/lib/date-utils';
+import { useRemoteSubRemoteCounts } from '@/hooks/useRemotes';
 
 const RemotesPage: React.FC = () => {
     const navigate = useNavigate();
     const { data: remotes, isLoading } = useRemotes();
+    const { data: hostCounts } = useRemoteHostCounts();
+    const { data: moduleCounts } = useRemoteModuleCounts();
+    const { data: subRemoteCounts } = useRemoteSubRemoteCounts();
     const deleteRemote = useDeleteRemote();
 
     const handleDelete = async (id: number) => {
@@ -25,14 +31,45 @@ const RemotesPage: React.FC = () => {
             key: 'name',
         },
         {
-            title: 'Storage Type',
-            dataIndex: 'storageType',
-            key: 'storageType',
+            title: 'Modules',
+            key: 'modules',
+            render: (_: any, record: any) => {
+                const count = moduleCounts?.find(mc => mc.remoteId === record.id)?.count || 0;
+                return (
+                    <span>{count}</span>
+                );
+            },
+        },
+        {
+            title: 'Sub-Remotes',
+            key: 'subRemotes',
+            render: (_: any, record: any) => {
+                const count = subRemoteCounts?.find(src => src.remoteId === record.id)?.count || 0;
+                return (
+                    <span>{count}</span>
+                );
+            },
+        },
+        {
+            title: 'Hosts',
+            key: 'hosts',
+            render: (_: any, record: any) => {
+                const count = hostCounts?.find(hc => hc.remoteId === record.id)?.count || 0;
+                return (
+                    <span>{count}</span>
+                );
+            },
         },
         {
             title: 'Created Date',
             dataIndex: 'created_Date',
             key: 'created_Date',
+            render: (date: string) => new Date(date).toLocaleDateString(),
+        },
+        {
+            title: 'Last Updated',
+            dataIndex: 'updated_Date',
+            key: 'updated_Date',
             render: (date: string) => new Date(date).toLocaleDateString(),
         },
         {
