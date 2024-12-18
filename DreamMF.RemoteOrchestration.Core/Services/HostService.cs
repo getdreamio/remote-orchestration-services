@@ -93,7 +93,7 @@ public class HostService
         return hosts.Select(HostMapper.ToResponse).ToList();
     }
 
-    public List<RemoteResponse> GetRemotesByHostIdAsync(int hostId)
+    public async Task<List<RemoteResponse>> GetRemotesByHostIdAsync(int hostId)
     {
         if (hostId <= 0)
         {
@@ -102,10 +102,10 @@ public class HostService
         var remotes = _dbContext.Host_Remotes
             .Where(hr => hr.Host_ID == hostId)
             .Select(hr => hr.Remote_ID);
-        return _dbContext.Remotes
+        return await _dbContext.Remotes
             .Where(r => remotes.Contains(r.Remote_ID))
             .Select(r => r.ToResponse())
-            .ToList();
+            .ToListAsync();
     }
 
     public async Task<bool> AttachRemoteToHostAsync(int hostId, int remoteId)
