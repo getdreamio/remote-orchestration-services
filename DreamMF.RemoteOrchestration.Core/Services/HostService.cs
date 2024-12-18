@@ -58,7 +58,10 @@ public class HostService
         if (existingHost == null) return false;
 
         existingHost.Name = request.Name;
+        existingHost.Description = request.Description;
         existingHost.Url = request.Url;
+        existingHost.Environment = request.Environment;
+        existingHost.Updated_Date = DateTimeOffset.UtcNow;
 
         await _dbContext.SaveChangesAsync();
         return true;

@@ -50,12 +50,9 @@ const HostsPage: React.FC = () => {
             dataIndex: 'name',
             key: 'name',
             sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-            render: (name: string, record: any) => (
+            render: (name: string) => (
                 <div>
-                    <div>{name}</div>
-                    <Text type="secondary" className="text-sm">
-                        {record.description}
-                    </Text>
+                    <div><b>{name}</b></div>
                 </div>
             ),
         },

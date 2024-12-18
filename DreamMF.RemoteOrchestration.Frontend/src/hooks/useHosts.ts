@@ -27,10 +27,26 @@ const fetchHosts = async (): Promise<Host[]> => {
     return response.json();
 };
 
+const fetchHost = async (id: number): Promise<Host> => {
+    const response = await fetch(`${config.backendUrl}/hosts/${id}`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+};
+
 export const useHosts = () => {
     return useQuery({
         queryKey: ['hosts'],
         queryFn: fetchHosts
+    });
+};
+
+export const useGetHost = (id: number) => {
+    return useQuery({
+        queryKey: ['hosts', id],
+        queryFn: () => fetchHost(id),
+        enabled: !!id
     });
 };
 

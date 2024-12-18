@@ -5,7 +5,7 @@ import { useTags } from '@/hooks/useTags';
 import { useRemotes } from '@/hooks/useRemotes';
 import { ServerIcon, TagIcon, DatabaseIcon } from 'lucide-react';
 
-const HomePage: React.FC = () => {
+const DashboardPage: React.FC = () => {
     const { data: hosts } = useHosts();
     const { data: tags } = useTags();
     const { data: remotes } = useRemotes();
@@ -13,7 +13,6 @@ const HomePage: React.FC = () => {
     return (
         <div>
             <h1 className="text-2xl font-semibold mb-6">Dashboard</h1>
-            
             <Row gutter={[16, 16]}>
                 <Col xs={24} sm={8}>
                     <Card>
@@ -101,4 +100,4 @@ const HomePage: React.FC = () => {
     );
 };
 
-export default HomePage;
+export default DashboardPage;

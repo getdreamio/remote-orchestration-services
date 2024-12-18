@@ -10,8 +10,9 @@ public static class HostMapper
         return new Host
         {
             Name = request.Name,
+            Description = request.Description,
             Url = request.Url,
-            Key = request.Key,
+            Key = Host.GenerateKey(),
             Environment = request.Environment,
             Created_Date = request.Created_Date,
             Updated_Date = request.Updated_Date
@@ -24,6 +25,7 @@ public static class HostMapper
         {
             Id = entity.Host_ID,
             Name = entity.Name,
+            Description = entity.Description,
             Url = entity.Url,
             Key = entity.Key,
             Environment = entity.Environment,
