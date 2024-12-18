@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Form, Input, Button, Card, message, Tabs, Table, Input as AntInput, Typography } from 'antd';
-import { useUpdateRemote, useRemote } from '@/hooks/useRemotes';
+import { useUpdateRemote, useRemote, RemoteModule } from '@/hooks/useRemotes';
 import { PlusOutlined, DeleteOutlined, CodeOutlined } from '@ant-design/icons';
 import { formatDate } from '@/lib/date-utils';
 import { TagInput, TagItem } from '@/components/tags/tag-input';
@@ -22,10 +22,10 @@ const EditRemotePage: React.FC = () => {
     const navigate = useNavigate();
     const [form] = Form.useForm();
     const updateRemote = useUpdateRemote();
-    const { data: remote, isLoading, error } = useRemote(id!);
+    const { data: remote, isLoading, error } = useRemote(Number(id));
     const { data: existingTags = [] } = useTags();
     const [activeTab, setActiveTab] = useState('general');
-    const [modules, setModules] = useState<string[]>([]);
+    const [modules, setModules] = useState<RemoteModule[]>([]);
     const [tags, setTags] = useState<TagItem[]>([]);
     const [newModule, setNewModule] = useState('');
     const [versions] = useState<Version[]>([]); // This would be populated from your API
@@ -189,10 +189,10 @@ const EditRemotePage: React.FC = () => {
                                 </div>
                                 <div className="space-y-2">
                                     {modules.map((module) => (
-                                        <div key={module} className="flex justify-between items-center p-2 bg-card rounded">
+                                        <div key={module.id} className="flex justify-between items-center p-2 bg-card rounded">
                                             <div className="flex items-center gap-2">
                                                 <CodeOutlined className="text-muted-foreground" />
-                                                <span>{module}</span>
+                                                <span>{module.name}</span>
                                             </div>
                                             <Button
                                                 type="text"
