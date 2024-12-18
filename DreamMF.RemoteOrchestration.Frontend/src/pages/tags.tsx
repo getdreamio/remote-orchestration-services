@@ -7,7 +7,6 @@ import { formatDate } from '@/utils/date-utils';
 interface Tag {
   id: number;
   key: string;
-  value: string;
   created_Date?: string;
   updated_Date?: string;
 }
@@ -70,11 +69,6 @@ const TagsPage: React.FC = () => {
       title: 'Key',
       dataIndex: 'key',
       key: 'key',
-    },
-    {
-      title: 'Value',
-      dataIndex: 'value',
-      key: 'value',
     },
     {
       title: 'Created Date',
@@ -153,13 +147,6 @@ const TagsPage: React.FC = () => {
             name="key"
             label="Key"
             rules={[{ required: true, message: 'Please input tag key!' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="value"
-            label="Value"
-            rules={[{ required: true, message: 'Please input tag value!' }]}
           >
             <Input />
           </Form.Item>
