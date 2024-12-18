@@ -3,14 +3,16 @@ import { config } from '@/config/env';
 import { message } from 'antd';
 
 interface Tag {
-    tag_ID: number;
-    text: string;
+    id: number;
+    key: string;
+    value: string;
     created_Date: string;
     updated_Date: string;
 }
 
 interface TagRequest {
-    text: string;
+    key: string;
+    value: string;
 }
 
 interface TagAssociation {

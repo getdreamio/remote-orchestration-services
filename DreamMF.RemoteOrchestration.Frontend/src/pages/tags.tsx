@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Button, Table, Modal, Form, Input, message } from 'antd';
+import { Button, Table, Modal, Form, Input, message, Card } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTags, useCreateTag, useUpdateTag, useDeleteTag } from '@/hooks/useTags';
 import { formatDate } from '@/utils/date-utils';
 
 interface Tag {
-  tag_ID: number;
+  id: number;
   key: string;
   value: string;
   created_Date?: string;
@@ -47,7 +47,7 @@ const TagsPage: React.FC = () => {
     try {
       const values = await form.validateFields();
       if (editingTag) {
-        await updateTagMutation.mutateAsync({ id: editingTag.tag_ID, ...values });
+        await updateTagMutation.mutateAsync({ id: editingTag.id, ...values });
         message.success('Tag updated successfully');
       } else {
         await createTagMutation.mutateAsync(values);
@@ -63,8 +63,8 @@ const TagsPage: React.FC = () => {
   const columns = [
     {
       title: 'ID',
-      dataIndex: 'tag_ID',
-      key: 'tag_ID',
+      dataIndex: 'id',
+      key: 'id',
     },
     {
       title: 'Key',
@@ -92,42 +92,48 @@ const TagsPage: React.FC = () => {
       title: 'Actions',
       key: 'actions',
       render: (_: any, record: Tag) => (
-        <>
+        <div className="flex gap-2">
           <Button
             type="link"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
-          />
+          >
+            Edit
+          </Button>
           <Button
-            type="link"
+            type="text"
             danger
             icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.tag_ID)}
-          />
-        </>
+            onClick={() => handleDelete(record.id)}
+          >
+            Delete
+          </Button>
+        </div>
       ),
     },
   ];
 
   return (
     <div className="p-6">
-      <div className="flex justify-between mb-4">
-        <h1 className="text-2xl font-bold">Tags</h1>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleAdd}
-        >
-          Add Tag
-        </Button>
-      </div>
-
-      <Table
-        columns={columns}
-        dataSource={tags}
-        rowKey="tag_ID"
-        loading={isLoading}
-      />
+      <Card
+        title="Tags"
+        extra={
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAdd}
+          >
+            Add Tag
+          </Button>
+        }
+      >
+        <Table
+          columns={columns}
+          dataSource={tags}
+          rowKey="id"
+          loading={isLoading}
+        />
+      </Card>
 
       <Modal
         title={editingTag ? 'Edit Tag' : 'Add Tag'}
