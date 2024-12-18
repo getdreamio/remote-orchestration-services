@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Settings, Users, Server, Database, Tag, BarChart } from 'lucide-react';
+import { LayoutDashboard, Settings, Users, Server, Database, Tag, BarChart, Shield, ToggleLeft, ScrollText } from 'lucide-react';
 import { ThemeToggle } from '../theme/theme-toggle';
 import { UserMenu } from '../user/user-menu';
 import { Breadcrumb } from '../navigation/breadcrumb';
@@ -54,22 +54,45 @@ const RootLayout = () => {
                                 className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent"
                             >
                                 <Tag className="h-5 w-5" />
-                                <span>Tags</span>
+                                <span>Tagging</span>
                             </Link>
-                            <Link
-                                to="/users"
-                                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent"
+                            <hr className="my-2 border-border" />
+                            <div
+                                className="flex items-center space-x-3 p-2 rounded-lg text-muted-foreground cursor-not-allowed"
+                                title="Coming in 1.1"
                             >
-                                <Users className="h-5 w-5" />
-                                <span>Users</span>
-                            </Link>
-                            <Link
-                                to="/analytics"
-                                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent"
+                                <Shield className="h-5 w-5" />
+                                <span>Access Control</span>
+                            </div>
+                            <div
+                                className="flex items-center space-x-3 p-2 rounded-lg text-muted-foreground cursor-not-allowed"
+                                title="Coming in 1.1"
+                            >
+                                <ToggleLeft className="h-5 w-5" />
+                                <span>Feature Toggles</span>
+                            </div>
+                            <div
+                                className="flex items-center space-x-3 p-2 rounded-lg text-muted-foreground cursor-not-allowed"
+                                title="Coming in 1.1"
+                            >
+                                <ScrollText className="h-5 w-5" />
+                                <span>Logging</span>
+                            </div>
+                            <hr className="my-2 border-border" />
+                            <div
+                                className="flex items-center space-x-3 p-2 rounded-lg text-muted-foreground cursor-not-allowed"
+                                title="Coming in 1.1"
                             >
                                 <BarChart className="h-5 w-5" />
                                 <span>Analytics</span>
-                            </Link>
+                            </div>
+                            <div
+                                className="flex items-center space-x-3 p-2 rounded-lg text-muted-foreground cursor-not-allowed"
+                                title="Coming in 1.1"
+                            >
+                                <Users className="h-5 w-5" />
+                                <span>User Management</span>
+                            </div>
                             <Link
                                 to="/settings"
                                 className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent"
