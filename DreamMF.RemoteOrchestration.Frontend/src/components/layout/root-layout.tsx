@@ -64,9 +64,17 @@ const RootLayout = () => {
                 </aside>
 
                 {/* Main Content */}
-                <main className="flex-1 lg:ml-64 min-h-screen">
-                    <Outlet />
-                </main>
+
+                <div className="flex-1 lg:ml-64">
+                    {/* Header */}
+                    <header className="h-16 border-b flex items-center justify-between px-6 bg-card">
+                        <h1 className="text-lg font-semibold">Welcome Back</h1>
+                    </header>
+                    {/* Page Content */}
+                    <main className="p-6">
+                        <Outlet />
+                    </main>
+                </div>
             </div>
         </div>
     );
