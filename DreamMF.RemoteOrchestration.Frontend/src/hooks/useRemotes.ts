@@ -4,6 +4,7 @@ import { config } from '@/config/env';
 interface Remote {
     id: number;
     name: string;
+    url?: string;
     storageType: string;
     configuration: string;
     created_Date: string;
@@ -12,10 +13,10 @@ interface Remote {
 }
 
 export interface RemoteModule {
-    id: number;
+    id?: number;
     name: string;
-    created_Date: string;
-    updated_Date: string;
+    created_Date?: string;
+    updated_Date?: string;
 }
 
 interface RemoteRequest {
@@ -47,7 +48,8 @@ export const useRemote = (id: number) => {
             }
             return response.json();
         },
-        enabled: !!id
+        enabled: !!id,
+        throwOnError: true
     });
 };
 
@@ -79,6 +81,7 @@ export const useUpdateRemote = () => {
 
     return useMutation({
         mutationFn: async ({ id, remote }: { id: number; remote: RemoteRequest }) => {
+            console.log(remote);
             const response = await fetch(`${config.backendUrl}/api/remotes/${id}`, {
                 method: 'PUT',
                 headers: {

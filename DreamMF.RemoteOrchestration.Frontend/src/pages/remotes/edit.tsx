@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Form, Input, Button, Card, message, Tabs, Table, Input as AntInput, Typography } from 'antd';
+import { Form, Input, Button, Card, message, Tabs, Table, Input as AntInput, Typography, Empty, InputRef } from 'antd';
 import { useUpdateRemote, useRemote, RemoteModule } from '@/hooks/useRemotes';
 import { PlusOutlined, DeleteOutlined, CodeOutlined } from '@ant-design/icons';
 import { formatDate } from '@/lib/date-utils';
@@ -18,6 +18,7 @@ interface Version {
 }
 
 const EditRemotePage: React.FC = () => {
+    const [moduleInput, setModuleInput] = useState('');
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [form] = Form.useForm();
@@ -27,7 +28,6 @@ const EditRemotePage: React.FC = () => {
     const [activeTab, setActiveTab] = useState('general');
     const [modules, setModules] = useState<RemoteModule[]>([]);
     const [tags, setTags] = useState<TagItem[]>([]);
-    const [newModule, setNewModule] = useState('');
     const [versions] = useState<Version[]>([]); // This would be populated from your API
     const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
 
@@ -46,7 +46,7 @@ const EditRemotePage: React.FC = () => {
     const onFinish = async (values: any) => {
         try {
             await updateRemote.mutateAsync({
-                id: id!,
+                id: Number(id),
                 remote: {
                     ...values,
                     modules,
@@ -61,24 +61,24 @@ const EditRemotePage: React.FC = () => {
         }
     };
 
-    const addModule = () => {
-        if (newModule && !modules.includes(newModule)) {
-            setModules([...modules, newModule]);
-            setNewModule('');
+    const addModule = (moduleName: string) => {
+        if (moduleName && !modules.some(m => m.name === moduleName)) {
+            setModules(prev => [...prev, {
+                name: moduleName,
+            }]);
+            setModuleInput('');
         }
     };
 
+
     const removeModule = (moduleToRemove: string) => {
-        setModules(modules.filter(m => m !== moduleToRemove));
+        setModules(modules.filter(m => m.name !== moduleToRemove));
     };
 
     const handleModuleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            if (newModule && !modules.includes(newModule)) {
-                setModules([...modules, newModule]);
-                setNewModule('');
-            }
+            addModule(String((e.target as HTMLInputElement).value));
         }
     };
 
@@ -126,7 +126,7 @@ const EditRemotePage: React.FC = () => {
     }));
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <EditRemoteSkeleton />;
     }
 
     if (error) {
@@ -136,7 +136,7 @@ const EditRemotePage: React.FC = () => {
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-4 mb-6">
-                <Title level={4} className="!mb-0">Edit Remote: {remote.name}</Title>
+                <Title level={4} className="!mb-0">Edit Remote: {remote?.name}</Title>
             </div>
             <Card>
                 <Tabs activeKey={activeTab} onChange={setActiveTab}>
@@ -173,15 +173,15 @@ const EditRemotePage: React.FC = () => {
                                 <label className="block">Modules</label>
                                 <div className="flex gap-2">
                                     <AntInput
+                                        value={moduleInput}
+                                        onChange={(e) => setModuleInput(e.target.value)}
                                         prefix={<CodeOutlined className="text-muted-foreground" />}
-                                        value={newModule}
-                                        onChange={(e) => setNewModule(e.target.value)}
-                                        onKeyPress={handleModuleKeyPress}
+                                        onKeyDown={handleModuleKeyPress}
                                         placeholder="Add a module and press Enter"
                                     />
                                     <Button
                                         type="primary"
-                                        onClick={addModule}
+                                        onClick={() => addModule(moduleInput)}
                                         icon={<PlusOutlined />}
                                     >
                                         Add
@@ -198,7 +198,7 @@ const EditRemotePage: React.FC = () => {
                                                 type="text"
                                                 danger
                                                 icon={<DeleteOutlined />}
-                                                onClick={() => removeModule(module)}
+                                                onClick={() => removeModule(module.name)}
                                             >
                                                 Remove
                                             </Button>
@@ -244,3 +244,76 @@ const EditRemotePage: React.FC = () => {
 };
 
 export default EditRemotePage;
+
+
+export const EditRemoteSkeleton: React.FC = () => {
+    return (
+        <div className="space-y-6">
+            <div className="flex items-center gap-4 mb-6">
+                <div className="h-8 w-64 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+            </div>
+            <Card>
+                {/* Tab Headers */}
+                <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
+                    <div className="flex gap-4 px-2">
+                        {['General', 'Sub-Remotes', 'Versions'].map((tab) => (
+                            <div
+                                key={tab}
+                                className="h-4 w-24 bg-gray-200 rounded dark:bg-gray-700 animate-pulse mb-4"
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Form Fields */}
+                <div className="space-y-6 p-6">
+                    {/* Name Field */}
+                    <div className="space-y-2">
+                        <div className="h-4 w-16 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                        <div className="h-10 w-full bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                    </div>
+
+                    {/* Scope Field */}
+                    <div className="space-y-2">
+                        <div className="h-4 w-20 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                        <div className="h-10 w-full bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                    </div>
+
+                    {/* URL Field */}
+                    <div className="space-y-2">
+                        <div className="h-4 w-12 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                        <div className="h-10 w-full bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                    </div>
+
+                    {/* Modules Section */}
+                    <div className="space-y-4">
+                        <div className="h-4 w-24 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                        <div className="flex gap-2">
+                            <div className="h-10 flex-1 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                            <div className="h-10 w-24 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                        </div>
+                        {/* Module Items */}
+                        {[1, 2].map((i) => (
+                            <div
+                                key={i}
+                                className="h-12 w-full bg-gray-200 rounded dark:bg-gray-700 animate-pulse"
+                            />
+                        ))}
+                    </div>
+
+                    {/* Tags Section */}
+                    <div className="space-y-2">
+                        <div className="h-4 w-16 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                        <div className="h-10 w-full bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-end space-x-2 pt-4">
+                        <div className="h-9 w-24 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                        <div className="h-9 w-32 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                    </div>
+                </div>
+            </Card>
+        </div>
+    );
+};

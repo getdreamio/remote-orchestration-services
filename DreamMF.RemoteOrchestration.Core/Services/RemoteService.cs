@@ -35,29 +35,24 @@ public class RemoteService
         return remote != null ? RemoteMapper.ToResponse(remote) : null;
     }
 
-    public async Task<RemoteResponse> CreateRemoteAsync(RemoteRequest request)
+    public async Task<RemoteResponse?> CreateRemoteAsync(RemoteRequest request)
     {
         var remote = RemoteMapper.ToEntity(request);
         
-        // Add modules
-        foreach (var moduleName in request.Modules)
+        foreach (var module in request.Modules.Where(m => m.Id == 0))
         {
-            var module = await _dbContext.Modules.FirstOrDefaultAsync(m => m.Name == moduleName);
-            if (module == null)
+            var newModule = new Module
             {
-                module = new Module
-                {
-                    Name = moduleName,
-                    Created_Date = DateTimeOffset.UtcNow,
-                    Updated_Date = DateTimeOffset.UtcNow
-                };
-                _dbContext.Modules.Add(module);
-                await _dbContext.SaveChangesAsync();
-            }
+                Name = module.Name,
+                Created_Date = DateTimeOffset.UtcNow,
+                Updated_Date = DateTimeOffset.UtcNow
+            };
+            _dbContext.Modules.Add(newModule);
+            await _dbContext.SaveChangesAsync();
 
             remote.RemoteModules.Add(new RemoteModule
             {
-                Module_ID = module.Module_ID,
+                Module_ID = newModule.Module_ID,
                 Created_Date = DateTimeOffset.UtcNow,
                 Updated_Date = DateTimeOffset.UtcNow
             });
@@ -69,39 +64,56 @@ public class RemoteService
         return await GetRemoteByIdAsync(remote.Remote_ID);
     }
 
-    public async Task<bool> UpdateRemoteAsync(int id, RemoteRequest request)
+public async Task<bool> UpdateRemoteAsync(int id, RemoteRequest request)
+{
+    var remote = await _dbContext.Remotes
+        .Include(r => r.RemoteModules)
+            .ThenInclude(rm => rm.Module)
+        .FirstOrDefaultAsync(r => r.Remote_ID == id);
+
+    if (remote == null) return false;
+
+    // Update basic properties
+    remote.Name = request.Name;
+    remote.Scope = request.Scope;
+    remote.Updated_Date = DateTimeOffset.UtcNow;
+
+    // Get module names for comparison
+    var currentModules = remote.RemoteModules
+        .Select(rm => new { rm.Module.Name, RemoteModule = rm })
+        .ToDictionary(x => x.Name, x => x.RemoteModule);
+
+    var requestedModuleNames = request.Modules
+        .Select(m => m.Name)
+        .ToHashSet();
+
+    // Remove modules that are no longer requested
+    var modulesToRemove = currentModules
+        .Where(kvp => !requestedModuleNames.Contains(kvp.Key))
+        .Select(kvp => kvp.Value)
+        .ToList();
+
+    foreach (var moduleToRemove in modulesToRemove)
     {
-        var remote = await _dbContext.Remotes
-            .Include(r => r.RemoteModules)
-                .ThenInclude(rm => rm.Module)
-            .FirstOrDefaultAsync(r => r.Remote_ID == id);
+        remote.RemoteModules.Remove(moduleToRemove);
+    }
 
-        if (remote == null) return false;
+    // Add new modules
+    var modulesToAdd = requestedModuleNames
+        .Where(name => !currentModules.ContainsKey(name))
+        .ToList();
 
-        remote.Name = request.Name;
-        remote.Scope = request.Scope;
-        remote.Updated_Date = DateTimeOffset.UtcNow;
+    if (modulesToAdd.Any())
+    {
+        // Get existing modules from DB to avoid duplicates
+        var existingModules = await _dbContext.Modules
+            .Where(m => modulesToAdd.Contains(m.Name))
+            .ToDictionaryAsync(m => m.Name, m => m);
 
-        // Update modules
-        var currentModuleNames = remote.RemoteModules.Select(rm => rm.Module.Name).ToList();
-        var modulesToAdd = request.Modules.Except(currentModuleNames);
-        var modulesToRemove = currentModuleNames.Except(request.Modules);
-
-        // Remove modules
-        foreach (var moduleName in modulesToRemove)
-        {
-            var moduleToRemove = remote.RemoteModules.FirstOrDefault(rm => rm.Module.Name == moduleName);
-            if (moduleToRemove != null)
-            {
-                remote.RemoteModules.Remove(moduleToRemove);
-            }
-        }
-
-        // Add new modules
         foreach (var moduleName in modulesToAdd)
         {
-            var module = await _dbContext.Modules.FirstOrDefaultAsync(m => m.Name == moduleName);
-            if (module == null)
+            Module module;
+            if (!existingModules.TryGetValue(moduleName, out module))
             {
                 module = new Module
                 {
@@ -110,20 +122,20 @@ public class RemoteService
                     Updated_Date = DateTimeOffset.UtcNow
                 };
                 _dbContext.Modules.Add(module);
-                await _dbContext.SaveChangesAsync();
             }
 
             remote.RemoteModules.Add(new RemoteModule
             {
-                Module_ID = module.Module_ID,
+                Module = module,
                 Created_Date = DateTimeOffset.UtcNow,
                 Updated_Date = DateTimeOffset.UtcNow
             });
         }
-
-        await _dbContext.SaveChangesAsync();
-        return true;
     }
+
+    await _dbContext.SaveChangesAsync();
+    return true;
+}
 
     public async Task<bool> DeleteRemoteAsync(int id)
     {
