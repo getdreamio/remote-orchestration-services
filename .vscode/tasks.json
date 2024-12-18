@@ -1,0 +1,56 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "dotnet: build",
+			"type": "dotnet",
+			"task": "build",
+			"group": {
+				"kind": "build"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "tsc: build",
+			"type": "typescript",
+			"tsconfig": "DreamMF.RemoteOrchestration.Frontend/tsconfig.json",
+			"problemMatcher": ["$tsc"],
+			"group": {
+				"kind": "build"
+			}
+		},
+		{
+			"label": "build",
+			"dependsOn": ["dotnet: build", "tsc: build"],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"type": "npm",
+			"script": "start",
+			"path": "DreamMF.RemoteOrchestration.Frontend",
+			"label": "npm: start",
+			"detail": "rsbuild dev",
+			"problemMatcher": [
+				{
+					"pattern": [
+						{
+							"regexp": ".",
+							"file": 1,
+							"location": 2,
+							"message": 3
+						}
+					],
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": ".",
+						"endsPattern": "."
+					}
+				}
+			],
+			"isBackground": true
+		}
+	]
+}
