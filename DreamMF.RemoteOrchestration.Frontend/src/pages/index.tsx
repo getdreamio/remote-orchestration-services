@@ -3,7 +3,8 @@ import { Card, Row, Col, Statistic } from 'antd';
 import { useHosts } from '@/hooks/useHosts';
 import { useTags } from '@/hooks/useTags';
 import { useRemotes } from '@/hooks/useRemotes';
-import { ServerIcon, TagIcon, DatabaseIcon } from 'lucide-react';
+import { ServerIcon, TagIcon, DatabaseIcon, ClockIcon } from 'lucide-react';
+import { formatDate } from '@/lib/date-utils';
 
 const DashboardPage: React.FC = () => {
     const { data: hosts } = useHosts();
@@ -53,9 +54,15 @@ const DashboardPage: React.FC = () => {
                         >
                             <div className="space-y-2">
                                 {hosts?.slice(0, 3).map((host) => (
-                                    <div key={host.host_ID} className="flex items-center gap-2">
-                                        <ServerIcon className="h-4 w-4" />
-                                        <span>{host.name}</span>
+                                    <div key={host.host_ID} className="flex flex-col gap-1">
+                                        <div className="flex items-center gap-2">
+                                            <ServerIcon className="h-4 w-4" />
+                                            <span>{host.name}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                            <ClockIcon className="h-3 w-3" />
+                                            <span>{formatDate(host.updated_Date)}</span>
+                                        </div>
                                     </div>
                                 ))}
                                 {!hosts?.length && <p className="text-gray-500">No hosts found</p>}
@@ -69,9 +76,15 @@ const DashboardPage: React.FC = () => {
                         >
                             <div className="space-y-2">
                                 {tags?.slice(0, 3).map((tag) => (
-                                    <div key={tag.tag_ID} className="flex items-center gap-2">
-                                        <TagIcon className="h-4 w-4" />
-                                        <span>{tag.text}</span>
+                                    <div key={tag.tag_ID} className="flex flex-col gap-1">
+                                        <div className="flex items-center gap-2">
+                                            <TagIcon className="h-4 w-4" />
+                                            <span>{tag.text}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                            <ClockIcon className="h-3 w-3" />
+                                            <span>{formatDate(tag.updated_Date)}</span>
+                                        </div>
                                     </div>
                                 ))}
                                 {!tags?.length && <p className="text-gray-500">No tags found</p>}
@@ -85,9 +98,15 @@ const DashboardPage: React.FC = () => {
                         >
                             <div className="space-y-2">
                                 {remotes?.slice(0, 3).map((remote) => (
-                                    <div key={remote.remote_ID} className="flex items-center gap-2">
-                                        <DatabaseIcon className="h-4 w-4" />
-                                        <span>{remote.name}</span>
+                                    <div key={remote.remote_ID} className="flex flex-col gap-1">
+                                        <div className="flex items-center gap-2">
+                                            <DatabaseIcon className="h-4 w-4" />
+                                            <span>{remote.name}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                            <ClockIcon className="h-3 w-3" />
+                                            <span>{formatDate(remote.updated_Date)}</span>
+                                        </div>
                                     </div>
                                 ))}
                                 {!remotes?.length && <p className="text-gray-500">No remotes found</p>}
