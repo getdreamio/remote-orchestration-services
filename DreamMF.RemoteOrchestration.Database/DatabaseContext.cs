@@ -1,10 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using DreamMF.RemoteOrchestration.Database.Entities;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace DreamMF.RemoteOrchestration.Database;
 
 public interface IRemoteOrchestrationDbContext
 {
+    DatabaseFacade Database { get; }
+    DbSet<T> Set<T>() where T : class;
     DbSet<Host> Hosts { get; set; }
     DbSet<Remote> Remotes { get; set; }
     DbSet<Configuration> Configurations { get; set; }
@@ -33,6 +36,8 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
     public DbSet<AuditReads_Host> AuditReads_Hosts { get; set; } = null!;
     public DbSet<AuditReads_Remote> AuditReads_Remotes { get; set; } = null!;
 
+    public new DatabaseFacade Database => base.Database;
+
     public RemoteOrchestrationDbContext(DbContextOptions<RemoteOrchestrationDbContext> options) : base(options)
     {
         EnsureDatabaseCreated();
@@ -54,6 +59,11 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         return base.SaveChangesAsync(cancellationToken);
+    }
+
+    public override DbSet<T> Set<T>() where T : class
+    {
+        return base.Set<T>();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

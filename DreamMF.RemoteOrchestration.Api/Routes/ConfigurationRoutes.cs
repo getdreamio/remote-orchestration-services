@@ -5,27 +5,16 @@ using DreamMF.RemoteOrchestration.Core.Services;
 
 namespace DreamMF.RemoteOrchestration.Api.Routes;
 
-/// <summary>
-/// Provides route configuration for configuration-related endpoints
-/// </summary>
 public static class ConfigurationRoutes
 {
     private const string GroupName = "Configurations";
 
-    /// <summary>
-    /// Maps all configuration-related routes for the application
-    /// </summary>
-    /// <param name="app">The web application to configure routes for</param>
     public static void MapConfigurationRoutes(this WebApplication app)
     {
         var group = app.MapGroup("/api/configurations").WithTags(GroupName);
         group.MapConfigurationsApi();
     }
 
-    /// <summary>
-    /// Configures the configuration API endpoints for the route group
-    /// </summary>
-    /// <param name="group">The route group to configure</param>
     private static RouteGroupBuilder MapConfigurationsApi(this RouteGroupBuilder group)
     {
         group.MapGet("", GetAllConfigurations)

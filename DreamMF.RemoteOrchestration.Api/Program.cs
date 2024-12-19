@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using DreamMF.RemoteOrchestration.Core.Middleware;
 using DreamMF.RemoteOrchestration.Core.Services;
-using DreamMF.RemoteOrchestration.Api.Services;
 using DreamMF.RemoteOrchestration.Core.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
@@ -98,5 +97,6 @@ app.MapHealthRoutes();
 app.MapRemoteRoutes();
 app.MapHostRoutes();
 app.MapTagRoutes();
+app.MapAnalyticsRoutes();
 
 app.Run();
