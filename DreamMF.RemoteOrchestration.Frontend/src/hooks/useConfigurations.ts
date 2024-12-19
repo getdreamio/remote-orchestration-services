@@ -20,6 +20,9 @@ export const AWS_REGION_KEY = 'AwsRegion';
 export const AWS_BUCKET_NAME_KEY = 'AwsS3BucketName';
 export const AWS_BUCKET_KEY_KEY = 'AwsS3BucketKey';
 
+// API Configuration Keys
+export const API_BASE_URL_KEY = 'ApiBaseUrl';
+
 // Database Configuration Keys
 export const DATABASE_TYPE_KEY = 'DatabaseType';
 export const DATABASE_CONNECTION_KEY = 'DatabaseConnection';
