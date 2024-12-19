@@ -17,6 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { config } from '@/config/env';
 import { Helmet } from 'react-helmet';
 import { ArrowUpIcon, ArrowDownIcon, BarChart3Icon, ClockIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface EntityAnalytics {
     entityId: number;
@@ -74,6 +75,8 @@ const AnalyticsPage: React.FC = () => {
             return response.json();
         },
     });
+
+    const navigate = useNavigate();
 
     // Sort remotes by last 30 days actions and limit to 5
     const sortedByUsage = [...remoteAnalytics]
@@ -155,6 +158,11 @@ const AnalyticsPage: React.FC = () => {
             dataIndex: 'entityName',
             key: 'entityName',
             sorter: (a: EntityAnalytics, b: EntityAnalytics) => a.entityName.localeCompare(b.entityName),
+            render: (text: string, record: EntityAnalytics) => (
+                <span className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                    {text}
+                </span>
+            ),
         },
         {
             title: 'Total Reads',
@@ -199,6 +207,11 @@ const AnalyticsPage: React.FC = () => {
             dataIndex: 'entityName',
             key: 'entityName',
             sorter: (a: EntityAnalytics, b: EntityAnalytics) => a.entityName.localeCompare(b.entityName),
+            render: (text: string, record: EntityAnalytics) => (
+                <span className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                    {text}
+                </span>
+            ),
         },
         {
             title: 'Total Reads',
@@ -340,14 +353,24 @@ const AnalyticsPage: React.FC = () => {
                                     {sortedByUsage.map((remote, index) => (
                                         <div 
                                             key={remote.entityId}
-                                            className="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm"
+                                            className="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer transition-colors duration-200"
+                                            onClick={() => navigate(`/remotes/${remote.entityId}`)}
+                                            role="button"
+                                            tabIndex={0}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    navigate(`/remotes/${remote.entityId}`);
+                                                }
+                                            }}
                                         >
                                             <div className="flex items-center gap-3">
-                                                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-semibold">
+                                                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400 font-semibold">
                                                     {index + 1}
                                                 </div>
                                                 <div>
-                                                    <div className="font-medium">{remote.entityName}</div>
+                                                    <div className="font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                                                        {remote.entityName}
+                                                    </div>
                                                     <div className="text-sm text-muted-foreground">
                                                         Last used: {new Date(summary?.recentRemoteActivity[0]?.readDate).toLocaleString()}
                                                     </div>
@@ -429,54 +452,52 @@ const AnalyticsPage: React.FC = () => {
             </Row>
 
             {/* Remote Analytics Table */}
-            <Card 
-                title="Remote Analytics Details" 
-                className="bg-gray-50 dark:bg-gray-800 mb-6"
-            >
-                {isLoadingRemotes ? (
-                    <div className="h-24 flex items-center justify-center">
-                        <Spin size="large" />
-                    </div>
-                ) : (
-                    <Table
-                        dataSource={remoteAnalytics}
-                        columns={remoteColumns}
-                        rowKey="entityId"
-                        pagination={{
-                            pageSize: 10,
-                            showSizeChanger: true,
-                            showQuickJumper: true,
-                        }}
-                        className="bg-transparent"
-                    />
-                )}
-            </Card>
-
-            {/* Host Analytics Table */}
-            <Card 
-                title="Host Analytics Details" 
-                className="bg-gray-50 dark:bg-gray-800"
-            >
-                {isLoadingHosts ? (
-                    <div className="h-24 flex items-center justify-center">
-                        <Spin size="large" />
-                    </div>
-                ) : (
-                    <Table
-                        dataSource={hostAnalytics}
-                        columns={hostColumns}
-                        rowKey="entityId"
-                        pagination={{
-                            pageSize: 10,
-                            showSizeChanger: true,
-                            showQuickJumper: true,
-                            showTotal: (total) => `Total ${total} items`,
-                        }}
-                        loading={isLoadingHosts}
-                        className="bg-white dark:bg-gray-800 rounded-lg shadow-sm"
-                    />
-                )}
-            </Card>
+            <Row gutter={[16, 16]}>
+                <Col xs={24}>
+                    <Card title="Remote Analytics Details" className="bg-gray-50 dark:bg-gray-800">
+                        <Table
+                            dataSource={remoteAnalytics}
+                            columns={remoteColumns}
+                            rowKey="entityId"
+                            pagination={{
+                                pageSize: 10,
+                                showSizeChanger: true,
+                                showQuickJumper: true,
+                                showTotal: (total) => `Total ${total} items`,
+                            }}
+                            loading={isLoadingRemotes}
+                            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm"
+                            onRow={(record) => ({
+                                onClick: () => navigate(`/remotes/${record.entityId}`),
+                                style: { cursor: 'pointer' },
+                                className: 'hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200'
+                            })}
+                        />
+                    </Card>
+                </Col>
+                <Col xs={24}>
+                    <Card title="Host Analytics Details" className="bg-gray-50 dark:bg-gray-800">
+                        <Table
+                            dataSource={hostAnalytics}
+                            columns={hostColumns}
+                            rowKey="entityId"
+                            pagination={{
+                                pageSize: 10,
+                                showSizeChanger: true,
+                                showQuickJumper: true,
+                                showTotal: (total) => `Total ${total} items`,
+                            }}
+                            loading={isLoadingHosts}
+                            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm"
+                            onRow={(record) => ({
+                                onClick: () => navigate(`/hosts/${record.entityId}`),
+                                style: { cursor: 'pointer' },
+                                className: 'hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200'
+                            })}
+                        />
+                    </Card>
+                </Col>
+            </Row>
         </div>
     );
 };
