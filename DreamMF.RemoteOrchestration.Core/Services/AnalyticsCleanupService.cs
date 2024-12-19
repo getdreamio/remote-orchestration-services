@@ -2,7 +2,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using DreamMF.RemoteOrchestration.Database;
-using DreamMF.RemoteOrchestration.Core.Models.Analytics;
 using Microsoft.EntityFrameworkCore;
 using DreamMF.RemoteOrchestration.Core.Configuration;
 using Microsoft.Extensions.DependencyInjection;

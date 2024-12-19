@@ -193,7 +193,7 @@ CREATE VIEW v_RemoteReadAnalytics AS
 SELECT 
     r.Remote_ID,
     r.Name as RemoteName,
-    COUNT(CASE WHEN ar.Action = 'GetById' THEN 1 END) as TotalReads,
+    COUNT(CASE WHEN ar.Action = 'Read' THEN 1 END) as TotalReads,
     COUNT(CASE WHEN ar.Action = 'Update' THEN 1 END) as TotalUpdates,
     COUNT(CASE WHEN ar.Action = 'Create' THEN 1 END) as TotalCreates,
     COUNT(CASE WHEN ar.Action = 'Delete' THEN 1 END) as TotalDeletes,
@@ -210,7 +210,7 @@ CREATE VIEW v_HostReadAnalytics AS
 SELECT 
     h.Host_ID,
     h.Name as HostName,
-    COUNT(CASE WHEN ar.Action = 'GetById' THEN 1 END) as TotalReads,
+    COUNT(CASE WHEN ar.Action = 'Read' THEN 1 END) as TotalReads,
     COUNT(CASE WHEN ar.Action = 'Update' THEN 1 END) as TotalUpdates,
     COUNT(CASE WHEN ar.Action = 'Create' THEN 1 END) as TotalCreates,
     COUNT(CASE WHEN ar.Action = 'Delete' THEN 1 END) as TotalDeletes,
@@ -229,7 +229,7 @@ SELECT
     h.Host_ID,
     h.Name as HostName,
     COUNT(*) as TotalReads,
-    COUNT(CASE WHEN ar.Action = 'GetById' THEN 1 END) as ReadCount,
+    COUNT(CASE WHEN ar.Action = 'Read' THEN 1 END) as ReadCount,
     COUNT(CASE WHEN ar.Action = 'Update' THEN 1 END) as UpdateCount,
     COUNT(CASE WHEN ar.Action = 'Create' THEN 1 END) as CreateCount,
     COUNT(CASE WHEN ar.Action = 'Delete' THEN 1 END) as DeleteCount
@@ -245,7 +245,7 @@ SELECT
     r.Remote_ID,
     r.Name as RemoteName,
     COUNT(*) as TotalReads,
-    COUNT(CASE WHEN ar.Action = 'GetById' THEN 1 END) as ReadCount,
+    COUNT(CASE WHEN ar.Action = 'Read' THEN 1 END) as ReadCount,
     COUNT(CASE WHEN ar.Action = 'Update' THEN 1 END) as UpdateCount,
     COUNT(CASE WHEN ar.Action = 'Create' THEN 1 END) as CreateCount,
     COUNT(CASE WHEN ar.Action = 'Delete' THEN 1 END) as DeleteCount

@@ -151,6 +151,18 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
             entity.ToTable("AuditReads_Remote");
         });
 
+        modelBuilder.Entity<EntityAnalytics>()
+            .HasNoKey()
+            .ToView("v_HostReadAnalytics");
+
+        modelBuilder.Entity<DailyEntityAnalytics>()
+            .HasNoKey()
+            .ToView("v_DailyHostReads");
+
+        modelBuilder.Entity<DailyEntityAnalytics>()
+            .HasNoKey()
+            .ToView("v_DailyRemoteReads");
+
         base.OnModelCreating(modelBuilder);
     }
 }

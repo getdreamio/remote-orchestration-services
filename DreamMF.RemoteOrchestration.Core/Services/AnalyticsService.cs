@@ -1,7 +1,6 @@
 using DreamMF.RemoteOrchestration.Database;
 using DreamMF.RemoteOrchestration.Database.Entities;
 using DreamMF.RemoteOrchestration.Core.Configuration;
-using DreamMF.RemoteOrchestration.Core.Models.Analytics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -232,7 +231,7 @@ public class AnalyticsService : IAnalyticsService
         {
             EntityId = int.Parse(hostId),
             EntityName = "Unknown",
-            GetByIdCount = 0,
+            ReadCount = 0,
             UpdateCount = 0,
             CreateCount = 0,
             DeleteCount = 0,
@@ -252,7 +251,7 @@ public class AnalyticsService : IAnalyticsService
         {
             EntityId = int.Parse(remoteId),
             EntityName = "Unknown",
-            GetByIdCount = 0,
+            ReadCount = 0,
             UpdateCount = 0,
             CreateCount = 0,
             DeleteCount = 0,

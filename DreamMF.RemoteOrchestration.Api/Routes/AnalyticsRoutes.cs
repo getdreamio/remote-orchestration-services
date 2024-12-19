@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using DreamMF.RemoteOrchestration.Core.Services;
 using DreamMF.RemoteOrchestration.Core.Models;
-using DreamMF.RemoteOrchestration.Core.Models.Analytics;
 using DreamMF.RemoteOrchestration.Core.Exceptions;
+using DreamMF.RemoteOrchestration.Database.Entities;
 
 namespace DreamMF.RemoteOrchestration.Api.Routes;
 

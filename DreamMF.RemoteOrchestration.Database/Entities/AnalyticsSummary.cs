@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace DreamMF.RemoteOrchestration.Core.Models.Analytics;
+namespace DreamMF.RemoteOrchestration.Database.Entities;
 
 public class AnalyticsSummary
 {

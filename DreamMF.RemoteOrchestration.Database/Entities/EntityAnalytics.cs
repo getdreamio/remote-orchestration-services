@@ -1,6 +1,6 @@
 using System;
 
-namespace DreamMF.RemoteOrchestration.Core.Models.Analytics;
+namespace DreamMF.RemoteOrchestration.Database.Entities;
 
 public class EntityAnalytics
 {
@@ -19,7 +19,7 @@ public class DailyEntityAnalytics
     public int EntityId { get; set; }
     public string EntityName { get; set; }
     public int TotalReads { get; set; }
-    public int GetByIdCount { get; set; }
+    public int ReadCount { get; set; }
     public int UpdateCount { get; set; }
     public int CreateCount { get; set; }
     public int DeleteCount { get; set; }
