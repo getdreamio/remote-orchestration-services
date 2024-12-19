@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
 import { useHosts } from '@/hooks/useHosts';

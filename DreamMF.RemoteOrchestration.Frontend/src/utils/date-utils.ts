@@ -1,6 +1,6 @@
 import { isValid, parseISO, format } from 'date-fns';
 
-export const formatDate = (date: string | Date | null | undefined): any => {
+export const formatDate = (date: string): unknown => {
     if (!date || date === '') return '';
     try {
         if (isValid(parseISO(date))) {

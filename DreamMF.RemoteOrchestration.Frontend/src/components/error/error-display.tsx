@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Button, Typography } from 'antd';
 import { AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

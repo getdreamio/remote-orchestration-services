@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { LayoutDashboard, Settings, Users, Server, Database, Tag, BarChart, Shield, ToggleLeft, ScrollText, Network } from 'lucide-react';
 import { ThemeToggle } from '../theme/theme-toggle';
