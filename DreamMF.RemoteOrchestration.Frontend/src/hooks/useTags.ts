@@ -3,10 +3,11 @@ import { config } from '@/config/env';
 import { message } from 'antd';
 
 export interface Tag {
-    id: number;
+    tag_ID: number;
     key: string;
-    created_Date: string;
-    updated_Date: string;
+    display_Name: string;
+    created_Date: Date;
+    updated_Date: Date;
 }
 export interface TagRequest {
     key: string;

@@ -8,12 +8,17 @@ public class Tags_Host
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Tag_Host_ID { get; set; }
-    public int Host_ID { get; set; }
+    
     public int Tag_ID { get; set; }
-    public string Value { get; set; }
-    public Tag Tag { get; set; } = null!;
-    [ForeignKey("Host_ID")]
+
+    [ForeignKey(nameof(Tag_ID))]
+    public Tag? Tag { get; set; }
+
+    public int Host_ID { get; set; }
+
+    [ForeignKey(nameof(Host_ID))]
     public Host? Host { get; set; }
-    public DateTimeOffset Created_Date { get; set; }
-    public DateTimeOffset Updated_Date { get; set; }
+
+    public DateTimeOffset Created_Date { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset Updated_Date { get; set; } = DateTimeOffset.UtcNow;
 }
