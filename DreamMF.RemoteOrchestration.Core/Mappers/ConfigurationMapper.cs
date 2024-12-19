@@ -5,16 +5,16 @@ namespace DreamMF.RemoteOrchestration.Core.Mappers;
 
 public static class ConfigurationMapper
 {
-    public static Configuration ToEntity(this ConfigurationRequest request)
+    public static Database.Entities.Configuration ToEntity(this ConfigurationRequest request)
     {
-        return new Configuration
+        return new Database.Entities.Configuration
         {
             Key = request.Key,
             Value = request.Value
         };
     }
 
-    public static ConfigurationResponse ToResponse(this Configuration entity)
+    public static ConfigurationResponse ToResponse(this Database.Entities.Configuration entity)
     {
         return new ConfigurationResponse
         {
