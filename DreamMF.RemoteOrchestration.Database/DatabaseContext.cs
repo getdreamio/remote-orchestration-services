@@ -19,6 +19,9 @@ public interface IRemoteOrchestrationDbContext
     DbSet<RemoteModule> RemoteModules { get; set; }
     DbSet<AuditReads_Host> AuditReads_Hosts { get; set; }
     DbSet<AuditReads_Remote> AuditReads_Remotes { get; set; }
+    DbSet<EntityAnalytics> EntityAnalytics { get; set; }
+    DbSet<DailyEntityAnalytics> DailyEntityAnalytics { get; set; }
+    DbSet<RecentRemoteAnalytics> RecentRemoteAnalytics { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 
@@ -35,6 +38,9 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
     public DbSet<RemoteModule> RemoteModules { get; set; } = null!;
     public DbSet<AuditReads_Host> AuditReads_Hosts { get; set; } = null!;
     public DbSet<AuditReads_Remote> AuditReads_Remotes { get; set; } = null!;
+    public DbSet<EntityAnalytics> EntityAnalytics { get; set; } = null!;
+    public DbSet<DailyEntityAnalytics> DailyEntityAnalytics { get; set; } = null!;
+    public DbSet<RecentRemoteAnalytics> RecentRemoteAnalytics { get; set; } = null!;
 
     public new DatabaseFacade Database => base.Database;
 
@@ -162,6 +168,10 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
         modelBuilder.Entity<DailyEntityAnalytics>()
             .HasNoKey()
             .ToView("v_DailyRemoteReads");
+
+        modelBuilder.Entity<RecentRemoteAnalytics>()
+            .HasNoKey()
+            .ToView("v_RecentRemoteAnalytics");
 
         base.OnModelCreating(modelBuilder);
     }

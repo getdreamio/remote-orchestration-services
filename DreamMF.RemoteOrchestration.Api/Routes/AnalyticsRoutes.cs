@@ -71,6 +71,13 @@ public static class AnalyticsRoutes
             .WithSummary("Get Daily Remote Analytics")
             .WithDescription("Gets daily analytics for a specific remote");
 
+        group.MapGet("recent-remotes", GetRecentRemoteAnalytics)
+            .Produces<RecentRemoteAnalytics>(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("Get Recent Remote Analytics"))
+            .WithSummary("Get Recent Remote Analytics")
+            .WithDescription("Gets recent remote analytics");
+
         return group;
     }
 
@@ -120,5 +127,23 @@ public static class AnalyticsRoutes
     {
         var analytics = await analyticsService.GetDailyRemoteAnalyticsAsync(id);
         return analytics.Any() ? Results.Ok(analytics) : Results.NotFound();
+    }
+
+    private static async Task<IResult> GetRecentRemoteAnalytics(IAnalyticsService analyticsService)
+    {
+        try
+        {
+            var result = await analyticsService.GetRecentRemoteAnalyticsAsync();
+            return Results.Ok(result);
+        }
+        catch (HandledException ex)
+        {
+            return Results.BadRequest(new HandledResponseError
+            {
+                Code = ex.ErrorCode,
+                Type = ex.GetType().Name,
+                Message = ex.Message
+            });
+        }
     }
 }

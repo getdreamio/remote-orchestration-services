@@ -24,6 +24,7 @@ public interface IAnalyticsService
     Task<EntityAnalytics> GetRemoteAnalyticsByIdAsync(int remoteId);
     Task<DailyEntityAnalytics?> GetHostAnalyticsByIdAsync(string hostId);
     Task<DailyEntityAnalytics?> GetRemoteAnalyticsByIdAsync(string remoteId);
+    Task<RecentRemoteAnalytics> GetRecentRemoteAnalyticsAsync();
 }
 
 public class AnalyticsService : IAnalyticsService
@@ -257,6 +258,36 @@ public class AnalyticsService : IAnalyticsService
             DeleteCount = 0,
             TotalReads = 0,
             ReadDate = DateTimeOffset.UtcNow
+        };
+    }
+
+    public async Task<RecentRemoteAnalytics> GetRecentRemoteAnalyticsAsync()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var last24Hours = now.AddHours(-24);
+        var last30Days = now.AddDays(-30);
+
+        var sql = @"
+            SELECT 
+                (SELECT COUNT(*) 
+                 FROM AuditReads_Remote 
+                 WHERE Created_Date >= @last24Hours AND Action = 'Read') as Last24HoursCount,
+                (SELECT COUNT(*) 
+                 FROM AuditReads_Remote 
+                 WHERE Created_Date >= @last30Days AND Action = 'Read') as Last30DaysCount,
+                 '" + now + @"' AS QueryTime";
+
+        var result = await _dbContext.Set<RecentRemoteAnalytics>()
+            .FromSqlRaw(sql, 
+                new SqliteParameter("@last24Hours", last24Hours.ToString()),
+                new SqliteParameter("@last30Days", last30Days.ToString()))
+            .FirstOrDefaultAsync();
+
+        return result ?? new RecentRemoteAnalytics
+        {
+            Last24HoursCount = 0,
+            Last30DaysCount = 0,
+            QueryTime = now
         };
     }
 }
