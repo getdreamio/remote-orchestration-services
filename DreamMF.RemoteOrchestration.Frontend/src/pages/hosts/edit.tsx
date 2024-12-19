@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, Typography, Spin, Tabs, Table, Button, Modal, message } from 'antd';
 import { LinkOutlined, DisconnectOutlined } from '@ant-design/icons';
@@ -27,9 +27,11 @@ const EditHostPage: React.FC = () => {
     };
 
     // Filter out already attached remotes
-    const availableRemotes = allRemotes?.filter(
-        remote => !hostRemotes?.some(hr => hr.remoteId === remote.id)
-    ) || [];
+    const availableRemotes = useMemo(() => {
+        if (!allRemotes || !hostRemotes) return [];
+        const attachedRemoteIds = new Set(hostRemotes.map(hr => hr.id));
+        return allRemotes.filter(remote => !attachedRemoteIds.has(remote.id));
+    }, [allRemotes, hostRemotes]);
 
     const handleAttachRemote = async (remoteId: number) => {
         try {
