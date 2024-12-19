@@ -25,10 +25,6 @@ public class RemoteService
             .ToListAsync();
 
         var remoteResponses = remotes.Select(RemoteMapper.ToResponse).ToList();
-        foreach (var remote in remotes)
-        {
-            _ = _analyticsService.LogRemoteReadAsync(remote.Remote_ID, "GetAll", 1);
-        }
         return remoteResponses;
     }
 
@@ -41,7 +37,7 @@ public class RemoteService
 
         if (remote != null)
         {
-            _ = _analyticsService.LogRemoteReadAsync(remote.Remote_ID, "GetById", 1);
+            _ = _analyticsService.LogRemoteReadAsync(remote.Remote_ID, "Read", 1);
         }
         return remote != null ? RemoteMapper.ToResponse(remote) : null;
     }
@@ -71,6 +67,7 @@ public class RemoteService
 
         _dbContext.Remotes.Add(remote);
         await _dbContext.SaveChangesAsync();
+        _ = _analyticsService.LogRemoteReadAsync(remote.Remote_ID, "Create", 1);
 
         return await GetRemoteByIdAsync(remote.Remote_ID);
     }
@@ -145,6 +142,7 @@ public class RemoteService
         }
 
         await _dbContext.SaveChangesAsync();
+        _ = _analyticsService.LogRemoteReadAsync(id, "Update", 1);
         return true;
     }
 
@@ -155,6 +153,7 @@ public class RemoteService
 
         _dbContext.Remotes.Remove(remote);
         await _dbContext.SaveChangesAsync();
+        _ = _analyticsService.LogRemoteReadAsync(id, "Delete", 1);
         return true;
     }
 }
