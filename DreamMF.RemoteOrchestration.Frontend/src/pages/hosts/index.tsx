@@ -13,10 +13,6 @@ const HostsPage: React.FC = () => {
     const { data: remoteCounts } = useHostRemoteCounts();
     const deleteHost = useDeleteHost();
 
-    const handleEdit = (host: any) => {
-        navigate(`/hosts/${host.id}`);
-    };
-
     const handleDelete = async (id: number) => {
         try {
             await deleteHost.mutateAsync(id);

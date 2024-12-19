@@ -137,12 +137,10 @@ CREATE TABLE Host_Remote (
     Host_Remote_ID INTEGER PRIMARY KEY AUTOINCREMENT,
     Host_ID INT,
     Remote_ID INT,
-    Version_ID INT,
     Created_Date DATETIMEOFFSET NOT NULL,
     Updated_Date DATETIMEOFFSET NOT NULL,
     FOREIGN KEY (Host_ID) REFERENCES Host(Host_ID),
-    FOREIGN KEY (Remote_ID) REFERENCES Remote(Remote_ID),
-    FOREIGN KEY (Version_ID) REFERENCES Version(Version_ID)
+    FOREIGN KEY (Remote_ID) REFERENCES Remote(Remote_ID)
 );
 
 CREATE TABLE Tags_Host (
