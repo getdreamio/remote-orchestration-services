@@ -15,7 +15,8 @@ const RootLayout = () => {
                 <div className="flex">
                     {/* Sidebar */}
                     <aside className="hidden lg:flex h-screen w-[336px] flex-col fixed left-0 top-0 border-r bg-card">
-                        <div className="p-6">
+                        {/* Header - Fixed */}
+                        <div className="flex-none p-6 border-b">
                             <div className="flex items-center gap-2">
                                 <div className={theme === 'dark' ? 'bg-white rounded-full p-1' : ''}>
                                     <img src="/favicon-32x32.png" alt="Dream.MF Logo" className="w-6 h-6" />
@@ -26,7 +27,8 @@ const RootLayout = () => {
                                 </div>
                             </div>
                         </div>
-                        <nav className="flex-1 p-4 space-y-2">
+                        {/* Navigation - Scrollable */}
+                        <nav className="flex-1 overflow-y-auto p-4 space-y-2">
                             <Link
                                 to="/"
                                 className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50"
@@ -134,7 +136,8 @@ const RootLayout = () => {
                                 </div>
                             </Link>
                         </nav>
-                        <div className="p-4 text-xs text-muted-foreground border-t">
+                        {/* Footer - Fixed */}
+                        <div className="flex-none p-4 text-xs text-muted-foreground border-t">
                             2025 Dream.MF - All rights reserved.
                         </div>
                     </aside>

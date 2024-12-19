@@ -10,10 +10,12 @@ namespace DreamMF.RemoteOrchestration.Core.Services;
 public class HostService
 {
     private readonly IRemoteOrchestrationDbContext _dbContext;
+    private readonly IAnalyticsService _analyticsService;
 
-    public HostService(IRemoteOrchestrationDbContext dbContext)
+    public HostService(IRemoteOrchestrationDbContext dbContext, IAnalyticsService analyticsService)
     {
         _dbContext = dbContext;
+        _analyticsService = analyticsService;
     }
 
     public async Task<List<HostResponse>> GetAllHostsAsync()
@@ -23,7 +25,8 @@ public class HostService
             throw new HandledException(ExceptionType.Validation, "Database context cannot be null.");
         }
         var hosts = await _dbContext.Hosts.ToListAsync();
-        return hosts.Select(HostMapper.ToResponse).ToList();
+        var hostResponses = hosts.Select(HostMapper.ToResponse).ToList();
+        return hostResponses;
     }
 
     public async Task<HostResponse?> GetHostByIdAsync(int id)
@@ -33,6 +36,10 @@ public class HostService
             throw new HandledException(ExceptionType.Validation, "ID must be greater than zero.");
         }
         var host = await _dbContext.Hosts.FindAsync(id);
+        if (host != null)
+        {
+            _ = _analyticsService.LogHostReadAsync(host.Host_ID, "Read", 1);
+        }
         return host != null ? HostMapper.ToResponse(host) : null;
     }
 
@@ -45,6 +52,7 @@ public class HostService
         var host = HostMapper.ToEntity(request);
         _dbContext.Hosts.Add(host);
         await _dbContext.SaveChangesAsync();
+        _ = _analyticsService.LogHostReadAsync(host.Host_ID, "Create", 1);
         return HostMapper.ToResponse(host);
     }
 
@@ -64,6 +72,7 @@ public class HostService
         existingHost.Updated_Date = DateTimeOffset.UtcNow;
 
         await _dbContext.SaveChangesAsync();
+        _ = _analyticsService.LogHostReadAsync(id, "Update", 1);
         return true;
     }
 
@@ -78,6 +87,7 @@ public class HostService
 
         _dbContext.Hosts.Remove(host);
         await _dbContext.SaveChangesAsync();
+        _ = _analyticsService.LogHostReadAsync(id, "Delete", 1);
         return true;
     }
 

@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using DreamMF.RemoteOrchestration.Core.Middleware;
 using DreamMF.RemoteOrchestration.Core.Services;
+using DreamMF.RemoteOrchestration.Api.Services;
+using DreamMF.RemoteOrchestration.Core.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,6 +59,13 @@ builder.Services.AddHealthChecks()
             RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(builder.Configuration["S3Storage:Region"])
         };
     }, name: "AWS S3");
+
+// Configure Analytics
+builder.Services.Configure<AnalyticsConfig>(builder.Configuration.GetSection("Analytics"));
+
+// Register services
+builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+builder.Services.AddHostedService<AnalyticsCleanupService>();
 
 builder.Services.AddScoped<HostService>();
 builder.Services.AddScoped<RemoteService>();
