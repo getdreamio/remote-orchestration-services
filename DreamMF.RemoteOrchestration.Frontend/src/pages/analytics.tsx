@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
 import { config } from '@/config/env';
+import { Helmet } from 'react-helmet';
 
 interface RemoteAnalytics {
     remoteId: string;
@@ -57,6 +58,10 @@ const AnalyticsPage: React.FC = () => {
 
     return (
         <div className="space-y-6">
+            <Helmet>
+                <title>[ROS] | Analytics</title>
+                <meta name="description" content="Dream.mf [ROS] | Analytics Page" />
+            </Helmet>
             <h1 className="text-2xl font-semibold">Analytics</h1>
             
             {/* Top Remotes by Usage */}

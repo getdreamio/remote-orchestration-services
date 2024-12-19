@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Table, Popconfirm, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTags, useDeleteTag } from '@/hooks/useTags';
+import { Helmet } from 'react-helmet';
 
 const TagsPage: React.FC = () => {
     const navigate = useNavigate();
@@ -59,6 +60,10 @@ const TagsPage: React.FC = () => {
 
     return (
         <div>
+            <Helmet>
+                <title>[ROS] | List Tags</title>
+                <meta name="description" content={`Dream.mf [ROS] | List Tags Page`} />
+            </Helmet>
             <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h1 className="text-2xl font-bold">Tags</h1>
                 <Button

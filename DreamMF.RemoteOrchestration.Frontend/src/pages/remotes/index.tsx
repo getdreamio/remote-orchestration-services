@@ -12,6 +12,7 @@ import {
 import { useRemotes, useDeleteRemote, useRemoteModuleCounts, useRemoteSubRemoteCounts } from '@/hooks/useRemotes';
 import { useRemoteHostCounts } from '@/hooks/useHosts';
 import { formatDate } from '@/lib/date-utils';
+import { Helmet } from 'react-helmet';
 
 const { Title } = Typography;
 
@@ -158,6 +159,10 @@ const RemotesPage: React.FC = () => {
 
     return (
         <div>
+            <Helmet>
+                <title>[ROS] | List Remotes</title>
+                <meta name="description" content={`Dream.mf [ROS] | List Remotes`} />
+            </Helmet>
             <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h1 className="text-2xl font-bold">Remotes</h1>
                 <Button
