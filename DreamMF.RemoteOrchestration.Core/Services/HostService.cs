@@ -10,10 +10,12 @@ namespace DreamMF.RemoteOrchestration.Core.Services;
 public class HostService
 {
     private readonly IRemoteOrchestrationDbContext _dbContext;
+    private readonly IAnalyticsService _analyticsService;
 
-    public HostService(IRemoteOrchestrationDbContext dbContext)
+    public HostService(IRemoteOrchestrationDbContext dbContext, IAnalyticsService analyticsService)
     {
         _dbContext = dbContext;
+        _analyticsService = analyticsService;
     }
 
     public async Task<List<HostResponse>> GetAllHostsAsync()
@@ -23,7 +25,12 @@ public class HostService
             throw new HandledException(ExceptionType.Validation, "Database context cannot be null.");
         }
         var hosts = await _dbContext.Hosts.ToListAsync();
-        return hosts.Select(HostMapper.ToResponse).ToList();
+        var hostResponses = hosts.Select(HostMapper.ToResponse).ToList();
+        foreach (var host in hosts)
+        {
+            _ = _analyticsService.LogHostReadAsync(host.Host_ID, "GetAll", 1);
+        }
+        return hostResponses;
     }
 
     public async Task<HostResponse?> GetHostByIdAsync(int id)
@@ -33,6 +40,10 @@ public class HostService
             throw new HandledException(ExceptionType.Validation, "ID must be greater than zero.");
         }
         var host = await _dbContext.Hosts.FindAsync(id);
+        if (host != null)
+        {
+            _ = _analyticsService.LogHostReadAsync(host.Host_ID, "GetById", 1);
+        }
         return host != null ? HostMapper.ToResponse(host) : null;
     }
 

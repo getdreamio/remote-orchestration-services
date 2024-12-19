@@ -14,6 +14,8 @@ public interface IRemoteOrchestrationDbContext
     DbSet<Tags_Host> Tags_Hosts { get; set; }
     DbSet<Host_Remote> Host_Remotes { get; set; }
     DbSet<RemoteModule> RemoteModules { get; set; }
+    DbSet<AuditReads_Host> AuditReads_Hosts { get; set; }
+    DbSet<AuditReads_Remote> AuditReads_Remotes { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 
@@ -28,6 +30,8 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
     public DbSet<Tags_Host> Tags_Hosts { get; set; } = null!;
     public DbSet<Host_Remote> Host_Remotes { get; set; } = null!;
     public DbSet<RemoteModule> RemoteModules { get; set; } = null!;
+    public DbSet<AuditReads_Host> AuditReads_Hosts { get; set; } = null!;
+    public DbSet<AuditReads_Remote> AuditReads_Remotes { get; set; } = null!;
 
     public RemoteOrchestrationDbContext(DbContextOptions<RemoteOrchestrationDbContext> options) : base(options)
     {
@@ -124,6 +128,18 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
             .HasOne(rm => rm.Remote)
             .WithMany(r => r.RemoteModules)
             .HasForeignKey(rm => rm.Remote_ID);
+
+        modelBuilder.Entity<AuditReads_Host>(entity =>
+        {
+            entity.HasKey(e => e.AuditRead_ID);
+            entity.ToTable("AuditReads_Host");
+        });
+
+        modelBuilder.Entity<AuditReads_Remote>(entity =>
+        {
+            entity.HasKey(e => e.AuditRead_ID);
+            entity.ToTable("AuditReads_Remote");
+        });
 
         base.OnModelCreating(modelBuilder);
     }

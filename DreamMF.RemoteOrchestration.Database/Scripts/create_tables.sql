@@ -14,6 +14,8 @@ DROP TABLE IF EXISTS Tags_Host;
 DROP TABLE IF EXISTS Tags_Remote;
 DROP TABLE IF EXISTS Audit_Host;
 DROP TABLE IF EXISTS Audit_Remote;
+DROP TABLE IF EXISTS AuditReads_Host;
+DROP TABLE IF EXISTS AuditReads_Remote;
 DROP TABLE IF EXISTS __EFMigrationsHistory;
 
 CREATE TABLE __EFMigrationsHistory (
@@ -34,6 +36,24 @@ CREATE TABLE Audit_Remote (
     Remote_ID INT,
     Change VARCHAR(255) NOT NULL,
     Change_User_ID INT,
+    Created_Date DATETIMEOFFSET NOT NULL,
+    FOREIGN KEY (Remote_ID) REFERENCES Remote(Remote_ID)
+);
+
+CREATE TABLE AuditReads_Host (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Host_ID INT NOT NULL,
+    Action VARCHAR(255) NOT NULL,
+    User_ID INT NOT NULL,
+    Created_Date DATETIMEOFFSET NOT NULL,
+    FOREIGN KEY (Host_ID) REFERENCES Host(Host_ID)
+);
+
+CREATE TABLE AuditReads_Remote (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Remote_ID INT NOT NULL,
+    Action VARCHAR(255) NOT NULL,
+    User_ID INT NOT NULL,
     Created_Date DATETIMEOFFSET NOT NULL,
     FOREIGN KEY (Remote_ID) REFERENCES Remote(Remote_ID)
 );
@@ -134,7 +154,6 @@ CREATE TABLE Tags_Remote (
     FOREIGN KEY (Tag_ID) REFERENCES Tag(Tag_ID)
 );
 
-
 CREATE TABLE Configuration
 (
     [Configuration_ID] INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -147,9 +166,9 @@ CREATE TABLE Configuration
 -- Insert default tags
 INSERT INTO Tag (Text, Created_Date, Updated_Date)
 VALUES 
-    ('Technology', '2024-12-18T11:30:47-07:00', '2024-12-18T11:30:47-07:00'),
-    ('Language', '2024-12-18T11:30:47-07:00', '2024-12-18T11:30:47-07:00'),
-    ('Framework', '2024-12-18T11:30:47-07:00', '2024-12-18T11:30:47-07:00'),
-    ('TeamName', '2024-12-18T11:30:47-07:00', '2024-12-18T11:30:47-07:00'),
-    ('Department', '2024-12-18T11:30:47-07:00', '2024-12-18T11:30:47-07:00'),
-    ('Organization', '2024-12-18T11:30:47-07:00', '2024-12-18T11:30:47-07:00');
+    ('Technology', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Language', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Framework', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('TeamName', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Department', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Organization', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00');

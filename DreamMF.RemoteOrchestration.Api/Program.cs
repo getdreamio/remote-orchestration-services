@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using DreamMF.RemoteOrchestration.Core.Middleware;
 using DreamMF.RemoteOrchestration.Core.Services;
+using DreamMF.RemoteOrchestration.Api.Services;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,15 +25,15 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Remote Orchestration API", Version = "v1" });
 });
 
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
-    {
-        options.Authority = "https://youridentityserver";
-        options.RequireHttpsMetadata = false;
-        options.Audience = "api1";
-    });
+// builder.Services.AddAuthentication("Bearer")
+//     .AddJwtBearer("Bearer", options =>
+//     {
+//         options.Authority = "https://youridentityserver";
+//         options.RequireHttpsMetadata = false;
+//         options.Audience = "api1";
+//     });
 
-builder.Services.AddAuthorization();
+// builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options =>
 {
@@ -57,6 +58,9 @@ builder.Services.AddHealthChecks()
             RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(builder.Configuration["S3Storage:Region"])
         };
     }, name: "AWS S3");
+
+builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+builder.Services.AddHostedService<AnalyticsCleanupService>();
 
 builder.Services.AddScoped<HostService>();
 builder.Services.AddScoped<RemoteService>();
