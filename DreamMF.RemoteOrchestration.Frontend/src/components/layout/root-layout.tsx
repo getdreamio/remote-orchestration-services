@@ -108,15 +108,16 @@ const RootLayout = () => {
                                 </div>
                             </div>
                             <hr className="my-2 border-border" />
-                            <div
-                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 cursor-not-allowed opacity-50"
+                            <Link
+                                to="/analytics"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50"
                             >
                                 <BarChart className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                                 <div className="flex flex-col">
                                     <span>Usage & Analytics</span>
                                     <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Usage and activity for hosts and remotes</span>
                                 </div>
-                            </div>
+                            </Link>
                             <div
                                 className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 cursor-not-allowed opacity-50"
                             >

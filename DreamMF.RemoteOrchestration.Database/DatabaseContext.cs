@@ -1,10 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using DreamMF.RemoteOrchestration.Database.Entities;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace DreamMF.RemoteOrchestration.Database;
 
 public interface IRemoteOrchestrationDbContext
 {
+    DatabaseFacade Database { get; }
+    DbSet<T> Set<T>() where T : class;
     DbSet<Host> Hosts { get; set; }
     DbSet<Remote> Remotes { get; set; }
     DbSet<Configuration> Configurations { get; set; }
@@ -16,6 +19,9 @@ public interface IRemoteOrchestrationDbContext
     DbSet<RemoteModule> RemoteModules { get; set; }
     DbSet<AuditReads_Host> AuditReads_Hosts { get; set; }
     DbSet<AuditReads_Remote> AuditReads_Remotes { get; set; }
+    DbSet<EntityAnalytics> EntityAnalytics { get; set; }
+    DbSet<DailyEntityAnalytics> DailyEntityAnalytics { get; set; }
+    DbSet<RecentRemoteAnalytics> RecentRemoteAnalytics { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 
@@ -32,6 +38,11 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
     public DbSet<RemoteModule> RemoteModules { get; set; } = null!;
     public DbSet<AuditReads_Host> AuditReads_Hosts { get; set; } = null!;
     public DbSet<AuditReads_Remote> AuditReads_Remotes { get; set; } = null!;
+    public DbSet<EntityAnalytics> EntityAnalytics { get; set; } = null!;
+    public DbSet<DailyEntityAnalytics> DailyEntityAnalytics { get; set; } = null!;
+    public DbSet<RecentRemoteAnalytics> RecentRemoteAnalytics { get; set; } = null!;
+
+    public new DatabaseFacade Database => base.Database;
 
     public RemoteOrchestrationDbContext(DbContextOptions<RemoteOrchestrationDbContext> options) : base(options)
     {
@@ -54,6 +65,11 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         return base.SaveChangesAsync(cancellationToken);
+    }
+
+    public override DbSet<T> Set<T>() where T : class
+    {
+        return base.Set<T>();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -140,6 +156,22 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
             entity.HasKey(e => e.AuditRead_ID);
             entity.ToTable("AuditReads_Remote");
         });
+
+        modelBuilder.Entity<EntityAnalytics>()
+            .HasNoKey()
+            .ToView("v_HostReadAnalytics");
+
+        modelBuilder.Entity<DailyEntityAnalytics>()
+            .HasNoKey()
+            .ToView("v_DailyHostReads");
+
+        modelBuilder.Entity<DailyEntityAnalytics>()
+            .HasNoKey()
+            .ToView("v_DailyRemoteReads");
+
+        modelBuilder.Entity<RecentRemoteAnalytics>()
+            .HasNoKey()
+            .ToView("v_RecentRemoteAnalytics");
 
         base.OnModelCreating(modelBuilder);
     }
