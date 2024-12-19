@@ -70,6 +70,7 @@ builder.Services.AddScoped<HostService>();
 builder.Services.AddScoped<RemoteService>();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<ConfigurationService>();
+builder.Services.AddScoped<IDreamService, DreamService>();
 
 var app = builder.Build();
 
@@ -98,5 +99,6 @@ app.MapRemoteRoutes();
 app.MapHostRoutes();
 app.MapTagRoutes();
 app.MapAnalyticsRoutes();
+app.MapDreamRoutes();
 
 app.Run();

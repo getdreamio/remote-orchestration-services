@@ -78,14 +78,14 @@ public static class HostRoutes
             .WithSummary("Attach Remote to Host")
             .WithDescription("Associates a remote instance with a specific host instance");
 
-        group.MapPost("/assign", AssignRemoteToHost)
+        group.MapPost("/{id}/detach", DetachRemoteFromHost)
             .WithTags(GroupName)
             .Produces(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(500)
-            .WithMetadata(new EndpointNameMetadata("Assign a remote to a host"))
-            .WithSummary("Assign a Remote to a Host")
-            .WithDescription("Assigns a remote instance to a specific host instance");
+            .WithMetadata(new EndpointNameMetadata("Detaches a remote from a host"))
+            .WithSummary("Detaches a Remote from a Host")
+            .WithDescription("Detaches a remote instance from a specific host instance");
 
         group.MapGet("/environment/{environment}", GetHostsByEnvironment)
             .WithTags(GroupName)
@@ -135,16 +135,16 @@ public static class HostRoutes
         return Results.Ok(remotes);
     }
 
-    private static async Task<IResult> AttachRemoteToHost(int id, int remoteId, HostService hostService)
+    private static async Task<IResult> AttachRemoteToHost(int id, AttachRemoteRequest request, HostService hostService)
     {
-        var success = await hostService.AttachRemoteToHostAsync(id, remoteId);
+        var success = await hostService.AttachRemoteToHostAsync(id, request.RemoteId);
         return success ? Results.NoContent() : Results.BadRequest();
     }
 
-    private static async Task<IResult> AssignRemoteToHost(int hostId, int remoteId, HostService hostService)
+    private static async Task<IResult> DetachRemoteFromHost(int id, AttachRemoteRequest request, HostService hostService)
     {
-        var success = await hostService.AttachRemoteToHostAsync(hostId, remoteId);
-        return success ? Results.Ok() : Results.BadRequest();
+        var success = await hostService.DetachRemoteFromHostAsync(id, request.RemoteId);
+        return success ? Results.NoContent() : Results.BadRequest();
     }
 
     private static async Task<IResult> GetHostsByEnvironment(string environment, HostService hostService)
