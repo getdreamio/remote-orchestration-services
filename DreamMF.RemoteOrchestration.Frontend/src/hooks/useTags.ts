@@ -45,11 +45,25 @@ export const useTag = (id: number) => {
     });
 };
 
-export const useTagAssociations = (id: number) => {
+export const useTagRemotes = (id: number) => {
     return useQuery<TagAssociation[]>({
-        queryKey: ['tag-associations', id],
+        queryKey: ['tag-remotes', id],
         queryFn: async () => {
-            const response = await fetch(`${config.backendUrl}/api/tags/${id}/associations`);
+            const response = await fetch(`${config.backendUrl}/api/tags/${id}/remotes`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        },
+        enabled: !!id
+    });
+};
+
+export const useTagHosts = (id: number) => {
+    return useQuery<TagAssociation[]>({
+        queryKey: ['tag-hosts', id],
+        queryFn: async () => {
+            const response = await fetch(`${config.backendUrl}/api/tags/${id}/hosts`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Avatar, List, Button, Tag } from 'antd';
 import { UserOutlined, PlusOutlined } from '@ant-design/icons';
+import { Helmet } from 'react-helmet';
 
 // This is a placeholder component since user management wasn't in the API
 // You can replace this with actual user management functionality when available
@@ -25,6 +26,10 @@ const mockUsers = [
 const UsersPage: React.FC = () => {
     return (
         <div>
+            <Helmet>
+                <title>[ROS] | User Management</title>
+                <meta name="description" content={`Dream.mf [ROS] | User Management`} />
+            </Helmet>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-semibold">Users</h1>
                 <Button type="primary" icon={<PlusOutlined />}>

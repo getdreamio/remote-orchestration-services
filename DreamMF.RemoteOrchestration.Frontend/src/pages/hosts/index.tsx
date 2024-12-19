@@ -3,6 +3,7 @@ import { Button, Table, message, Tag, Typography, Tooltip, Popconfirm } from 'an
 import { PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined, ApiOutlined } from '@ant-design/icons';
 import { useHosts, useDeleteHost, useHostRemoteCounts } from '@/hooks/useHosts';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 const { Text } = Typography;
 
@@ -167,6 +168,10 @@ const HostsPage: React.FC = () => {
 
     return (
         <div>
+            <Helmet>
+                <title>[ROS] | List Hosts</title>
+                <meta name="description" content="Dream.mf [ROS] | List Hosts Page" />
+            </Helmet>
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold">Hosts</h1>
                 <Button

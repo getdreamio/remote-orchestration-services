@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Card, Typography } from 'antd';
 import { useCreateTag } from '@/hooks/useTags';
+import { Helmet } from 'react-helmet';
 
 const { Title } = Typography;
 
@@ -22,6 +23,10 @@ const NewTagPage: React.FC = () => {
 
     return (
         <div className="p-6">
+            <Helmet>
+                <title>[ROS] | Create Tag</title>
+                <meta name="description" content={`Dream.mf [ROS] | Create Tag`} />
+            </Helmet>
             <Title level={2} className="mb-6">New Tag</Title>
             <Card className="max-w-2xl bg-gray-50 dark:bg-gray-800">
                 <Form
@@ -39,15 +44,6 @@ const NewTagPage: React.FC = () => {
                         tooltip="The key identifies the tag. It can contain letters, numbers, underscores and hyphens."
                     >
                         <Input placeholder="e.g., environment" />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="Value"
-                        name="value"
-                        rules={[{ required: true, message: 'Please input the tag value!' }]}
-                        tooltip="The value assigned to this tag"
-                    >
-                        <Input placeholder="e.g., production" />
                     </Form.Item>
 
                     <Form.Item className="mb-0 flex justify-end">

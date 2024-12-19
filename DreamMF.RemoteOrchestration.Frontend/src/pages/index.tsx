@@ -6,6 +6,7 @@ import { useRemotes } from '@/hooks/useRemotes';
 import { ServerIcon, TagIcon, DatabaseIcon, ClockIcon, ArrowRightIcon, BarChart3Icon, AlertCircleIcon, CheckCircleIcon, XCircleIcon } from 'lucide-react';
 import { formatDate } from '@/lib/date-utils';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 // Mock data for analytics and logs (replace with real data later)
 const analyticsData = {
@@ -71,6 +72,10 @@ const DashboardPage: React.FC = () => {
 
     return (
         <div>
+            <Helmet>
+                <title>[ROS] | Dashboard</title>
+                <meta name="description" content="Dream.mf [ROS] | Dashboard Page" />
+            </Helmet>
             <h1 className="text-2xl font-semibold mb-6">Dashboard</h1>
             <Row gutter={[16, 16]}>
                 <Col xs={24} sm={8}>

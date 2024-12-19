@@ -6,6 +6,7 @@ import { PlusOutlined, DeleteOutlined, CodeOutlined } from '@ant-design/icons';
 import { formatDate } from '@/lib/date-utils';
 import { TagInput, TagItem } from '@/components/tags/tag-input';
 import { useTags } from '@/hooks/useTags';
+import { Helmet } from 'react-helmet';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -118,6 +119,10 @@ const NewRemotePage: React.FC = () => {
             <div className="flex items-center gap-4 mb-6">
                 <Title level={4} className="!mb-0">New Remote</Title>
             </div>
+            <Helmet>
+                <title>[ROS] | Create Remote</title>
+                <meta name="description" content={`Dream.mf [ROS] | Create Remote`} />
+            </Helmet>
             <Card className="bg-gray-50 dark:bg-gray-800">
                 <Tabs activeKey={activeTab} onChange={setActiveTab}>
                     <TabPane tab="General" key="general">

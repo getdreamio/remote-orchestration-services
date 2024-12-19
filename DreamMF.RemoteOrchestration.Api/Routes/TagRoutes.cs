@@ -64,10 +64,30 @@ public static class TagRoutes
 
         group.MapDelete("{id}", DeleteTag)
             .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status404NotFound)
-            .WithMetadata(new EndpointNameMetadata("Delete a tag"))
-            .WithSummary("Delete a Tag")
-            .WithDescription("Deletes a tag by its unique identifier");
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(404)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("Delete tag"))
+            .WithSummary("Delete Tag")
+            .WithDescription("Deletes a specific tag by its unique identifier");
+
+        group.MapGet("{id}/hosts", GetTagHosts)
+            .Produces<List<HostResponse>>(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(404)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("Get hosts using tag"))
+            .WithSummary("Get Tag Hosts")
+            .WithDescription("Retrieves all hosts that are using this tag");
+
+        group.MapGet("{id}/remotes", GetTagRemotes)
+            .Produces<List<RemoteResponse>>(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(404)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("Get remotes using tag"))
+            .WithSummary("Get Tag Remotes")
+            .WithDescription("Retrieves all remotes that are using this tag");
 
         group.MapPost("remote/{remoteId}/add/{tagId}", AddTagToRemote)
             .Produces(StatusCodes.Status204NoContent)
@@ -184,5 +204,17 @@ public static class TagRoutes
     {
         var success = await tagService.RemoveTagFromRemoteAsync(remoteId, tagId);
         return success ? Results.NoContent() : Results.NotFound();
+    }
+
+    private static async Task<IResult> GetTagHosts(int id, TagService tagService)
+    {
+        var hosts = await tagService.GetTagHosts(id);
+        return hosts != null ? Results.Ok(hosts) : Results.NotFound();
+    }
+
+    private static async Task<IResult> GetTagRemotes(int id, TagService tagService)
+    {
+        var remotes = await tagService.GetTagRemotes(id);
+        return remotes != null ? Results.Ok(remotes) : Results.NotFound();
     }
 }

@@ -6,6 +6,7 @@ import HostForm from '@/components/hosts/host-form';
 import { useGetHost, useHostRemotes, useAttachRemote, useDetachRemote } from '@/hooks/useHosts';
 import { useRemotes } from '@/hooks/useRemotes';
 import { formatDate } from '@/lib/date-utils';
+import { Helmet } from 'react-helmet';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -154,6 +155,10 @@ const EditHostPage: React.FC = () => {
             <div className="flex items-center gap-4 mb-6">
                 <Title level={4} className="!mb-0">Edit Host: {host.name}</Title>
             </div>
+            <Helmet>
+                <title>[ROS] | Edit Host {host.name}</title>
+                <meta name="description" content={`Dream.mf [ROS] | Edit Host ${host.name}`} />
+            </Helmet>
             <Card className="bg-gray-50 dark:bg-gray-800">
                 <Tabs activeKey={activeTab} onChange={setActiveTab}>
                     <TabPane tab="General" key="general">

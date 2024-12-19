@@ -12,6 +12,8 @@ public class Tags_Host
     public int Tag_ID { get; set; }
     public string Value { get; set; }
     public Tag Tag { get; set; } = null!;
+    [ForeignKey("Host_ID")]
+    public Host? Host { get; set; }
     public DateTimeOffset Created_Date { get; set; }
     public DateTimeOffset Updated_Date { get; set; }
 }

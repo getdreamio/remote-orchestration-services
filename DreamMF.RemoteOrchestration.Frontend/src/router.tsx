@@ -16,6 +16,8 @@ import LoginPage from './pages/auth/login';
 import LogoutPage from './pages/auth/logout';
 import TagsPage from './pages/tags/index';
 import ErrorDisplay from './components/error/error-display';
+import EditTagPage from './pages/tags/edit';
+import NewTagPage from './pages/tags/new';
 
 export const router = createBrowserRouter([
     {
@@ -66,6 +68,14 @@ export const router = createBrowserRouter([
                 path: 'tags',
                 element: <TagsPage />,
                 errorElement: <ErrorDisplay message="Error loading tags" />,
+            },
+            {
+                path: 'tags/new',
+                element: <NewTagPage />,
+            },
+            {
+                path: 'tags/:id',
+                element: <EditTagPage />,
             },
             {
                 path: 'users',

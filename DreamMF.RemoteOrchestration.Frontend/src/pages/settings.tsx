@@ -15,6 +15,8 @@ import { SettingsCard } from '../components/settings/settings-card';
 import { StorageSettingsForm } from '../components/settings/storage-settings-form';
 import { DatabaseSettingsForm } from '../components/settings/database-settings-form';
 import { Card } from 'antd';
+import { ApiSettingsForm } from '@/components/settings/api-settings-form';
+import { Helmet } from 'react-helmet';
 
 const SettingsPage = () => {
     const { data: configurations, isLoading } = useConfigurations();
@@ -45,6 +47,10 @@ const SettingsPage = () => {
     return (
 
         <div>
+            <Helmet>
+                <title>[ROS] | Configuration</title>
+                <meta name="description" content="Dream.mf [ROS] | Configuration Page" />
+            </Helmet>
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold">Configuration</h1>
             </div>
@@ -57,8 +63,14 @@ const SettingsPage = () => {
                     <div className="fixed bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-md shadow-lg">
                         Saving changes...
                     </div>
-                )}
+            )}
 
+            <Card className='mb-4 bg-gray-50 dark:bg-gray-800'>
+                <ApiSettingsForm
+                    configurations={configurations}
+                    onSave={handleSave}
+                />
+            </Card>
             <Card className='mb-4 bg-gray-50 dark:bg-gray-800'>
                 <DatabaseSettingsForm 
                     configurations={configurations}
