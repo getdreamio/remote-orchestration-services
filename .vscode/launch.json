@@ -5,7 +5,7 @@
 			"name": "Debug API",
 			"type": "dotnet",
 			"request": "launch",
-			"projectPath": "${workspaceFolder}/DreamMF.RemoteOrchestration.Api/DreamMF.RemoteOrchestration.Api.csproj"
+			"projectPath": "${workspaceFolder}/DreamMF.RemoteOrchestration.Api/DreamMF.RemoteOrchestration.Api.csproj",
 		},
 		{
 			"name": "Debug Frontend (Firefox)",
@@ -13,14 +13,6 @@
 			"request": "launch",
 			"url": "http://localhost:3000",
 			"webRoot": "${workspaceFolder}/DreamMF.RemoteOrchestration.Frontend",
-			"log": {
-				"fileName": "${workspaceFolder}/vscode-firefox-debug.log",
-				"fileLevel": {
-					"default": "Debug",
-					"BreakpointsManager": "Debug",
-					"PathConversion": "Debug"
-				}
-			}
 		}
 	]
 }

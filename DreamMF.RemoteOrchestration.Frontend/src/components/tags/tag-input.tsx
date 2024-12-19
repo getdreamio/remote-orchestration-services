@@ -1,69 +1,63 @@
 import { useState } from 'react';
-import { Select, Tag, Tooltip } from 'antd';
+import { Select, Tag as AntDTag, Tooltip } from 'antd';
 import { TagOutlined } from '@ant-design/icons';
+import { useTags, type Tag } from '@/hooks/useTags';
 
-export interface TagItem {
-    key: string;
-    value: string;
-}
 
 interface TagInputProps {
-    tags: TagItem[];
-    onChange: (tags: TagItem[]) => void;
-    existingTags?: TagItem[]; // For tag suggestions
+    value?: Tag[];
+    onChange?: (tags: Tag[]) => void;
 }
 
-export const TagInput: React.FC<TagInputProps> = ({ tags, onChange, existingTags = [] }) => {
+export const TagInput: React.FC<TagInputProps> = ({ value: tags, onChange}) => {
     const [inputVisible, setInputVisible] = useState(false);
-    const [selectedKey, setSelectedKey] = useState<string>('');
-    const [selectedValue, setSelectedValue] = useState<string>('');
+    const [selectedTagId, setSelectedTagId] = useState<number>();
 
-    // Get unique keys from existing tags for suggestions
-    const uniqueKeys = Array.from(new Set(existingTags.map(tag => tag.key)));
+    const { data: allTags } = useTags();
 
-    const handleClose = (removedTag: TagItem) => {
-        onChange(tags.filter(tag => !(tag.key === removedTag.key && tag.value === removedTag.value)));
+    const selectedTag = allTags?.find(t => t.tag_ID === selectedTagId);
+
+    const handleClose = (removedTag: Tag) => {
+        onChange(tags.filter(tag => tag !== removedTag));
     };
 
     const handleAdd = () => {
-        if (selectedKey && selectedValue) {
-            const newTag = { key: selectedKey, value: selectedValue };
-            onChange([...tags, newTag]);
-            setSelectedKey('');
-            setSelectedValue('');
+        if (selectedTag) {
+            onChange([...tags, selectedTag]);
+            setSelectedTagId(undefined);
             setInputVisible(false);
         }
     };
-
+ 
     return (
         <div className="space-y-2">
             <div className="flex flex-wrap gap-2">
                 {tags?.map((tag) => {
                     const tagElement = (
-                        <Tag
-                            key={`${tag.key}:${tag.value}`}
+                        <AntDTag
+                            key={`${tag.tag_ID}`}
                             closable
                             onClose={() => handleClose(tag)}
                             className="flex items-center gap-1"
                         >
                             <span className="font-medium">{tag.key}</span>
                             <span className="text-muted-foreground">:</span>
-                            <span>{tag.value}</span>
-                        </Tag>
+                            <span>{tag.display_Name}</span>
+                        </AntDTag>
                     );
                     return (
-                        <Tooltip key={`${tag.key}:${tag.value}`} title={`${tag.key}: ${tag.value}`}>
+                        <Tooltip key={`${tag.key}:${tag.display_Name}`} title={`${tag.key}: ${tag.display_Name}`}>
                             {tagElement}
                         </Tooltip>
                     );
                 })}
                 {!inputVisible && (
-                    <Tag
+                    <AntDTag
                         className="bg-transparent border-dashed cursor-pointer hover:border-primary"
                         onClick={() => setInputVisible(true)}
                     >
                         <TagOutlined /> Add Tag
-                    </Tag>
+                    </AntDTag>
                 )}
             </div>
 
@@ -73,50 +67,25 @@ export const TagInput: React.FC<TagInputProps> = ({ tags, onChange, existingTags
                         <Select
                             className="w-full"
                             placeholder="Key"
-                            value={selectedKey}
-                            onChange={setSelectedKey}
+                            value={selectedTagId}
+                            onChange={setSelectedTagId}
                             showSearch
                             allowClear
                         >
-                            {uniqueKeys.map(key => (
-                                <Select.Option key={key} value={key}>
-                                    {key}
+                            {allTags?.map(tag => (
+                                <Select.Option key={tag.tag_ID} value={tag.tag_ID}>
+                                    {tag.display_Name}
                                 </Select.Option>
                             ))}
-                            <Select.Option value={selectedKey} disabled={uniqueKeys.includes(selectedKey)}>
-                                Add new key: {selectedKey}
-                            </Select.Option>
-                        </Select>
-                    </div>
-                    <div className="flex-1">
-                        <Select
-                            className="w-full"
-                            placeholder="Value"
-                            value={selectedValue}
-                            onChange={setSelectedValue}
-                            showSearch
-                            allowClear
-                            disabled={!selectedKey}
-                        >
-                            {existingTags
-                                .filter(tag => tag.key === selectedKey)
-                                .map(tag => (
-                                    <Select.Option key={tag.value} value={tag.value}>
-                                        {tag.value}
-                                    </Select.Option>
-                                ))}
-                            <Select.Option
-                                value={selectedValue}
-                                disabled={existingTags.some(t => t.key === selectedKey && t.value === selectedValue)}
-                            >
-                                Add new value: {selectedValue}
+                            <Select.Option value={selectedTagId} disabled={selectedTag}>
+                                {selectedTag?.display_Name}
                             </Select.Option>
                         </Select>
                     </div>
                     <button
                         type="button"
                         onClick={handleAdd}
-                        disabled={!selectedKey || !selectedValue}
+                        disabled={!selectedTagId}
                         className="px-4 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Add
@@ -125,8 +94,7 @@ export const TagInput: React.FC<TagInputProps> = ({ tags, onChange, existingTags
                         type="button"
                         onClick={() => {
                             setInputVisible(false);
-                            setSelectedKey('');
-                            setSelectedValue('');
+                            setSelectedTagId(undefined);
                         }}
                         className="px-4 py-1 bg-muted text-muted-foreground rounded hover:bg-muted/90"
                     >

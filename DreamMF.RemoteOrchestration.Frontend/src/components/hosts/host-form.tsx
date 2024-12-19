@@ -68,6 +68,8 @@ const HostForm: React.FC<HostFormProps> = ({ onSuccess, editingHost, renderFoote
         message.success('Key copied to clipboard');
     };
 
+    console.log(form.getFieldsValue());
+
     return (
         <Form
             form={form}
@@ -141,14 +143,9 @@ const HostForm: React.FC<HostFormProps> = ({ onSuccess, editingHost, renderFoote
                     <Form.Item
                         label="Tags"
                         name="tags"
+                        initialValue={[]}
                     >
-                        <TagInput
-                            value={form.getFieldValue('tags') || []}
-                            onChange={(newTags) => form.setFieldsValue({ tags: newTags })}
-                            suggestions={formattedExistingTags}
-                            placeholder="Add tags..."
-                            className="w-full"
-                        />
+                        <TagInput />
                     </Form.Item>
                 </>
             )}
