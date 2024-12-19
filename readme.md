@@ -10,6 +10,9 @@ Dream.mf Remote Orchestration Services is a microservice designed to facilitate 
 - **Version Control**: Manage different versions of files and configurations.
 - **Relationship Management**: Maintain relationships between different modules and services.
 
+## Screenshots
+You can see more screenshots here: [screenshots.md](screenshots.md)
+
 ## Architecture
 The service architecture is designed to support scalability and reliability. It includes:
 - **Microservices**: Each component is a separate microservice, allowing for independent scaling and deployment.
