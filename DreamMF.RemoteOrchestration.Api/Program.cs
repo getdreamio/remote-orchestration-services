@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using DreamMF.RemoteOrchestration.Core.Middleware;
 using DreamMF.RemoteOrchestration.Core.Services;
-using DreamMF.RemoteOrchestration.Api.Services;
 using DreamMF.RemoteOrchestration.Core.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
@@ -71,6 +70,7 @@ builder.Services.AddScoped<HostService>();
 builder.Services.AddScoped<RemoteService>();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<ConfigurationService>();
+builder.Services.AddScoped<IDreamService, DreamService>();
 
 var app = builder.Build();
 
@@ -98,5 +98,7 @@ app.MapHealthRoutes();
 app.MapRemoteRoutes();
 app.MapHostRoutes();
 app.MapTagRoutes();
+app.MapAnalyticsRoutes();
+app.MapDreamRoutes();
 
 app.Run();

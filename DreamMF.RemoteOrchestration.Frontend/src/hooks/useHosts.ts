@@ -63,7 +63,7 @@ const fetchHostRemotes = async (hostId: number): Promise<HostRemote[]> => {
 
 // Attach a remote to a host
 const attachRemoteToHost = async ({ hostId, remoteId }: { hostId: number; remoteId: number }): Promise<void> => {
-    const response = await fetch(`${config.backendUrl}/api/hosts/${hostId}/remotes`, {
+    const response = await fetch(`${config.backendUrl}/api/hosts/${hostId}/attach`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -77,8 +77,12 @@ const attachRemoteToHost = async ({ hostId, remoteId }: { hostId: number; remote
 
 // Detach a remote from a host
 const detachRemoteFromHost = async ({ hostId, remoteId }: { hostId: number; remoteId: number }): Promise<void> => {
-    const response = await fetch(`${config.backendUrl}/api/hosts/${hostId}/remotes/${remoteId}`, {
-        method: 'DELETE',
+    const response = await fetch(`${config.backendUrl}/api/hosts/${hostId}/detach`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ remoteId }),
     });
     if (!response.ok) {
         throw new Error('Network response was not ok');

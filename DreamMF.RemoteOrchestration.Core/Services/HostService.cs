@@ -135,4 +135,25 @@ public class HostService
         await _dbContext.SaveChangesAsync();
         return true;
     }
+
+    public async Task<bool> DetachRemoteFromHostAsync(int hostId, int remoteId)
+    {
+        if (hostId <= 0 || remoteId <= 0)
+        {
+            throw new HandledException(ExceptionType.Validation, "IDs must be greater than zero.");
+        }
+        if (!await _dbContext.Hosts.AnyAsync(h => h.Host_ID == hostId) ||
+            !await _dbContext.Remotes.AnyAsync(r => r.Remote_ID == remoteId))
+        {
+            return false;
+        }
+
+        var hostRemote = await _dbContext.Host_Remotes
+            .FirstOrDefaultAsync(hr => hr.Host_ID == hostId && hr.Remote_ID == remoteId);
+        if (hostRemote == null) return false;
+
+        _dbContext.Host_Remotes.Remove(hostRemote);
+        await _dbContext.SaveChangesAsync();
+        return true;
+    }
 }

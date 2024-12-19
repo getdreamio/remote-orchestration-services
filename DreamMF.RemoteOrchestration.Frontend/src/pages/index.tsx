@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col, Statistic, Button, Progress } from 'antd';
+import { Card, Row, Col, Statistic, Button, Progress, Spin } from 'antd';
 import { useHosts } from '@/hooks/useHosts';
 import { useTags } from '@/hooks/useTags';
 import { useRemotes } from '@/hooks/useRemotes';
@@ -7,6 +7,8 @@ import { ServerIcon, TagIcon, DatabaseIcon, ClockIcon, ArrowRightIcon, BarChart3
 import { formatDate } from '@/lib/date-utils';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import { useQuery } from '@tanstack/react-query';
+import { config } from '@/config/env';
 
 // Mock data for analytics and logs (replace with real data later)
 const analyticsData = {
@@ -40,11 +42,26 @@ const recentLogs = {
     ]
 };
 
+interface RecentRemoteAnalytics {
+    last24HoursCount: number;
+    last30DaysCount: number;
+    queryTime: string;
+}
+
 const DashboardPage: React.FC = () => {
     const navigate = useNavigate();
     const { data: hosts } = useHosts();
     const { data: tags } = useTags();
     const { data: remotes } = useRemotes();
+
+    const { data: recentAnalytics, isLoading: isLoadingAnalytics } = useQuery<RecentRemoteAnalytics>({
+        queryKey: ['recentRemoteAnalytics'],
+        queryFn: async () => {
+            const response = await fetch(`${config.backendUrl}/api/analytics/recent-remotes`);
+            if (!response.ok) throw new Error('Failed to fetch recent analytics');
+            return response.json();
+        },
+    });
 
     const getLogIcon = (type: string) => {
         switch (type) {
@@ -156,28 +173,26 @@ const DashboardPage: React.FC = () => {
                         title="Remote Usage"
                         className="h-full bg-gray-50 dark:bg-gray-800"
                         extra={<Button type="link" onClick={() => navigate('/analytics')}>View Usage</Button>}>
-                            <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Statistic
-                                        title="24 Hour Total"
-                                        value={analyticsData.requests24h}
-                                        suffix="requests"
-                                    />
-                                    <Statistic
-                                        title="30 Day Total"
-                                        value={analyticsData.requests30d}
-                                        suffix="requests"
-                                    />
+                            {isLoadingAnalytics ? (
+                                <div className="h-24 flex items-center justify-center">
+                                    <Spin />
                                 </div>
-                                <div className="pt-2">
-                                    <Progress
-                                        percent={Math.round((analyticsData.requests24h / 20000) * 100)}
-                                        size="small"
-                                        strokeColor="#3f8600"
-                                        showInfo={false}
-                                    />
+                            ) : (
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <Statistic
+                                            title="24 Hour Total"
+                                            value={recentAnalytics?.last24HoursCount ?? 0}
+                                            suffix="requests"
+                                        />
+                                        <Statistic
+                                            title="30 Day Total"
+                                            value={recentAnalytics?.last30DaysCount ?? 0}
+                                            suffix="requests"
+                                        />
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </Card>
                     </Col>
                     <Col xs={24} sm={8}>
