@@ -1,8 +1,4 @@
-# Dream Remote Orchestration Services - Screenshots
-
-This document provides a visual walkthrough of the Dream Remote Orchestration Services application, showcasing its key features and interfaces.
-
-## Dashboard & Navigation
+# Screenshots
 
 ### Screenshot 1: Main Dashboard
 ![Dashboard](.docs/screenshots/screenshot_01.png)
