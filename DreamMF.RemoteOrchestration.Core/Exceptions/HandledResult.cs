@@ -98,7 +98,8 @@ public class HandledResult<T> where T : Exception
             {
                 Code = ex.ErrorCode,
                 Type = ex.ExceptionType.ToString(),
-                Message = ex.Message
+                Message = ex.Message,
+                Stacktrace = ex.StackTrace
             });
         });
         return collection;

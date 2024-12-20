@@ -73,7 +73,8 @@ CREATE INDEX idx_auditreads_remote_action ON AuditReads_Remote(Action);
 
 CREATE TABLE Tag (
     Tag_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    Text VARCHAR(255) NOT NULL,
+    [Key] VARCHAR(255) NOT NULL,
+    Display_Name VARCHAR(500) NOT NULL,
     Created_Date DATETIMEOFFSET NOT NULL,
     Updated_Date DATETIMEOFFSET NOT NULL
 );
@@ -118,6 +119,7 @@ CREATE TABLE Host (
 CREATE TABLE Remote (
     Remote_ID INTEGER PRIMARY KEY AUTOINCREMENT,
     Name VARCHAR(255) NOT NULL,
+    [Key] VARCHAR(255) NOT NULL,
     Scope VARCHAR(255) NOT NULL,
     Created_Date DATETIMEOFFSET NOT NULL,
     Updated_Date DATETIMEOFFSET NOT NULL
@@ -137,12 +139,10 @@ CREATE TABLE Host_Remote (
     Host_Remote_ID INTEGER PRIMARY KEY AUTOINCREMENT,
     Host_ID INT,
     Remote_ID INT,
-    Version_ID INT,
     Created_Date DATETIMEOFFSET NOT NULL,
     Updated_Date DATETIMEOFFSET NOT NULL,
     FOREIGN KEY (Host_ID) REFERENCES Host(Host_ID),
-    FOREIGN KEY (Remote_ID) REFERENCES Remote(Remote_ID),
-    FOREIGN KEY (Version_ID) REFERENCES Version(Version_ID)
+    FOREIGN KEY (Remote_ID) REFERENCES Remote(Remote_ID)
 );
 
 CREATE TABLE Tags_Host (
@@ -177,14 +177,14 @@ CREATE TABLE Configuration
 );
 
 -- Insert default tags
-INSERT INTO Tag (Text, Created_Date, Updated_Date)
+INSERT INTO Tag ([Key], Display_Name, Created_Date, Updated_Date)
 VALUES 
-    ('Technology', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
-    ('Language', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
-    ('Framework', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
-    ('TeamName', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
-    ('Department', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
-    ('Organization', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00');
+    ('Technology', 'Main Technology', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Language', 'Programming Language', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Framework', 'Framework', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('TeamName', 'Team or Project Name', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Department', 'Department or Team', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Organization', 'Organization Name', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00');
 
 -- Analytics Views
 

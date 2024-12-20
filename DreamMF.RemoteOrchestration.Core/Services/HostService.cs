@@ -141,7 +141,7 @@ public class HostService
     {
         if (hostId <= 0 || remoteId <= 0)
         {
-            throw new HandledException(ExceptionType.Validation, "IDs must be greater than zero.");
+                throw new HandledException(ExceptionType.Validation, "IDs must be greater than zero.");
         }
         if (!await _dbContext.Hosts.AnyAsync(h => h.Host_ID == hostId) ||
             !await _dbContext.Remotes.AnyAsync(r => r.Remote_ID == remoteId))

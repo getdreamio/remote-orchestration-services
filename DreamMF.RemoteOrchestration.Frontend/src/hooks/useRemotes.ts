@@ -4,6 +4,7 @@ import { config } from '@/config/env';
 interface Remote {
     id: number;
     name: string;
+    key: string;
     url?: string;
     storageType: string;
     configuration: string;
@@ -20,6 +21,7 @@ export interface RemoteModule {
 
 interface RemoteRequest {
     name: string;
+    key: string;
     storageType: string;
     configuration: string;
 }

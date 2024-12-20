@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, Typography, Spin, Tabs, Table, Button, Modal, message } from 'antd';
-import { ArrowLeftOutlined, LinkOutlined, DisconnectOutlined } from '@ant-design/icons';
+import { LinkOutlined, DisconnectOutlined } from '@ant-design/icons';
 import HostForm from '@/components/hosts/host-form';
 import { useGetHost, useHostRemotes, useAttachRemote, useDetachRemote } from '@/hooks/useHosts';
 import { useRemotes } from '@/hooks/useRemotes';
@@ -10,13 +10,6 @@ import { Helmet } from 'react-helmet';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
-
-interface Version {
-    id: string;
-    version: string;
-    createdAt: string;
-    isActive: boolean;
-}
 
 const EditHostPage: React.FC = () => {
     const navigate = useNavigate();
@@ -28,17 +21,17 @@ const EditHostPage: React.FC = () => {
     const detachRemote = useDetachRemote();
     const [activeTab, setActiveTab] = useState('general');
     const [isAttachModalOpen, setIsAttachModalOpen] = useState(false);
-    const [versions] = useState<Version[]>([]);
-    const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
 
     const handleSuccess = () => {
         navigate('/hosts');
     };
 
     // Filter out already attached remotes
-    const availableRemotes = allRemotes?.filter(
-        remote => !hostRemotes?.some(hr => hr.remoteId === remote.id)
-    ) || [];
+    const availableRemotes = useMemo(() => {
+        if (!allRemotes || !hostRemotes) return [];
+        const attachedRemoteIds = new Set(hostRemotes.map(hr => hr.id));
+        return allRemotes.filter(remote => !attachedRemoteIds.has(remote.id));
+    }, [allRemotes, hostRemotes]);
 
     const handleAttachRemote = async (remoteId: number) => {
         try {
@@ -52,6 +45,7 @@ const EditHostPage: React.FC = () => {
 
     const handleDetachRemote = async (remoteId: number) => {
         try {
+            console.log(`Detaching remote ${remoteId} from host ${id}`);
             await detachRemote.mutateAsync({ hostId: Number(id), remoteId });
             message.success('Remote detached successfully');
         } catch (error) {
@@ -64,34 +58,32 @@ const EditHostPage: React.FC = () => {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
-            render: (_: any, record: any) => {
-                const remote = allRemotes?.find(r => r.id === record.remoteId);
-                return remote?.name || 'Unknown Remote';
-            },
+            render: (name: any) => name,
         },
         {
             title: 'Scope',
             dataIndex: 'scope',
             key: 'scope',
-            render: (_: any, record: any) => {
-                const remote = allRemotes?.find(r => r.id === record.remoteId);
-                return remote?.scope || '-';
-            },
+            render: (scope: any) => scope,
         },
         {
             title: 'Attached Date',
-            dataIndex: 'createdAt',
-            key: 'createdAt',
+            dataIndex: 'created_Date',
+            key: 'created_Date',
             render: (date: string) => formatDate(date),
+            sorter: (a: any, b: any) => {
+                if (!a.created_date || !b.created_date) return 0;
+                return new Date(a.created_date).getTime() - new Date(b.created_date).getTime();
+            },
         },
         {
             title: 'Actions',
             key: 'actions',
-            render: (_: any, record: any) => (
+            render: (record: any) => (
                 <Button
                     type="text"
                     icon={<DisconnectOutlined />}
-                    onClick={() => handleDetachRemote(record.remoteId)}
+                    onClick={() => handleDetachRemote(record.id)}
                     danger
                 >
                     Detach
@@ -234,7 +226,7 @@ const EditHostPage: React.FC = () => {
                                 columns={columns}
                                 dataSource={hostRemotes || []}
                                 rowKey="id"
-                                pagination={false}
+                                pagination={true}
                             />
                         </div>
                     </TabPane>
@@ -252,7 +244,7 @@ const EditHostPage: React.FC = () => {
                     columns={availableRemoteColumns}
                     dataSource={availableRemotes}
                     rowKey="id"
-                    pagination={false}
+                    pagination={true}
                 />
             </Modal>
         </div>

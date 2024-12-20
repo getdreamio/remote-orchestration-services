@@ -18,6 +18,7 @@ import TagsPage from './pages/tags/index';
 import ErrorDisplay from './components/error/error-display';
 import EditTagPage from './pages/tags/edit';
 import NewTagPage from './pages/tags/new';
+import SearchPage from './pages/search';
 
 export const router = createBrowserRouter([
     {
@@ -88,6 +89,10 @@ export const router = createBrowserRouter([
             {
                 path: 'analytics',
                 element: <AnalyticsPage />,
+            },
+            {
+                path: 'search',
+                element: <SearchPage />,
             },
             {
                 path: '*',

@@ -320,7 +320,7 @@ const DashboardPage: React.FC = () => {
                                     <div key={i} className="flex flex-col gap-1 p-2 rounded-md hover:bg-muted/50">
                                         <div className="flex items-center gap-2">
                                             <TagIcon className="h-4 w-4 text-purple-500 dark:text-purple-400" />
-                                            <span className="font-medium">{tag.text}</span>
+                                            <span className="font-medium">{tag.key}</span>
                                         </div>
                                         <div className="flex items-center gap-1 text-xs text-muted-foreground dark:text-muted-foreground/70">
                                             <ClockIcon className="h-3 w-3" />

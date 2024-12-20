@@ -1,5 +1,5 @@
 import { Link, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Settings, Users, Server, Database, Tag, BarChart, Shield, ToggleLeft, ScrollText, Network } from 'lucide-react';
+import { LayoutDashboard, Settings, Users, Server, Database, Tag, BarChart, Shield, ToggleLeft, ScrollText, Network, Search } from 'lucide-react';
 import { ThemeToggle } from '../theme/theme-toggle';
 import { UserMenu } from '../user/user-menu';
 import { Breadcrumb } from '../navigation/breadcrumb';
@@ -67,6 +67,16 @@ const RootLayout = () => {
                                 <div className="flex flex-col">
                                     <span>Tagging</span>
                                     <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Metadata about hosts and remotes</span>
+                                </div>
+                            </Link>
+                            <Link
+                                to="/search"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50"
+                            >
+                                <Search className="h-5 w-5 text-amber-500 dark:text-amber-400" />
+                                <div className="flex flex-col">
+                                    <span>Search</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Find hosts and remotes by tags</span>
                                 </div>
                             </Link>
                             <div
@@ -147,20 +157,27 @@ const RootLayout = () => {
                     <div className="flex-1 lg:ml-[336px]">
                         {/* Header */}
                         <header className="h-16 border-b flex items-center justify-between px-6 bg-card">
-                            <Breadcrumb />
-                            <div className="flex items-center space-x-4">
-                                <UserMenu />
-                                <ThemeToggle />
-                            </div>
+                                <Breadcrumb />
+                                <div className="flex items-center space-x-4">
+                                    <UserMenu />
+                                    <Link
+                                        to="/search"
+                                        className="p-2 hover:bg-muted rounded-md transition-colors"
+                                        title="Search"
+                                    >
+                                        <Search className="h-5 w-5 text-muted-foreground" />
+                                    </Link>
+                                    <ThemeToggle />
+                                </div>
                         </header>
                         {/* Page Content */}
                         <main className="p-6">
                             <ErrorBoundary>
                                 <Outlet />
                             </ErrorBoundary>
-                        </main>
-                    </div>
+                    </main>
                 </div>
+            </div>
             </div>
         </ErrorBoundary>
     );

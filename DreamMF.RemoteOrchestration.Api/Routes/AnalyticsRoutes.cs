@@ -131,19 +131,7 @@ public static class AnalyticsRoutes
 
     private static async Task<IResult> GetRecentRemoteAnalytics(IAnalyticsService analyticsService)
     {
-        try
-        {
-            var result = await analyticsService.GetRecentRemoteAnalyticsAsync();
-            return Results.Ok(result);
-        }
-        catch (HandledException ex)
-        {
-            return Results.BadRequest(new HandledResponseError
-            {
-                Code = ex.ErrorCode,
-                Type = ex.GetType().Name,
-                Message = ex.Message
-            });
-        }
+        var analytics = await analyticsService.GetRecentRemoteAnalyticsAsync();
+        return analytics != null ? Results.Ok(analytics) : Results.NotFound();
     }
 }
