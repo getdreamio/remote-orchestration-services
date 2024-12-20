@@ -62,7 +62,7 @@ public class HostService
         {
             throw new HandledException(ExceptionType.Validation, "Invalid input parameters.");
         }
-        var existingHost = await _dbContext.Hosts.FindAsync(id);
+        var existingHost = await _dbContext.Hosts.Include(h => h.Tags).FirstOrDefaultAsync(h => h.Host_ID == id);
         if (existingHost == null) return false;
 
         existingHost.Name = request.Name;
@@ -70,6 +70,7 @@ public class HostService
         existingHost.Url = request.Url;
         existingHost.Environment = request.Environment;
         existingHost.Updated_Date = DateTimeOffset.UtcNow;
+        existingHost.Tags = request.Tags.Select(t => new Tag() { Tag_ID = t.Tag_ID.Value, Key = t.Key}).ToList();
 
         await _dbContext.SaveChangesAsync();
         _ = _analyticsService.LogHostReadAsync(id, "Update", 1);

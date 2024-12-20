@@ -3,7 +3,7 @@ import { Form, Input, Button, message, Select, Typography } from 'antd';
 import { type HostRequest, useCreateHost, useUpdateHost } from '@/hooks/useHosts';
 import { CopyOutlined } from '@ant-design/icons';
 import { TagInput, type TagItem } from '@/components/tags/tag-input';
-import { useTags } from '@/hooks/useTags';
+import { Tag, useTags } from '@/hooks/useTags';
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -19,7 +19,7 @@ interface HostFormProps {
         url: string;
         key: string;
         environment: string;
-        tags?: TagItem[];
+        tags?: Tag[];
         repository?: string;
         contactName?: string;
         contactEmail?: string;
@@ -32,9 +32,9 @@ const HostForm: React.FC<HostFormProps> = ({ onSuccess, editingHost, renderFoote
     const [isSubmitting, setIsSubmitting] = useState(false);
     const createHost = useCreateHost();
     const updateHost = useUpdateHost();
-    const { data: existingTags = [] } = useTags();
+    const { data: allTags = [] } = useTags();
 
-    const formattedExistingTags = existingTags.map(tag => ({
+    const formattedExistingTags = allTags.map(tag => ({
         key: 'tag',
         value: tag.key
     }));
@@ -44,7 +44,7 @@ const HostForm: React.FC<HostFormProps> = ({ onSuccess, editingHost, renderFoote
             setIsSubmitting(true);
             const hostData = {
                 ...values,
-                tags: values.tags?.map(tag => tag.value) || []
+                // tags: values.tags?.map(tag => tag.value) || []
             };
 
             if (editingHost) {

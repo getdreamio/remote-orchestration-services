@@ -12,4 +12,6 @@ public class Tag
     public string Display_Name { get; set; } = string.Empty;
     public DateTimeOffset Created_Date { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset Updated_Date { get; set; } = DateTimeOffset.UtcNow;
+
+    public ICollection<Host> Hosts {get; set;} = [];
 }

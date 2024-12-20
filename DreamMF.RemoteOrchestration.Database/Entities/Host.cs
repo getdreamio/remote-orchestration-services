@@ -16,6 +16,8 @@ public class Host
     public string Environment { get; set; } = string.Empty;
     public DateTimeOffset Created_Date { get; set; }
     public DateTimeOffset Updated_Date { get; set; }
+    
+    public ICollection<Tag> Tags {get; set;} = [];
 
     public static string GenerateKey()
     {

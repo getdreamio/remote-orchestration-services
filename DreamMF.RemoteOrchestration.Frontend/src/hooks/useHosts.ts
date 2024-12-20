@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { config } from '@/config/env';
+import type { Tag } from './useTags';
 
 interface Host {
     id: number;
@@ -12,7 +13,7 @@ interface Host {
     contactName?: string;
     contactEmail?: string;
     documentationUrl?: string;
-    tags?: string[];
+    tags?: Tag[];
     createdAt?: string;
     updatedAt?: string;
 }

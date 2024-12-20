@@ -5,7 +5,7 @@ import { useTags, type Tag } from "@/hooks/useTags";
 
 interface TagInputProps {
 	value?: Tag[];
-	onChange?: (tags: Tag[]) => void;
+	onChange?: (value: Tag[]) => void;
 }
 
 export const TagInput: React.FC<TagInputProps> = ({
@@ -19,7 +19,7 @@ export const TagInput: React.FC<TagInputProps> = ({
 
 	const selectedTag = allTags?.find((t) => t.tag_ID === selectedTagId);
 
-	const handleClose = (removedTag: Tag) => {
+	const removeTag = (removedTag: Tag) => {
 		if (!onChange || !tags) return;
 		onChange(tags?.filter((tag) => tag !== removedTag));
 	};
@@ -43,7 +43,7 @@ export const TagInput: React.FC<TagInputProps> = ({
 						<AntDTag
 							key={`${tag.tag_ID}`}
 							closable
-							onClose={() => handleClose(tag)}
+							onClose={() => removeTag(tag)}
 							className="flex items-center gap-1"
 						>
 							{ifDisplayNameSame(tag) ? (

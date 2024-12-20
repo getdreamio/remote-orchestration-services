@@ -78,6 +78,7 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
         {
             entity.HasKey(e => e.Host_ID);
             entity.ToTable("Host");
+            entity.HasMany(e => e.Tags).WithMany(e => e.Hosts).UsingEntity("Tags_Host");
         });
 
         modelBuilder.Entity<Remote>(entity =>
@@ -96,6 +97,7 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
         {
             entity.HasKey(e => e.Tag_ID);
             entity.ToTable("Tag");
+            entity.HasMany(e => e.Hosts).WithMany(e => e.Tags).UsingEntity("Tags_Host");
         });
 
         modelBuilder.Entity<Tags_Remote>(entity =>
@@ -104,11 +106,11 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
             entity.ToTable("Tags_Remote");
         });
 
-        modelBuilder.Entity<Tags_Host>(entity =>
-        {
-            entity.HasKey(e => e.Tag_Host_ID);
-            entity.ToTable("Tags_Host");
-        });
+        // modelBuilder.Entity<Tags_Host>(entity =>
+        // {
+        //     entity.HasKey(e => e.Tag_Host_ID);
+        //     entity.ToTable("Tags_Host");
+        // });
 
         modelBuilder.Entity<Host_Remote>(entity =>
         {
