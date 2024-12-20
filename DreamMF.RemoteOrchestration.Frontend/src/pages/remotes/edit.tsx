@@ -39,9 +39,9 @@ const EditRemotePage: React.FC = () => {
                 key: remote.key,
                 scope: remote.scope,
                 repository: remote.repository,
-                contactName: remote.contactName,
-                contactEmail: remote.contactEmail,
-                documentationUrl: remote.documentationUrl
+                contact_name: remote.contact_name,
+                contact_email: remote.contact_email,
+                documentation_url: remote.documentation_url
             });
             setModules(remote.modules || []);
             setTags(remote.tags || []);
@@ -60,9 +60,9 @@ const EditRemotePage: React.FC = () => {
                     activeVersion: selectedVersion,
                     key: form.getFieldValue('key'),
                     repository: form.getFieldValue('repository'),
-                    contactName: form.getFieldValue('contactName'),
-                    contactEmail: form.getFieldValue('contactEmail'),
-                    documentationUrl: form.getFieldValue('documentationUrl')
+                    contact_name: form.getFieldValue('contact_name'),
+                    contact_email: form.getFieldValue('contact_email'),
+                    documentation_url: form.getFieldValue('documentation_url')
                 }
             });
             message.success('Remote updated successfully');
@@ -146,13 +146,13 @@ const EditRemotePage: React.FC = () => {
 
     return (
         <div className="space-y-6">
+            <Helmet>
+                <title>[ROS] | Edit Remote {remote?.name}</title>
+                <meta name="description" content={`Dream.mf [ROS] | Edit Remote ${remote?.name}`} />
+            </Helmet>
             <div className="flex items-center gap-4 mb-6">
                 <Title level={4} className="!mb-0">Edit Remote: {remote?.name}</Title>
             </div>
-            <Helmet>
-                <title>[ROS] | Edit Remote {remote.name}</title>
-                <meta name="description" content={`Dream.mf [ROS] | Edit Remote ${remote.name}`} />
-            </Helmet>
             <Card className="bg-gray-50 dark:bg-gray-800">
                 <Tabs activeKey={activeTab} onChange={setActiveTab}>
                     <TabPane tab="General" key="general">
@@ -160,16 +160,7 @@ const EditRemotePage: React.FC = () => {
                             form={form}
                             layout="vertical"
                             onFinish={onFinish}
-                            initialValues={{
-                                name: remote.name,
-                                key: remote.key,
-                                scope: remote.scope,
-                                repository: remote.repository,
-                                contactName: remote.contactName,
-                                contactEmail: remote.contactEmail,
-                                documentationUrl: remote.documentationUrl
-                            }}
-                            className="space-y-4"
+                            className="max-w-2xl"
                         >
                             <Form.Item
                                 label="Name"
@@ -182,31 +173,48 @@ const EditRemotePage: React.FC = () => {
                             <Form.Item
                                 label="Key"
                                 name="key"
-                                rules={[
-                                    { required: true, message: 'Please input the remote key!' },
-                                    { pattern: /^[A-Za-z_]+$/, message: 'Key can only contain alphabetical characters and underscores!' }
-                                ]}
-                                help="Only letters (A-Z, a-z) and underscores (_) are allowed"
+                                rules={[{ required: true, message: 'Please input the remote key!' }]}
                             >
-                                <Input placeholder="Enter alphabetical characters and underscores only" />
+                                <Input />
                             </Form.Item>
 
                             <Form.Item
                                 label="Scope"
                                 name="scope"
-                                rules={[
-                                    { required: true, message: 'Please input the scope!' },
-                                    { pattern: /^[A-Za-z]+$/, message: 'Scope can only contain alphabetical characters!' }
-                                ]}
-                                help="Only letters (A-Z, a-z) are allowed"
+                                rules={[{ required: true, message: 'Please input the remote scope!' }]}
                             >
-                                <Input placeholder="Enter alphabetical characters only" />
+                                <Input />
                             </Form.Item>
 
                             <Form.Item
-                                label="URL"
+                                label="Repository URL"
+                                name="repository"
+                                rules={[{ type: 'url', message: 'Please enter a valid URL!' }]}
                             >
-                                <Input value={remote.url} disabled />
+                                <Input />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Contact Name"
+                                name="contact_name"
+                            >
+                                <Input />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Contact Email"
+                                name="contact_email"
+                                rules={[{ type: 'email', message: 'Please enter a valid email!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Documentation URL"
+                                name="documentation_url"
+                                rules={[{ type: 'url', message: 'Please enter a valid URL!' }]}
+                            >
+                                <Input />
                             </Form.Item>
 
                             <div className="space-y-2">
@@ -255,14 +263,16 @@ const EditRemotePage: React.FC = () => {
                                 />
                             </Form.Item>
 
-                            <div className="flex justify-end space-x-2 pt-4">
-                                <Button onClick={() => navigate('/remotes')}>
-                                    Cancel
-                                </Button>
-                                <Button type="primary" htmlType="submit">
-                                    Save Changes
-                                </Button>
-                            </div>
+                            <Form.Item>
+                                <div className="flex justify-end gap-2">
+                                    <Button onClick={() => navigate('/remotes')}>
+                                        Cancel
+                                    </Button>
+                                    <Button type="primary" htmlType="submit" loading={updateRemote.isPending}>
+                                        Save Changes
+                                    </Button>
+                                </div>
+                            </Form.Item>
                         </Form>
                     </TabPane>
                     <TabPane tab="Information" key="information">

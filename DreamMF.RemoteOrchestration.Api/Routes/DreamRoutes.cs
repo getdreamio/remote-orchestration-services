@@ -42,15 +42,15 @@ public static class DreamRoutes
             .WithSummary("Get remotes by host by Access Key")
             .WithDescription("Gets all attached remotes for a host by its access key");
 
-        group.MapGet("/hosts/{accessKey}/remote/{name}", GetRemoteByAccessKeyAndName)
+        group.MapGet("/hosts/{accessKey}/remote/{key}", GetRemoteByAccessKeyAndName)
             .WithTags(GroupName)
             .Produces<RemoteResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
             .Produces<HandledResponseModel>(500)
-            .WithMetadata(new EndpointNameMetadata("Reads remote using key and name"))
-            .WithSummary("Reads remote using access key and remote name")
-            .WithDescription("Reads remote using access key and remote name");
+            .WithMetadata(new EndpointNameMetadata("Reads remote using access key and remote key"))
+            .WithSummary("Reads remote using access key and remote key")
+            .WithDescription("Reads remote using access key and remote key");
 
         return group;
     }
@@ -67,9 +67,9 @@ public static class DreamRoutes
         return result != null ? Results.Ok(result) : Results.NotFound();
     }
 
-    private static async Task<IResult> GetRemoteByAccessKeyAndName(string accessKey, string remoteName, IDreamService service)
+    private static async Task<IResult> GetRemoteByAccessKeyAndName(string accessKey, string key, IDreamService service)
     {
-        var result = await service.GetRemoteByAccessKeyAndName(accessKey, remoteName);
+        var result = await service.GetRemoteByAccessKeyAndName(accessKey, key);
         return result != null ? Results.Ok(result) : Results.NotFound();
     }
 }

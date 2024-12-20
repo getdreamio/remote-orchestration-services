@@ -5,11 +5,14 @@ interface Remote {
     id: number;
     name: string;
     key: string;
-    url?: string;
-    storageType: string;
-    configuration: string;
+    scope: string;
+    repository: string;
+    contact_name: string;
+    contact_email: string;
+    documentation_url: string;
     created_Date: string;
     updated_Date: string;
+    modules?: RemoteModule[];
 }
 
 export interface RemoteModule {
@@ -22,8 +25,12 @@ export interface RemoteModule {
 interface RemoteRequest {
     name: string;
     key: string;
-    storageType: string;
-    configuration: string;
+    scope: string;
+    repository: string;
+    contact_name: string;
+    contact_email: string;
+    documentation_url: string;
+    modules?: RemoteModule[];
 }
 
 interface RemoteModuleCount {

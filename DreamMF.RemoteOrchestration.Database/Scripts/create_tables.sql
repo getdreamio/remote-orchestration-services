@@ -112,6 +112,10 @@ CREATE TABLE Host (
     Description VARCHAR(1000) NOT NULL,
     [Key] VARCHAR(255) NOT NULL,
     Environment VARCHAR(255) NOT NULL,
+    Repository VARCHAR(255),
+    Contact_Name VARCHAR(255),
+    Contact_Email VARCHAR(255),
+    Documentation_Url VARCHAR(255),
     Created_Date DATETIMEOFFSET NOT NULL,
     Updated_Date DATETIMEOFFSET NOT NULL
 );
@@ -121,6 +125,10 @@ CREATE TABLE Remote (
     Name VARCHAR(255) NOT NULL,
     [Key] VARCHAR(255) NOT NULL,
     Scope VARCHAR(255) NOT NULL,
+    Repository VARCHAR(255),
+    Contact_Name VARCHAR(255),
+    Contact_Email VARCHAR(255),
+    Documentation_Url VARCHAR(255),
     Created_Date DATETIMEOFFSET NOT NULL,
     Updated_Date DATETIMEOFFSET NOT NULL
 );

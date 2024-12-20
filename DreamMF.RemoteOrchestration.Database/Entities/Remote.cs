@@ -12,6 +12,10 @@ public class Remote
     public string Name { get; set; } = string.Empty;
     public string Key { get; set; } = string.Empty;
     public string Scope { get; set; } = string.Empty; // e.g., AzureBlob, AWSS3
+    public string? Repository { get; set; }
+    public string? Contact_Name { get; set; }
+    public string? Contact_Email { get; set; }
+    public string? Documentation_Url { get; set; }
     public DateTimeOffset Created_Date { get; set; }
     public DateTimeOffset Updated_Date { get; set; }
 
