@@ -45,6 +45,7 @@ const EditHostPage: React.FC = () => {
 
     const handleDetachRemote = async (remoteId: number) => {
         try {
+            console.log(`Detaching remote ${remoteId} from host ${id}`);
             await detachRemote.mutateAsync({ hostId: Number(id), remoteId });
             message.success('Remote detached successfully');
         } catch (error) {
@@ -78,11 +79,11 @@ const EditHostPage: React.FC = () => {
         {
             title: 'Actions',
             key: 'actions',
-            render: (_: any, record: any) => (
+            render: (record: any) => (
                 <Button
                     type="text"
                     icon={<DisconnectOutlined />}
-                    onClick={() => handleDetachRemote(record.remoteId)}
+                    onClick={() => handleDetachRemote(record.id)}
                     danger
                 >
                     Detach
@@ -243,7 +244,7 @@ const EditHostPage: React.FC = () => {
                     columns={availableRemoteColumns}
                     dataSource={availableRemotes}
                     rowKey="id"
-                    pagination={false}
+                    pagination={true}
                 />
             </Modal>
         </div>
