@@ -3,13 +3,15 @@ import { config } from '@/config/env';
 import { message } from 'antd';
 
 export interface Tag {
-    id: number;
+    tag_ID: number;
     key: string;
-    created_Date: string;
-    updated_Date: string;
+    display_Name: string;
+    created_Date: Date;
+    updated_Date: Date;
 }
 export interface TagRequest {
     key: string;
+    display_Name: string;
 }
 
 export interface TagAssociation {
@@ -100,7 +102,7 @@ export const useUpdateTag = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ id, tag }: { id: number; tag: Partial<TagRequest> }) => {
+        mutationFn: async ({ id, tag }: { id: number; tag: Partial<Tag> }) => {
             const response = await fetch(`${config.backendUrl}/api/tags/${id}`, {
                 method: 'PUT',
                 headers: {
@@ -111,7 +113,6 @@ export const useUpdateTag = () => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            return response.json();
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tags'] });

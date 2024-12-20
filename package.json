@@ -1,0 +1,5 @@
+{
+    "scripts": {
+        "start": "cd DreamMF.RemoteOrchestration.Frontend && npm start"
+    }
+}

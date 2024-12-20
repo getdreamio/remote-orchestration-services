@@ -9,7 +9,8 @@ public static class TagMapper
     {
         return new Tag
         {
-            Text = request.Text
+            Key = request.Key,
+            Display_Name = request.Display_Name
         };
     }
 
@@ -18,7 +19,8 @@ public static class TagMapper
         return new TagResponse
         {
             Tag_ID = entity.Tag_ID,
-            Text = entity.Text,
+            Key = entity.Key,
+            Display_Name = entity.Display_Name,
             Created_Date = entity.Created_Date,
             Updated_Date = entity.Updated_Date
         };

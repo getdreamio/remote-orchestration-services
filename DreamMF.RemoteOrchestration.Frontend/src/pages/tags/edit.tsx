@@ -2,8 +2,9 @@ import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Form, Input, Button, Card, Typography, Spin, Table, Tabs, Popconfirm } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
-import { useTag, useUpdateTag, useTagRemotes, useTagHosts, useRemoveTagAssociation } from '@/hooks/useTags';
+import { useTag, useUpdateTag, useTagRemotes, useTagHosts, useRemoveTagAssociation, type Tag } from '@/hooks/useTags';
 import { Helmet } from 'react-helmet';
+import TagFormFields from './form-fields';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -24,9 +25,9 @@ const EditTagPage: React.FC = () => {
         }
     }, [tag, form]);
 
-    const onFinish = async (values: any) => {
+    const onFinish = async (tag: Tag) => {
         try {
-            await updateTag.mutateAsync({ id: Number(id), tag: values });
+            await updateTag.mutateAsync({ id: Number(id), tag });
             navigate('/tags');
         } catch (error) {
             // Error is handled by the mutation
@@ -51,11 +52,11 @@ const EditTagPage: React.FC = () => {
             title: 'Actions',
             key: 'actions',
             width: 100,
-            render: (_: any, record: any) => (
+            render: (_: Tag, record: Tag) => (
                 <Popconfirm
                     title="Remove Tag Association"
                     description="Are you sure you want to remove this tag from this item?"
-                    onConfirm={() => handleRemoveAssociation(record.id, record.type)}
+                    onConfirm={() => handleRemoveAssociation(record.tag_ID, record.type)}
                     okText="Yes"
                     cancelText="No"
                 >
@@ -81,8 +82,8 @@ const EditTagPage: React.FC = () => {
         <div className="p-6">
             <Title level={2} className="mb-6">Edit Tag</Title>
             <Helmet>
-                <title>[ROS] | Edit Tag {tag ? tag.text : 'Loading...'}</title>
-                <meta name="description" content={`Dream.mf [ROS] | Edit Tag ${tag ? tag.text : 'Loading...'}`} />
+                <title>[ROS] | Edit Tag {tag ? tag.display_Name : 'Loading...'}</title>
+                <meta name="description" content={`Dream.mf [ROS] | Edit Tag ${tag ? tag.display_Name : 'Loading...'}`} />
             </Helmet>
             <div className="space-y-6">
                 <Card className="max-w-2xl bg-gray-50 dark:bg-gray-800">
@@ -91,18 +92,7 @@ const EditTagPage: React.FC = () => {
                         layout="vertical"
                         onFinish={onFinish}
                     >
-                        <Form.Item
-                            label="Key"
-                            name="key"
-                            rules={[
-                                { required: true, message: 'Please input the tag key!' },
-                                { pattern: /^[a-zA-Z0-9_-]+$/, message: 'Key can only contain letters, numbers, underscores and hyphens' }
-                            ]}
-                            tooltip="The key identifies the tag. It can contain letters, numbers, underscores and hyphens."
-                        >
-                            <Input placeholder="e.g., environment" />
-                        </Form.Item>
-
+                        <TagFormFields />
                         <Form.Item className="mb-0 flex justify-end">
                             <Button className="mr-2" onClick={() => navigate('/tags')}>
                                 Cancel

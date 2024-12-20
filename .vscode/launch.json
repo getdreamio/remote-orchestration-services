@@ -1,0 +1,18 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Debug API",
+			"type": "dotnet",
+			"request": "launch",
+			"projectPath": "${workspaceFolder}/DreamMF.RemoteOrchestration.Api/DreamMF.RemoteOrchestration.Api.csproj",
+		},
+		{
+			"name": "Debug Frontend (Firefox)",
+			"type": "firefox",
+			"request": "launch",
+			"url": "http://localhost:3000",
+			"webRoot": "${workspaceFolder}/DreamMF.RemoteOrchestration.Frontend",
+		}
+	]
+}

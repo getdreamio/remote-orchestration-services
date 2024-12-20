@@ -1,8 +1,8 @@
-import React from 'react';
+import type React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Table, Popconfirm, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useTags, useDeleteTag } from '@/hooks/useTags';
+import { useTags, useDeleteTag, Tag } from '@/hooks/useTags';
 import { Helmet } from 'react-helmet';
 
 const TagsPage: React.FC = () => {
@@ -21,9 +21,14 @@ const TagsPage: React.FC = () => {
 
     const columns = [
         {
-            title: 'Text',
-            dataIndex: 'text',
-            key: 'text',
+            title: 'Key',
+            dataIndex: 'key',
+            key: 'key',
+        },
+        {
+            title: 'Display Name',
+            dataIndex: 'display_Name',
+            key: 'key',
         },
         {
             title: 'Created Date',
@@ -34,18 +39,18 @@ const TagsPage: React.FC = () => {
         {
             title: 'Actions',
             key: 'actions',
-            render: (_: any, record: any) => (
+            render: (tag: Tag) => (
                 <span>
                     <Button
                         type="link"
                         icon={<EditOutlined />}
-                        onClick={() => navigate(`/tags/${record.tag_ID}`)}
+                        onClick={() => navigate(`/tags/${tag.tag_ID}`)}
                     >
                         Edit
                     </Button>
                     <Popconfirm
                         title="Are you sure you want to delete this tag?"
-                        onConfirm={() => handleDelete(record.tag_ID)}
+                        onConfirm={() => handleDelete(tag.tag_ID)}
                         okText="Yes"
                         cancelText="No"
                     >
@@ -62,7 +67,7 @@ const TagsPage: React.FC = () => {
         <div>
             <Helmet>
                 <title>[ROS] | List Tags</title>
-                <meta name="description" content={`Dream.mf [ROS] | List Tags Page`} />
+                <meta name="description" content={"Dream.mf [ROS] | List Tags Page"} />
             </Helmet>
             <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h1 className="text-2xl font-bold">Tags</h1>
