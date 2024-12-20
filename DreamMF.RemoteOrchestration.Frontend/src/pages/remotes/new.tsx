@@ -141,11 +141,27 @@ const NewRemotePage: React.FC = () => {
                             </Form.Item>
 
                             <Form.Item
+                                label="Key"
+                                name="key"
+                                rules={[
+                                    { required: true, message: 'Please input the remote key!' },
+                                    { pattern: /^[A-Za-z_]+$/, message: 'Key can only contain alphabetical characters and underscores!' }
+                                ]}
+                                help="Only letters (A-Z, a-z) and underscores (_) are allowed"
+                            >
+                                <Input placeholder="Enter alphabetical characters and underscores only" />
+                            </Form.Item>
+
+                            <Form.Item
                                 label="Scope"
                                 name="scope"
-                                rules={[{ required: true, message: 'Please input the scope!' }]}
+                                rules={[
+                                    { required: true, message: 'Please input the scope!' },
+                                    { pattern: /^[A-Za-z]+$/, message: 'Scope can only contain alphabetical characters!' }
+                                ]}
+                                help="Only letters (A-Z, a-z) are allowed"
                             >
-                                <Input />
+                                <Input placeholder="Enter alphabetical characters only" />
                             </Form.Item>
 
                             <Form.Item

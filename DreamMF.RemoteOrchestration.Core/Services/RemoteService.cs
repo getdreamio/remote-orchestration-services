@@ -83,6 +83,7 @@ public class RemoteService
 
         // Update basic properties
         remote.Name = request.Name;
+        remote.Key = request.Key;
         remote.Scope = request.Scope;
         remote.Updated_Date = DateTimeOffset.UtcNow;
 

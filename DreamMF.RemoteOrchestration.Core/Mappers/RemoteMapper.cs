@@ -12,6 +12,7 @@ public static class RemoteMapper
         {
             Name = request.Name,
             Scope = request.Scope,
+            Key = request.Key,
             Created_Date = DateTimeOffset.UtcNow,
             Updated_Date = DateTimeOffset.UtcNow
         };
@@ -24,6 +25,7 @@ public static class RemoteMapper
             Id = entity.Remote_ID,
             Name = entity.Name,
             Scope = entity.Scope,
+            Key = entity.Key,
             Created_Date = entity.Created_Date,
             Updated_Date = entity.Updated_Date,
             Modules = entity.RemoteModules
