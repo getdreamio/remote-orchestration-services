@@ -178,12 +178,12 @@ CREATE TABLE Configuration
 -- Insert default tags
 INSERT INTO Tag ([Key], Display_Name, Created_Date, Updated_Date)
 VALUES 
-    ('Technology', 'Technology', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
-    ('Language', 'Language', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Technology', 'Main Technology', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Language', 'Programming Language', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
     ('Framework', 'Framework', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
-    ('TeamName', 'Team Name', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
-    ('Department', 'Department', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
-    ('Organization', 'Organization', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00');
+    ('TeamName', 'Team or Project Name', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Department', 'Department or Team', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Organization', 'Organization Name', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00');
 
 -- Analytics Views
 
