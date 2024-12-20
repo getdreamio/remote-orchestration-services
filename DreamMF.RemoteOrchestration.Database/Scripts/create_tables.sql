@@ -73,7 +73,8 @@ CREATE INDEX idx_auditreads_remote_action ON AuditReads_Remote(Action);
 
 CREATE TABLE Tag (
     Tag_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    Text VARCHAR(255) NOT NULL,
+    [Key] VARCHAR(255) NOT NULL,
+    Display_Name VARCHAR(500) NOT NULL,
     Created_Date DATETIMEOFFSET NOT NULL,
     Updated_Date DATETIMEOFFSET NOT NULL
 );
@@ -175,14 +176,14 @@ CREATE TABLE Configuration
 );
 
 -- Insert default tags
-INSERT INTO Tag (Text, Created_Date, Updated_Date)
+INSERT INTO Tag ([Key], Display_Name, Created_Date, Updated_Date)
 VALUES 
-    ('Technology', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
-    ('Language', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
-    ('Framework', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
-    ('TeamName', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
-    ('Department', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
-    ('Organization', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00');
+    ('Technology', 'Technology', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Language', 'Language', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Framework', 'Framework', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('TeamName', 'Team Name', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Department', 'Department', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
+    ('Organization', 'Organization', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00');
 
 -- Analytics Views
 
