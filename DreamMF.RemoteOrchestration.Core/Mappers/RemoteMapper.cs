@@ -28,13 +28,13 @@ public static class RemoteMapper
             Key = entity.Key,
             Created_Date = entity.Created_Date,
             Updated_Date = entity.Updated_Date,
-            Modules = entity.RemoteModules
-                .Select(rm => new ModuleResponse
+            Modules = entity.Modules
+                .Select(module => new ModuleResponse
                 {
-                    Id = rm.Module.Module_ID,
-                    Name = rm.Module.Name,
-                    Created_Date = rm.Module.Created_Date,
-                    Updated_Date = rm.Module.Updated_Date
+                    Id = module.Module_ID,
+                    Name = module.Name,
+                    Created_Date = module.Created_Date,
+                    Updated_Date = module.Updated_Date
                 })
                 .ToList()
         };

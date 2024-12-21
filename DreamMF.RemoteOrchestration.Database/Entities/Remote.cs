@@ -15,5 +15,6 @@ public class Remote
     public DateTimeOffset Created_Date { get; set; }
     public DateTimeOffset Updated_Date { get; set; }
 
-    public ICollection<RemoteModule> RemoteModules { get; set; } = new List<RemoteModule>();
+    public virtual ICollection<Module> Modules {get; set;} = [];
+    public virtual ICollection<Tag> Tags { get; set; } = [];
 }

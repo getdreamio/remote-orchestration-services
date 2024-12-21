@@ -46,20 +46,7 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
 
     public RemoteOrchestrationDbContext(DbContextOptions<RemoteOrchestrationDbContext> options) : base(options)
     {
-        EnsureDatabaseCreated();
-    }
-
-    private void EnsureDatabaseCreated()
-    {
         Database.Migrate();
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            optionsBuilder.UseSqlite("Data Source=remote_orchestration.db");
-        }
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -78,12 +65,15 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
         {
             entity.HasKey(e => e.Host_ID);
             entity.ToTable("Host");
-            entity.HasMany(e => e.Tags).WithMany(e => e.Hosts).UsingEntity("Tags_Host");
+            entity.HasMany(e => e.Tags).WithMany(e => e.Hosts);
         });
 
         modelBuilder.Entity<Remote>(entity =>
         {
             entity.HasKey(e => e.Remote_ID);
+            entity.HasMany(e => e.Modules)
+                .WithMany(e => e.Remotes)
+                .UsingEntity<RemoteModule>("Remote_Module");
             entity.ToTable("Remote");
         });
 
@@ -97,7 +87,7 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
         {
             entity.HasKey(e => e.Tag_ID);
             entity.ToTable("Tag");
-            entity.HasMany(e => e.Hosts).WithMany(e => e.Tags).UsingEntity("Tags_Host");
+            entity.HasMany(e => e.Hosts).WithMany(e => e.Tags);
         });
 
         modelBuilder.Entity<Tags_Remote>(entity =>
@@ -136,16 +126,16 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
             entity.ToTable("Module");
         });
 
-        modelBuilder.Entity<RemoteModule>(entity =>
-        {
-            entity.HasKey(e => e.Remote_Module_ID);
-            entity.ToTable("Remote_Module");
-        });
+        // modelBuilder.Entity<RemoteModule>(entity =>
+        // {
+        //     entity.HasKey(e => e.Remote_Module_ID);
+        //     entity.ToTable("Remote_Module");
+        // });
 
-        modelBuilder.Entity<RemoteModule>()
-            .HasOne(rm => rm.Remote)
-            .WithMany(r => r.RemoteModules)
-            .HasForeignKey(rm => rm.Remote_ID);
+        // modelBuilder.Entity<RemoteModule>()
+        //     .HasOne(rm => rm.Remote)
+        //     .WithMany(r => r.RemoteModules)
+        //     .HasForeignKey(rm => rm.Remote_ID);
 
         modelBuilder.Entity<AuditReads_Host>(entity =>
         {

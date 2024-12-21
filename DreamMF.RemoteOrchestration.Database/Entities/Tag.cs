@@ -14,4 +14,5 @@ public class Tag
     public DateTimeOffset Updated_Date { get; set; } = DateTimeOffset.UtcNow;
 
     public ICollection<Host> Hosts {get; set;} = [];
+    public ICollection<Remote> Remotes {get; set;} = [];
 }

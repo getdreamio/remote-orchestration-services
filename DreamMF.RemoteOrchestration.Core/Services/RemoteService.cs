@@ -20,8 +20,7 @@ public class RemoteService
     public async Task<List<RemoteResponse>> GetAllRemotesAsync()
     {
         var remotes = await _dbContext.Remotes
-            .Include(r => r.RemoteModules)
-                .ThenInclude(rm => rm.Module)
+            .Include(r => r.Modules)
             .ToListAsync();
 
         var remoteResponses = remotes.Select(RemoteMapper.ToResponse).ToList();
@@ -31,8 +30,7 @@ public class RemoteService
     public async Task<RemoteResponse?> GetRemoteByIdAsync(int id)
     {
         var remote = await _dbContext.Remotes
-            .Include(r => r.RemoteModules)
-                .ThenInclude(rm => rm.Module)
+            .Include(r => r.Modules)
             .FirstOrDefaultAsync(r => r.Remote_ID == id);
 
         if (remote != null)
@@ -46,20 +44,12 @@ public class RemoteService
     {
         var remote = RemoteMapper.ToEntity(request);
         
-        foreach (var module in request.Modules.Where(m => m.Id == 0))
+        foreach (var module in request.Modules)
         {
-            var newModule = new Module
+            remote.Modules.Add(new Module
             {
+                Module_ID = module.Id,
                 Name = module.Name,
-                Created_Date = DateTimeOffset.UtcNow,
-                Updated_Date = DateTimeOffset.UtcNow
-            };
-            _dbContext.Modules.Add(newModule);
-            await _dbContext.SaveChangesAsync();
-
-            remote.RemoteModules.Add(new RemoteModule
-            {
-                Module_ID = newModule.Module_ID,
                 Created_Date = DateTimeOffset.UtcNow,
                 Updated_Date = DateTimeOffset.UtcNow
             });
@@ -74,73 +64,92 @@ public class RemoteService
 
     public async Task<bool> UpdateRemoteAsync(int id, RemoteRequest request)
     {
-        var remote = await _dbContext.Remotes
-            .Include(r => r.RemoteModules)
-                .ThenInclude(rm => rm.Module)
+        var current = await _dbContext.Remotes
+            .Include(r => r.Modules)
             .FirstOrDefaultAsync(r => r.Remote_ID == id);
 
-        if (remote == null) return false;
+        if (current == null) return false;
 
         // Update basic properties
-        remote.Name = request.Name;
-        remote.Key = request.Key;
-        remote.Scope = request.Scope;
-        remote.Updated_Date = DateTimeOffset.UtcNow;
+        current.Name = request.Name;
+        current.Key = request.Key;
+        current.Scope = request.Scope;
+        current.Updated_Date = DateTimeOffset.UtcNow;
+
+        var requestModuleIds = request.Modules.Select(m => m.Id);
+        var currentModulesById = current.Modules.ToDictionary(m => m.Module_ID);
+
+        var addedIds = requestModuleIds.Except(currentModulesById.Keys);
+        var removedIds = currentModulesById.Keys.Except(requestModuleIds);
+
+        foreach (var addId in addedIds)
+        {
+            // Assume these ids are in the databse
+            var module = new Module { Module_ID = addId};
+            _dbContext.Modules.Attach(module);
+            current.Modules.Add(module);
+        }
+
+        foreach (var removeId in removedIds)
+        {
+            current.Modules.Remove(currentModulesById[removeId]);
+        }
+
 
         // Get module names for comparison
-        var currentModules = remote.RemoteModules
-            .Select(rm => new { rm.Module.Name, RemoteModule = rm })
-            .ToDictionary(x => x.Name, x => x.RemoteModule);
+        // var currentModules = remote.Modules
+        //     .Select(module => new { module.Name, RemoteModule = module })
+        //     .ToDictionary(x => x.Name, x => x.RemoteModule);
 
-        var requestedModuleNames = request.Modules
-            .Select(m => m.Name)
-            .ToHashSet();
+        // var requestedModuleNames = request.Modules
+        //     .Select(m => m.Name)
+        //     .ToHashSet();
 
         // Remove modules that are no longer requested
-        var modulesToRemove = currentModules
-            .Where(kvp => !requestedModuleNames.Contains(kvp.Key))
-            .Select(kvp => kvp.Value)
-            .ToList();
+        // var modulesToRemove = currentModules
+        //     .Where(kvp => !requestedModuleNames.Contains(kvp.Key))
+        //     .Select(kvp => kvp.Value)
+        //     .ToList();
 
-        foreach (var moduleToRemove in modulesToRemove)
-        {
-            remote.RemoteModules.Remove(moduleToRemove);
-        }
+        // foreach (var moduleToRemove in modulesToRemove)
+        // {
+        //     current.RemoteModules.Remove(moduleToRemove);
+        // }
 
-        // Add new modules
-        var modulesToAdd = requestedModuleNames
-            .Where(name => !currentModules.ContainsKey(name))
-            .ToList();
+        // // Add new modules
+        // var modulesToAdd = requestedModuleNames
+        //     .Where(name => !currentModules.ContainsKey(name))
+        //     .ToList();
 
-        if (modulesToAdd.Any())
-        {
-            // Get existing modules from DB to avoid duplicates
-            var existingModules = await _dbContext.Modules
-                .Where(m => modulesToAdd.Contains(m.Name))
-                .ToDictionaryAsync(m => m.Name, m => m);
+        // if (modulesToAdd.Any())
+        // {
+        //     // Get existing modules from DB to avoid duplicates
+        //     var existingModules = await _dbContext.Modules
+        //         .Where(m => modulesToAdd.Contains(m.Name))
+        //         .ToDictionaryAsync(m => m.Name, m => m);
 
-            foreach (var moduleName in modulesToAdd)
-            {
-                Module module;
-                if (!existingModules.TryGetValue(moduleName, out module))
-                {
-                    module = new Module
-                    {
-                        Name = moduleName,
-                        Created_Date = DateTimeOffset.UtcNow,
-                        Updated_Date = DateTimeOffset.UtcNow
-                    };
-                    _dbContext.Modules.Add(module);
-                }
+        //     foreach (var moduleName in modulesToAdd)
+        //     {
+        //         Module module;
+        //         if (!existingModules.TryGetValue(moduleName, out module))
+        //         {
+        //             module = new Module
+        //             {
+        //                 Name = moduleName,
+        //                 Created_Date = DateTimeOffset.UtcNow,
+        //                 Updated_Date = DateTimeOffset.UtcNow
+        //             };
+        //             _dbContext.Modules.Add(module);
+        //         }
 
-                remote.RemoteModules.Add(new RemoteModule
-                {
-                    Module = module,
-                    Created_Date = DateTimeOffset.UtcNow,
-                    Updated_Date = DateTimeOffset.UtcNow
-                });
-            }
-        }
+        //         current.RemoteModules.Add(new RemoteModule
+        //         {
+        //             Module = module,
+        //             Created_Date = DateTimeOffset.UtcNow,
+        //             Updated_Date = DateTimeOffset.UtcNow
+        //         });
+        //     }
+        // }
 
         await _dbContext.SaveChangesAsync();
         _ = _analyticsService.LogRemoteReadAsync(id, "Update", 1);

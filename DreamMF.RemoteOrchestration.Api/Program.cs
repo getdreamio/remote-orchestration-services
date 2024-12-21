@@ -5,7 +5,6 @@ using Microsoft.OpenApi.Models;
 using DreamMF.RemoteOrchestration.Core.Middleware;
 using DreamMF.RemoteOrchestration.Core.Services;
 using DreamMF.RemoteOrchestration.Core.Configuration;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +16,16 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 builder.Services.AddDbContext<IRemoteOrchestrationDbContext, RemoteOrchestrationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    var connString = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (string.IsNullOrWhiteSpace(connString))
+    {
+        throw new InvalidOperationException("Missing datbase connection string.");
+    }
+    // Relative to executing assembly
+    connString = connString?.Replace("{AppDir}", AppDomain.CurrentDomain.BaseDirectory.TrimEnd('/'));
+    options.UseSqlite(connString);
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
