@@ -56,13 +56,7 @@ const EditRemotePage: React.FC = () => {
                 remote: {
                     ...values,
                     modules,
-                    tags,
-                    activeVersion: selectedVersion,
-                    key: form.getFieldValue('key'),
-                    repository: form.getFieldValue('repository'),
-                    contact_name: form.getFieldValue('contact_name'),
-                    contact_email: form.getFieldValue('contact_email'),
-                    documentation_url: form.getFieldValue('documentation_url')
+                    tags
                 }
             });
             message.success('Remote updated successfully');
@@ -154,203 +148,157 @@ const EditRemotePage: React.FC = () => {
                 <Title level={4} className="!mb-0">Edit Remote: {remote?.name}</Title>
             </div>
             <Card className="bg-gray-50 dark:bg-gray-800">
-                <Tabs activeKey={activeTab} onChange={setActiveTab}>
-                    <TabPane tab="General" key="general">
-                        <Form
-                            form={form}
-                            layout="vertical"
-                            onFinish={onFinish}
-                            className="max-w-2xl"
-                        >
-                            <Form.Item
-                                label="Name"
-                                name="name"
-                                rules={[{ required: true, message: 'Please input the remote name!' }]}
-                            >
-                                <Input />
-                            </Form.Item>
 
-                            <Form.Item
-                                label="Key"
-                                name="key"
-                                rules={[{ required: true, message: 'Please input the remote key!' }]}
-                            >
-                                <Input />
-                            </Form.Item>
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={onFinish}
+                initialValues={{
+                    name: remote.name,
+                    key: remote.key,
+                    scope: remote.scope,
+                    repository: remote.repository,
+                    contactName: remote.contactName,
+                    contactEmail: remote.contactEmail,
+                    documentationUrl: remote.documentationUrl
+                }}
+                className="space-y-4"
+            >
+                    <Tabs activeKey={activeTab} onChange={setActiveTab}>
+                        <TabPane tab="General" key="general">
+                                <Form.Item
+                                    label="Name"
+                                    name="name"
+                                    rules={[{ required: true, message: 'Please input the remote name!' }]}
+                                >
+                                    <Input />
+                                </Form.Item>
 
-                            <Form.Item
-                                label="Scope"
-                                name="scope"
-                                rules={[{ required: true, message: 'Please input the remote scope!' }]}
-                            >
-                                <Input />
-                            </Form.Item>
+                                <Form.Item
+                                    label="Key"
+                                    name="key"
+                                    rules={[{ required: true, message: 'Please input the remote key!' }]}
+                                >
+                                    <Input />
+                                </Form.Item>
 
-                            <Form.Item
-                                label="Repository URL"
-                                name="repository"
-                                rules={[{ type: 'url', message: 'Please enter a valid URL!' }]}
-                            >
-                                <Input />
-                            </Form.Item>
+                                <Form.Item
+                                    label="Scope"
+                                    name="scope"
+                                    rules={[{ required: true, message: 'Please input the remote scope!' }]}
+                                >
+                                    <Input />
+                                </Form.Item>
 
-                            <Form.Item
-                                label="Contact Name"
-                                name="contact_name"
-                            >
-                                <Input />
-                            </Form.Item>
-
-                            <Form.Item
-                                label="Contact Email"
-                                name="contact_email"
-                                rules={[{ type: 'email', message: 'Please enter a valid email!' }]}
-                            >
-                                <Input />
-                            </Form.Item>
-
-                            <Form.Item
-                                label="Documentation URL"
-                                name="documentation_url"
-                                rules={[{ type: 'url', message: 'Please enter a valid URL!' }]}
-                            >
-                                <Input />
-                            </Form.Item>
-
-                            <div className="space-y-2">
-                                <label className="block">Modules</label>
-                                <div className="flex gap-2">
-                                    <AntInput
-                                        value={moduleInput}
-                                        onChange={(e) => setModuleInput(e.target.value)}
-                                        prefix={<CodeOutlined className="text-muted-foreground" />}
-                                        onKeyDown={handleModuleKeyPress}
-                                        placeholder="Add a module and press Enter"
-                                    />
-                                    <Button
-                                        type="primary"
-                                        onClick={() => addModule(moduleInput)}
-                                        icon={<PlusOutlined />}
-                                    >
-                                        Add
-                                    </Button>
-                                </div>
                                 <div className="space-y-2">
-                                    {modules.map((module, i) => (
-                                        <div key={i} className="flex justify-between items-center p-2 bg-card rounded">
-                                            <div className="flex items-center gap-2">
-                                                <CodeOutlined className="text-muted-foreground" />
-                                                <span>{module.name}</span>
+                                    <label className="block">Modules</label>
+                                    <div className="flex gap-2">
+                                        <AntInput
+                                            value={moduleInput}
+                                            onChange={(e) => setModuleInput(e.target.value)}
+                                            prefix={<CodeOutlined className="text-muted-foreground" />}
+                                            onKeyDown={handleModuleKeyPress}
+                                            placeholder="Add a module and press Enter"
+                                        />
+                                        <Button
+                                            type="primary"
+                                            onClick={() => addModule(moduleInput)}
+                                            icon={<PlusOutlined />}
+                                        >
+                                            Add
+                                        </Button>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {modules.map((module, i) => (
+                                            <div key={i} className="flex justify-between items-center p-2 bg-card rounded">
+                                                <div className="flex items-center gap-2">
+                                                    <CodeOutlined className="text-muted-foreground" />
+                                                    <span>{module.name}</span>
+                                                </div>
+                                                <Button
+                                                    type="text"
+                                                    danger
+                                                    icon={<DeleteOutlined />}
+                                                    onClick={() => removeModule(module.name)}
+                                                >
+                                                    Remove
+                                                </Button>
                                             </div>
-                                            <Button
-                                                type="text"
-                                                danger
-                                                icon={<DeleteOutlined />}
-                                                onClick={() => removeModule(module.name)}
-                                            >
-                                                Remove
-                                            </Button>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <Form.Item label="Tags">
-                                <TagInput
-                                    tags={tags}
-                                    onChange={setTags}
-                                    existingTags={formattedExistingTags}
-                                />
-                            </Form.Item>
+                                <Form.Item label="Tags">
+                                    <TagInput
+                                        tags={tags}
+                                        onChange={setTags}
+                                        existingTags={formattedExistingTags}
+                                    />
+                                </Form.Item>
 
-                            <Form.Item>
-                                <div className="flex justify-end gap-2">
-                                    <Button onClick={() => navigate('/remotes')}>
-                                        Cancel
-                                    </Button>
-                                    <Button type="primary" htmlType="submit" loading={updateRemote.isPending}>
-                                        Save Changes
-                                    </Button>
-                                </div>
-                            </Form.Item>
-                        </Form>
-                    </TabPane>
-                    <TabPane tab="Information" key="information">
-                        <Form
-                            form={form}
-                            layout="vertical"
-                            onFinish={onFinish}
-                            initialValues={{
-                                name: remote.name,
-                                key: remote.key,
-                                scope: remote.scope,
-                                repository: remote.repository,
-                                contactName: remote.contactName,
-                                contactEmail: remote.contactEmail,
-                                documentationUrl: remote.documentationUrl
-                            }}
-                            className="space-y-4"
-                        >
-                            <Form.Item
-                                label="Repository"
-                                name="repository"
-                                rules={[
-                                    { type: 'url', message: 'Please enter a valid repository URL!' }
-                                ]}
-                            >
-                                <Input placeholder="e.g., https://github.com/organization/repo" />
-                            </Form.Item>
+                        </TabPane>
+                        <TabPane tab="Information" key="information">
+                                <Form.Item
+                                    label="Repository"
+                                    name="repository"
+                                    rules={[
+                                        { type: 'url', message: 'Please enter a valid repository URL!' }
+                                    ]}
+                                >
+                                    <Input placeholder="e.g., https://github.com/organization/repo" />
+                                </Form.Item>
 
-                            <Form.Item
-                                label="Contact Name"
-                                name="contactName"
-                            >
-                                <Input placeholder="e.g., John Smith" />
-                            </Form.Item>
+                                <Form.Item
+                                    label="Contact Name"
+                                    name="contactName"
+                                >
+                                    <Input placeholder="e.g., John Smith" />
+                                </Form.Item>
 
-                            <Form.Item
-                                label="Contact Email"
-                                name="contactEmail"
-                                rules={[
-                                    { type: 'email', message: 'Please enter a valid email address!' }
-                                ]}
-                            >
-                                <Input placeholder="e.g., john.smith@company.com" />
-                            </Form.Item>
+                                <Form.Item
+                                    label="Contact Email"
+                                    name="contactEmail"
+                                    rules={[
+                                        { type: 'email', message: 'Please enter a valid email address!' }
+                                    ]}
+                                >
+                                    <Input placeholder="e.g., john.smith@company.com" />
+                                </Form.Item>
 
-                            <Form.Item
-                                label="Documentation URL"
-                                name="documentationUrl"
-                                rules={[
-                                    { type: 'url', message: 'Please enter a valid URL!' }
-                                ]}
-                            >
-                                <Input placeholder="e.g., https://docs.example.com" />
-                            </Form.Item>
-
-                            <div className="flex justify-end space-x-2 pt-4">
-                                <Button onClick={() => navigate('/remotes')}>
-                                    Cancel
-                                </Button>
-                                <Button type="primary" htmlType="submit">
-                                    Save Changes
-                                </Button>
-                            </div>
-                        </Form>
-                    </TabPane>
-                    <TabPane tab="Sub-Remotes" key="remotes">
-                        Coming soon....
-                    </TabPane>
-                    <TabPane tab="Versions" key="versions">
-                        <Table
-                            rowSelection={rowSelection}
-                            columns={columns}
-                            dataSource={versions}
-                            rowKey="id"
-                            pagination={false}
-                        />
-                    </TabPane>
-                </Tabs>
+                                <Form.Item
+                                    label="Documentation URL"
+                                    name="documentationUrl"
+                                    rules={[
+                                        { type: 'url', message: 'Please enter a valid URL!' }
+                                    ]}
+                                >
+                                    <Input placeholder="e.g., https://docs.example.com" />
+                                </Form.Item>
+                        </TabPane>
+                        <TabPane tab="Sub-Remotes" key="remotes">
+                            Coming soon....
+                        </TabPane>
+                        <TabPane tab="Versions" key="versions">
+                            <Table
+                                rowSelection={rowSelection}
+                                columns={columns}
+                                dataSource={versions}
+                                rowKey="id"
+                                pagination={false}
+                            />
+                        </TabPane>
+                    </Tabs>
+                    <Form.Item>
+                        <div className="flex justify-end gap-2">
+                            <Button onClick={() => navigate('/remotes')}>
+                                Cancel
+                            </Button>
+                            <Button type="primary" htmlType="submit" loading={updateRemote.isPending}>
+                                Save Changes
+                            </Button>
+                        </div>
+                    </Form.Item>
+                </Form>
             </Card>
         </div>
     );

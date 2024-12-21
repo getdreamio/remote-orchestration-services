@@ -86,6 +86,10 @@ public class RemoteService
         remote.Key = request.Key;
         remote.Scope = request.Scope;
         remote.Updated_Date = DateTimeOffset.UtcNow;
+        remote.Repository = request.Repository;
+        remote.Contact_Name = request.ContactName;
+        remote.Contact_Email = request.ContactEmail;
+        remote.Documentation_Url = request.DocumentationUrl;
 
         // Get module names for comparison
         var currentModules = remote.RemoteModules

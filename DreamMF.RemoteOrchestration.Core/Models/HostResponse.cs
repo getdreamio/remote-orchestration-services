@@ -9,9 +9,9 @@ public class HostResponse
     public string Key { get; set; } = string.Empty;
     public string Environment { get; set; } = string.Empty;
     public string Repository { get; set; } = string.Empty;
-    public string Contact_Name { get; set; } = string.Empty;
-    public string Contact_Email { get; set; } = string.Empty;
-    public string Documentation_Url { get; set; } = string.Empty;
+    public string ContactName { get; set; } = string.Empty;
+    public string ContactEmail { get; set; } = string.Empty;
+    public string DocumentationUrl { get; set; } = string.Empty;
     public DateTimeOffset Created_Date { get; set; }
     public DateTimeOffset Updated_Date { get; set; }
 }
