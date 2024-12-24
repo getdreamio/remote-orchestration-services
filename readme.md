@@ -50,8 +50,5 @@ The service architecture is designed to support scalability and reliability. It 
 ## Documentation
 For detailed information on the architecture and design, refer to the diagrams in the `.docs` folder.
 
-## Contributing
-Contributions are welcome! Please read the [contributing guidelines](CONTRIBUTING.md) for more information.
-
 ## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE.md) file for details.
+This project is licensed under the GPLv2 License. See the [LICENSE.GPL2](LICENSE.GPL2) file for details.
