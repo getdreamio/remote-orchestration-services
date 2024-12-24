@@ -2,8 +2,7 @@ import React from 'react';
 import { Form, Input, Card, Button } from 'antd';
 import { Configuration } from '@/hooks/useConfigurations';
 
-// Configuration key for the API base URL
-export const API_BASE_URL_KEY = 'ApiBaseUrl';
+import { API_BASE_URL_KEY } from '@/constants/settings_constants';
 
 interface ApiSettingsFormProps {
     configurations: Configuration[] | undefined;
@@ -14,6 +13,8 @@ export const ApiSettingsForm: React.FC<ApiSettingsFormProps> = ({
     configurations,
     onSave,
 }) => {
+    console.log('#api-settings#', configurations);
+    
     const getConfigValue = (key: string) => {
         return configurations?.find(c => c.key === key)?.value || '';
     };
@@ -28,7 +29,7 @@ export const ApiSettingsForm: React.FC<ApiSettingsFormProps> = ({
                 layout="vertical"
                 onFinish={handleSave}
                 initialValues={{
-                    baseUrl: getConfigValue(API_BASE_URL_KEY) || 'https://localhost:5001',
+                    baseUrl: getConfigValue(API_BASE_URL_KEY),
                 }}
             >
                 <Form.Item
@@ -38,9 +39,9 @@ export const ApiSettingsForm: React.FC<ApiSettingsFormProps> = ({
                         { required: true, message: 'Please input the API base URL!' },
                         { type: 'url', message: 'Please enter a valid URL!' },
                     ]}
-                    tooltip="The base URL for the backend API (e.g., https://localhost:5001)"
+                    tooltip="The base URL for the backend API (e.g., https://localhost:5000)"
                 >
-                    <Input placeholder="https://localhost:5001" />
+                    <Input placeholder="https://localhost:5000" />
                 </Form.Item>
 
                 <Form.Item className="mb-0 flex justify-end">

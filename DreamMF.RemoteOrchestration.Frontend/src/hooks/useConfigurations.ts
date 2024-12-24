@@ -7,31 +7,6 @@ export interface Configuration {
     value: string;
 }
 
-// Storage Configuration Keys
-export const STORAGE_TYPE_KEY = 'StorageType';
-export const LOCAL_STORAGE_PATH_KEY = 'LocalStoragePath';
-export const AZURE_STORAGE_ACCOUNT_KEY = 'AzureStorageAccount';
-export const AZURE_STORAGE_KEY_KEY = 'AzureStorageKey';
-export const AZURE_CONTAINER_NAME_KEY = 'AzureBlobStorageContainerName';
-export const AZURE_BLOB_NAME_KEY = 'AzureBlobStorageBlobName';
-export const AWS_ACCESS_KEY_ID_KEY = 'AwsAccessKeyId';
-export const AWS_SECRET_ACCESS_KEY_KEY = 'AwsSecretAccessKey';
-export const AWS_REGION_KEY = 'AwsRegion';
-export const AWS_BUCKET_NAME_KEY = 'AwsS3BucketName';
-export const AWS_BUCKET_KEY_KEY = 'AwsS3BucketKey';
-
-// API Configuration Keys
-export const API_BASE_URL_KEY = 'ApiBaseUrl';
-
-// Database Configuration Keys
-export const DATABASE_TYPE_KEY = 'DatabaseType';
-export const DATABASE_CONNECTION_KEY = 'DatabaseConnection';
-export const DATABASE_NAME_KEY = 'DatabaseName';
-export const DATABASE_USER_KEY = 'DatabaseUser';
-export const DATABASE_PASSWORD_KEY = 'DatabasePassword';
-export const DATABASE_HOST_KEY = 'DatabaseHost';
-export const DATABASE_PORT_KEY = 'DatabasePort';
-
 export type StorageType = 'LocalStorage' | 'AzureBlobStorage' | 'AwsS3Bucket';
 export type DatabaseType = 'sqlite' | 'sqlserver' | 'postgres';
 

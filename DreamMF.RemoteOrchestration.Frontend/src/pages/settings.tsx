@@ -1,17 +1,11 @@
 import { useEffect, useState } from 'react';
 import { 
-    Configuration, 
-    StorageType, 
-    useConfigurations, 
+    useConfigurations,
     useUpdateConfiguration,
     useCreateConfiguration,
-    STORAGE_TYPE_KEY, 
-    AZURE_CONTAINER_NAME_KEY, 
-    AZURE_BLOB_NAME_KEY, 
-    AWS_BUCKET_NAME_KEY, 
-    AWS_BUCKET_KEY_KEY 
 } from '../hooks/useConfigurations';
-import { SettingsCard } from '../components/settings/settings-card';
+// import * as SettingsConstants from '../constants/settings_constants';
+// import { SettingsCard } from '../components/settings/settings-card';
 import { StorageSettingsForm } from '../components/settings/storage-settings-form';
 import { DatabaseSettingsForm } from '../components/settings/database-settings-form';
 import { Card } from 'antd';
@@ -20,23 +14,26 @@ import { Helmet } from 'react-helmet';
 
 const SettingsPage = () => {
     const { data: configurations, isLoading } = useConfigurations();
-    const { mutate: updateConfiguration, isPending: isUpdating } = useUpdateConfiguration();
-    const { mutate: createConfiguration, isPending: isCreating } = useCreateConfiguration();
+    const { mutate: updateSetting, isPending: isUpdating } = useUpdateConfiguration();
+    const { mutate: createSetting, isPending: isCreating } = useCreateConfiguration();
 
-    const getConfigValue = (key: string) => {
-        return configurations?.find(c => c.key === key)?.value || '';
+
+    console.log('###', configurations);
+
+    const getSettingValue = (key: string) => {
+        return configurations?.find(s => s.key === key)?.value || '';
     };
 
-    const getConfigId = (key: string) => {
-        return configurations?.find(c => c.key === key)?.id;
+    const getSettingId = (key: string) => {
+        return configurations?.find(s => s.key === key)?.id;
     };
 
     const handleSave = async (key: string, value: string) => {
-        const configId = getConfigId(key);
-        if (configId) {
-            updateConfiguration({ id: configId, key, value });
+        const settingId = getSettingId(key);
+        if (settingId) {
+            updateSetting({ id: settingId, key, value });
         } else {
-            createConfiguration({ key, value });
+            createSetting({ key, value });
         }
     };
 
@@ -45,7 +42,6 @@ const SettingsPage = () => {
     }
 
     return (
-
         <div>
             <Helmet>
                 <title>[ROS] | Configuration</title>
@@ -60,9 +56,9 @@ const SettingsPage = () => {
             </div>
 
             {(isUpdating || isCreating) && (
-                    <div className="fixed bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-md shadow-lg">
-                        Saving changes...
-                    </div>
+                <div className="fixed bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-md shadow-lg">
+                    Saving changes...
+                </div>
             )}
 
             <Card className='mb-4 bg-gray-50 dark:bg-gray-800'>

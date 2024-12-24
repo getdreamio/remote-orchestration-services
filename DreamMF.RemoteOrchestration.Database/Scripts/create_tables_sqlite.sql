@@ -194,6 +194,35 @@ VALUES
     ('Department', 'Department or Team', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00'),
     ('Organization', 'Organization Name', '2024-12-19T09:11:35-07:00', '2024-12-19T09:11:35-07:00');
 
+-- Insert default configuration settings
+INSERT INTO Configuration ([Key], [Value], Created_Date, Updated_Date)
+VALUES 
+    -- Storage Settings
+    ('storage:type', 'local', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    ('storage:azure:container_name', '', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    ('storage:azure:blob_name', '', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    ('storage:aws:bucket_name', '', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    ('storage:aws:bucket_key', '', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    
+    -- Database Settings
+    ('database:type', 'sqlite', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    ('database:filename', 'remote_orchestration.db', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    ('database:host', 'localhost', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    ('database:port', '5432', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    ('database:name', '', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    ('database:user', '', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    ('database:password', '', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    
+    -- API Settings
+    ('api:base_url', 'http://localhost:5000', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    ('api:version', 'v1', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    ('api:timeout', '30000', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    
+    -- Application Settings
+    ('app:name', 'Dream Remote Orchestration Services', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    ('app:environment', 'development', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00'),
+    ('app:debug_mode', 'false', '2024-12-21T20:34:20-07:00', '2024-12-21T20:34:20-07:00');
+
 -- Analytics Views
 
 -- View for Remote read/update analytics
