@@ -16,7 +16,7 @@ builder.Configuration
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
 
-builder.Services.AddScoped<IConfigurationService, ConfigurationService>();
+builder.Services.AddScoped<IRootConfigurationService, RootConfigurationService>();
 
 builder.Services.AddDbContext<IRemoteOrchestrationDbContext, RemoteOrchestrationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -71,6 +71,7 @@ builder.Services.AddHostedService<AnalyticsCleanupService>();
 builder.Services.AddScoped<HostService>();
 builder.Services.AddScoped<RemoteService>();
 builder.Services.AddScoped<TagService>();
+builder.Services.AddScoped<ConfigurationService>();
 builder.Services.AddScoped<IDreamService, DreamService>();
 
 var app = builder.Build();

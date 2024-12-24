@@ -1,130 +1,82 @@
-using System.Data.SQLite;
 using DreamMF.RemoteOrchestration.Core.Models;
-using Microsoft.Extensions.Configuration;
+using DreamMF.RemoteOrchestration.Core.Mappers;
+using Microsoft.EntityFrameworkCore;
+using DreamMF.RemoteOrchestration.Database;
 
 namespace DreamMF.RemoteOrchestration.Core.Services;
 
-public interface IConfigurationService
+public class ConfigurationService
 {
-    Task<List<ConfigurationResponse>> GetAllConfigurationsAsync();
-    Task<ConfigurationResponse?> GetConfigurationByKeyAsync(string key);
-    Task<ConfigurationResponse> CreateConfigurationAsync(ConfigurationRequest request);
-    Task<ConfigurationResponse?> UpdateConfigurationAsync(string key, string value);
-}
+    private readonly IRemoteOrchestrationDbContext _dbContext;
 
-public class ConfigurationService : IConfigurationService
-{
-    private readonly string _connectionString;
-
-    public ConfigurationService(IConfiguration configuration)
+    public ConfigurationService(IRemoteOrchestrationDbContext dbContext)
     {
-        _connectionString = configuration.GetConnectionString("DefaultConnection") ?? "Data Source=remote_orchestration.db";
-    }
-
-    private SQLiteConnection CreateConnection()
-    {
-        var connection = new SQLiteConnection(_connectionString);
-        connection.Open();
-        return connection;
+        _dbContext = dbContext;
     }
 
     public async Task<List<ConfigurationResponse>> GetAllConfigurationsAsync()
     {
-        using var connection = CreateConnection();
-        using var command = new SQLiteCommand(
-            "SELECT Configuration_ID, Key, Value, Created_Date, Updated_Date FROM Configurations",
-            connection);
-
-        var configurations = new List<ConfigurationResponse>();
-        using var reader = await command.ExecuteReaderAsync();
-        
-        while (await reader.ReadAsync())
-        {
-            configurations.Add(new ConfigurationResponse
-            {
-                Id = reader.GetInt32(0),
-                Key = reader.GetString(1),
-                Value = reader.GetString(2),
-                Created_Date = reader.GetDateTime(3),
-                Updated_Date = reader.GetDateTime(4)
-            });
-        }
+        var configurations = await _dbContext.Configurations
+            .OrderBy(c => c.Key)
+            .Select(c => c.ToResponse())
+            .ToListAsync();
 
         return configurations;
     }
 
+    public async Task<ConfigurationResponse?> GetConfigurationByIdAsync(int id)
+    {
+        var configuration = await _dbContext.Configurations
+            .Where(c => c.Configuration_ID == id)
+            .Select(c => c.ToResponse())
+            .FirstOrDefaultAsync();
+
+        return configuration;
+    }
+
     public async Task<ConfigurationResponse?> GetConfigurationByKeyAsync(string key)
     {
-        using var connection = CreateConnection();
-        using var command = new SQLiteCommand(
-            "SELECT Configuration_ID, Key, Value, Created_Date, Updated_Date FROM Configurations WHERE Key = @Key",
-            connection);
-        
-        command.Parameters.AddWithValue("@Key", key);
+        var configuration = await _dbContext.Configurations
+            .Where(c => c.Key == key)
+            .Select(c => c.ToResponse())
+            .FirstOrDefaultAsync();
 
-        using var reader = await command.ExecuteReaderAsync();
-        if (await reader.ReadAsync())
-        {
-            return new ConfigurationResponse
-            {
-                Id = reader.GetInt32(0),
-                Key = reader.GetString(1),
-                Value = reader.GetString(2),
-                Created_Date = reader.GetDateTime(3),
-                Updated_Date = reader.GetDateTime(4)
-            };
-        }
-
-        return null;
+        return configuration;
     }
 
     public async Task<ConfigurationResponse> CreateConfigurationAsync(ConfigurationRequest request)
     {
-        using var connection = CreateConnection();
-        using var command = new SQLiteCommand(
-            @"INSERT INTO Configurations (Key, Value, Created_Date, Updated_Date) 
-              VALUES (@Key, @Value, @CreatedDate, @UpdatedDate);
-              SELECT last_insert_rowid();",
-            connection);
+        var configuration = request.ToEntity();
 
-        var now = DateTime.UtcNow;
-        command.Parameters.AddWithValue("@Key", request.Key);
-        command.Parameters.AddWithValue("@Value", request.Value);
-        command.Parameters.AddWithValue("@CreatedDate", now);
-        command.Parameters.AddWithValue("@UpdatedDate", now);
+        _dbContext.Configurations.Add(configuration);
+        await _dbContext.SaveChangesAsync();
 
-        var id = Convert.ToInt32(await command.ExecuteScalarAsync());
-
-        return new ConfigurationResponse
-        {
-            Id = id,
-            Key = request.Key,
-            Value = request.Value,
-            Created_Date = now,
-            Updated_Date = now
-        };
+        return configuration.ToResponse();
     }
 
-    public async Task<ConfigurationResponse?> UpdateConfigurationAsync(string key, string value)
+    public async Task<ConfigurationResponse?> UpdateConfigurationAsync(int id, ConfigurationRequest request)
     {
-        using var connection = CreateConnection();
-        using var command = new SQLiteCommand(
-            @"UPDATE Configurations 
-              SET Value = @Value, Updated_Date = @UpdatedDate 
-              WHERE Key = @Key",
-            connection);
+        var configuration = await _dbContext.Configurations.FindAsync(id);
+        if (configuration == null)
+            return null;
 
-        var now = DateTime.UtcNow;
-        command.Parameters.AddWithValue("@Key", key);
-        command.Parameters.AddWithValue("@Value", value);
-        command.Parameters.AddWithValue("@UpdatedDate", now);
+        configuration.Value = request.Value;
+        configuration.Updated_Date = DateTimeOffset.UtcNow;
 
-        var rowsAffected = await command.ExecuteNonQueryAsync();
-        if (rowsAffected > 0)
-        {
-            return await GetConfigurationByKeyAsync(key);
-        }
+        await _dbContext.SaveChangesAsync();
 
-        return null;
+        return configuration.ToResponse();
+    }
+
+    public async Task<bool> DeleteConfigurationAsync(int id)
+    {
+        var configuration = await _dbContext.Configurations.FindAsync(id);
+        if (configuration == null)
+            return false;
+
+        _dbContext.Configurations.Remove(configuration);
+        await _dbContext.SaveChangesAsync();
+
+        return true;
     }
 }

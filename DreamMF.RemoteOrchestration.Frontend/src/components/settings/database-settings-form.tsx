@@ -178,8 +178,9 @@ export const DatabaseSettingsForm: React.FC<DatabaseSettingsFormProps> = ({
                         onChange={(value) => setSelectedDatabaseType(value)}
                     >
                         <Select.Option value="sqlite">SQLite</Select.Option>
-                        <Select.Option value="sqlserver">SQL Server</Select.Option>
-                        <Select.Option value="postgres">PostgreSQL</Select.Option>
+                        <Select.Option value="sqlserver" disabled>SQL Server</Select.Option>
+                        <Select.Option value="postgres" disabled>PostgreSQL</Select.Option>
+                        <Select.Option value="mysql" disabled>MySQL</Select.Option>
                     </Select>
                 </Form.Item>
 
