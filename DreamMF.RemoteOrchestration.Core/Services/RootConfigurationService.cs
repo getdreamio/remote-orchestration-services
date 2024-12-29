@@ -1,5 +1,6 @@
-using System.Data.SQLite;
 using DreamMF.RemoteOrchestration.Core.Models;
+using DreamMF.RemoteOrchestration.Database;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace DreamMF.RemoteOrchestration.Core.Services;
@@ -8,71 +9,124 @@ public interface IRootConfigurationService
 {
     Task<List<ConfigurationResponse>> GetAllConfigurationsAsync();
     Task<ConfigurationResponse?> GetConfigurationByKeyAsync(string key);
+    Task<ConfigurationResponse> CreateConfigurationAsync(ConfigurationRequest request);
+    Task<ConfigurationResponse?> UpdateConfigurationAsync(string key, string value);
+    string GetDatabaseConnectionString();
 }
 
 public class RootConfigurationService : IRootConfigurationService
 {
-    private readonly string _connectionString;
+    private readonly IConfiguration _configuration;
+    private readonly IConfigurationDbContext _dbContext;
+    private const string DEFAULT_CONNECTION = "Data Source=remote_orchestration.db";
 
-    public RootConfigurationService(IConfiguration configuration)
+    public RootConfigurationService(
+        IConfiguration configuration,
+        IConfigurationDbContext dbContext)
     {
-        _connectionString = configuration.GetConnectionString("DefaultConnection") ?? "Data Source=remote_orchestration.db";
+        _configuration = configuration;
+        _dbContext = dbContext;
     }
 
-    private SQLiteConnection CreateConnection()
+    public string GetDatabaseConnectionString()
     {
-        var connection = new SQLiteConnection(_connectionString);
-        connection.Open();
-        return connection;
+        try
+        {
+            var connectionConfig = _dbContext.Configurations
+                .FirstOrDefault(c => c.Key == "DatabaseConnectionString");
+
+            if (connectionConfig != null)
+                return connectionConfig.Value;
+
+            var configConnection = _configuration.GetConnectionString("DefaultConnection");
+            if (!string.IsNullOrEmpty(configConnection))
+                return configConnection;
+
+            return DEFAULT_CONNECTION;
+        }
+        catch
+        {
+            return DEFAULT_CONNECTION;
+        }
     }
 
     public async Task<List<ConfigurationResponse>> GetAllConfigurationsAsync()
     {
-        using var connection = CreateConnection();
-        using var command = new SQLiteCommand(
-            "SELECT Configuration_ID, Key, Value, Created_Date, Updated_Date FROM Configurations",
-            connection);
-
-        var configurations = new List<ConfigurationResponse>();
-        using var reader = await command.ExecuteReaderAsync();
-        
-        while (await reader.ReadAsync())
-        {
-            configurations.Add(new ConfigurationResponse
+        var configurations = await _dbContext.Configurations
+            .OrderBy(c => c.Key)
+            .Select(c => new ConfigurationResponse
             {
-                Id = reader.GetInt32(0),
-                Key = reader.GetString(1),
-                Value = reader.GetString(2),
-                Created_Date = reader.GetDateTime(3),
-                Updated_Date = reader.GetDateTime(4)
-            });
-        }
+                Id = c.Configuration_ID,
+                Key = c.Key,
+                Value = c.Value,
+                Created_Date = c.Created_Date,
+                Updated_Date = c.Updated_Date
+            })
+            .ToListAsync();
 
         return configurations;
     }
 
     public async Task<ConfigurationResponse?> GetConfigurationByKeyAsync(string key)
     {
-        using var connection = CreateConnection();
-        using var command = new SQLiteCommand(
-            "SELECT Configuration_ID, Key, Value, Created_Date, Updated_Date FROM Configurations WHERE Key = @Key",
-            connection);
-        
-        command.Parameters.AddWithValue("@Key", key);
-
-        using var reader = await command.ExecuteReaderAsync();
-        if (await reader.ReadAsync())
-        {
-            return new ConfigurationResponse
+        var configuration = await _dbContext.Configurations
+            .Where(c => c.Key == key)
+            .Select(c => new ConfigurationResponse
             {
-                Id = reader.GetInt32(0),
-                Key = reader.GetString(1),
-                Value = reader.GetString(2),
-                Created_Date = reader.GetDateTime(3),
-                Updated_Date = reader.GetDateTime(4)
-            };
-        }
+                Id = c.Configuration_ID,
+                Key = c.Key,
+                Value = c.Value,
+                Created_Date = c.Created_Date,
+                Updated_Date = c.Updated_Date
+            })
+            .FirstOrDefaultAsync();
 
-        return null;
+        return configuration;
+    }
+
+    public async Task<ConfigurationResponse> CreateConfigurationAsync(ConfigurationRequest request)
+    {
+        var configuration = new Database.Entities.Configuration
+        {
+            Key = request.Key,
+            Value = request.Value,
+            Created_Date = DateTimeOffset.UtcNow,
+            Updated_Date = DateTimeOffset.UtcNow
+        };
+
+        _dbContext.Configurations.Add(configuration);
+        await _dbContext.SaveChangesAsync();
+
+        return new ConfigurationResponse
+        {
+            Id = configuration.Configuration_ID,
+            Key = configuration.Key,
+            Value = configuration.Value,
+            Created_Date = configuration.Created_Date,
+            Updated_Date = configuration.Updated_Date
+        };
+    }
+
+    public async Task<ConfigurationResponse?> UpdateConfigurationAsync(string key, string value)
+    {
+        var configuration = await _dbContext.Configurations
+            .FirstOrDefaultAsync(c => c.Key == key);
+
+        if (configuration == null)
+            return null;
+
+        configuration.Value = value;
+        configuration.Updated_Date = DateTimeOffset.UtcNow;
+
+        await _dbContext.SaveChangesAsync();
+
+        return new ConfigurationResponse
+        {
+            Id = configuration.Configuration_ID,
+            Key = configuration.Key,
+            Value = configuration.Value,
+            Created_Date = configuration.Created_Date,
+            Updated_Date = configuration.Updated_Date
+        };
     }
 }

@@ -7,9 +7,9 @@ namespace DreamMF.RemoteOrchestration.Core.Services;
 
 public class ConfigurationService
 {
-    private readonly IRemoteOrchestrationDbContext _dbContext;
+    private readonly IConfigurationDbContext _dbContext;
 
-    public ConfigurationService(IRemoteOrchestrationDbContext dbContext)
+    public ConfigurationService(IConfigurationDbContext dbContext)
     {
         _dbContext = dbContext;
     }

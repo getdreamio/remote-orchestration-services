@@ -10,7 +10,6 @@ public interface IRemoteOrchestrationDbContext
     DbSet<T> Set<T>() where T : class;
     DbSet<Host> Hosts { get; set; }
     DbSet<Remote> Remotes { get; set; }
-    DbSet<Configuration> Configurations { get; set; }
     DbSet<Tag> Tags { get; set; }
     DbSet<Module> Modules { get; set; }
     DbSet<Tags_Remote> Tags_Remotes { get; set; }
@@ -29,7 +28,6 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
 {
     public DbSet<Host> Hosts { get; set; } = null!;
     public DbSet<Remote> Remotes { get; set; } = null!;
-    public DbSet<Configuration> Configurations { get; set; } = null!;
     public DbSet<Tag> Tags { get; set; } = null!;
     public DbSet<Module> Modules { get; set; } = null!;
     public DbSet<Tags_Remote> Tags_Remotes { get; set; } = null!;
@@ -44,32 +42,27 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
 
     public new DatabaseFacade Database => base.Database;
 
-    public RemoteOrchestrationDbContext(DbContextOptions<RemoteOrchestrationDbContext> options) : base(options)
+    public RemoteOrchestrationDbContext(DbContextOptions<RemoteOrchestrationDbContext> options)
+        : base(options)
     {
         EnsureDatabaseCreated();
     }
 
     private void EnsureDatabaseCreated()
     {
-        Database.Migrate();
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
+        try
         {
-            optionsBuilder.UseSqlite("Data Source=remote_orchestration.db");
+            Database.EnsureCreated();
+            if (Database.GetPendingMigrations().Any())
+            {
+                Database.Migrate();
+            }
         }
-    }
-
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        return base.SaveChangesAsync(cancellationToken);
-    }
-
-    public override DbSet<T> Set<T>() where T : class
-    {
-        return base.Set<T>();
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error ensuring database is created: {ex.Message}");
+            throw;
+        }
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -77,66 +70,76 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
         modelBuilder.Entity<Host>(entity =>
         {
             entity.HasKey(e => e.Host_ID);
+            entity.Property(e => e.Host_ID).ValueGeneratedOnAdd();
+            entity.Property(e => e.Name).IsRequired();
+            entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Updated_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.ToTable("Host");
         });
 
         modelBuilder.Entity<Remote>(entity =>
         {
             entity.HasKey(e => e.Remote_ID);
+            entity.Property(e => e.Remote_ID).ValueGeneratedOnAdd();
+            entity.Property(e => e.Name).IsRequired();
+            entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Updated_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.ToTable("Remote");
-        });
-
-        modelBuilder.Entity<Configuration>(entity =>
-        {
-            entity.HasKey(e => e.Configuration_ID);
-            entity.ToTable("Configuration");
         });
 
         modelBuilder.Entity<Tag>(entity =>
         {
             entity.HasKey(e => e.Tag_ID);
+            entity.Property(e => e.Tag_ID).ValueGeneratedOnAdd();
+            entity.Property(e => e.Key).IsRequired();
+            entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Updated_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.ToTable("Tag");
+        });
+
+        modelBuilder.Entity<Module>(entity =>
+        {
+            entity.HasKey(e => e.Module_ID);
+            entity.Property(e => e.Module_ID).ValueGeneratedOnAdd();
+            entity.Property(e => e.Name).IsRequired();
+            entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Updated_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.ToTable("Module");
         });
 
         modelBuilder.Entity<Tags_Remote>(entity =>
         {
             entity.HasKey(e => e.Tag_Remote_ID);
+            entity.Property(e => e.Tag_Remote_ID).ValueGeneratedOnAdd();
+            entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Updated_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.ToTable("Tags_Remote");
         });
 
         modelBuilder.Entity<Tags_Host>(entity =>
         {
             entity.HasKey(e => e.Tag_Host_ID);
+            entity.Property(e => e.Tag_Host_ID).ValueGeneratedOnAdd();
+            entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Updated_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.ToTable("Tags_Host");
         });
 
         modelBuilder.Entity<Host_Remote>(entity =>
         {
             entity.HasKey(e => e.Host_Remote_ID);
+            entity.Property(e => e.Host_Remote_ID).ValueGeneratedOnAdd();
+            entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Updated_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.ToTable("Host_Remote");
-        });
-
-        modelBuilder.Entity<Audit_Remote>(entity =>
-        {
-            entity.HasKey(e => e.Audit_ID);
-            entity.ToTable("Audit_Remote");
-        });
-
-        modelBuilder.Entity<Audit_Host>(entity =>
-        {
-            entity.HasKey(e => e.Audit_ID);
-            entity.ToTable("Audit_Host");
-        });
-
-        modelBuilder.Entity<Module>(entity =>
-        {
-            entity.HasKey(e => e.Module_ID);
-            entity.ToTable("Module");
         });
 
         modelBuilder.Entity<RemoteModule>(entity =>
         {
             entity.HasKey(e => e.Remote_Module_ID);
+            entity.Property(e => e.Remote_Module_ID).ValueGeneratedOnAdd();
+            entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Updated_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.ToTable("Remote_Module");
         });
 
@@ -148,15 +151,19 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
         modelBuilder.Entity<AuditReads_Host>(entity =>
         {
             entity.HasKey(e => e.AuditRead_ID);
+            entity.Property(e => e.AuditRead_ID).ValueGeneratedOnAdd();
+            entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.ToTable("AuditReads_Host");
         });
 
         modelBuilder.Entity<AuditReads_Remote>(entity =>
         {
             entity.HasKey(e => e.AuditRead_ID);
+            entity.Property(e => e.AuditRead_ID).ValueGeneratedOnAdd();
+            entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.ToTable("AuditReads_Remote");
         });
-
+        
         modelBuilder.Entity<EntityAnalytics>()
             .HasNoKey()
             .ToView("v_HostReadAnalytics");
@@ -174,5 +181,15 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
             .ToView("v_RecentRemoteAnalytics");
 
         base.OnModelCreating(modelBuilder);
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    public override DbSet<T> Set<T>() where T : class
+    {
+        return base.Set<T>();
     }
 }

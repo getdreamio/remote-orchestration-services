@@ -17,9 +17,19 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 builder.Services.AddScoped<IRootConfigurationService, RootConfigurationService>();
+builder.Services.AddScoped<IDbContextFactory, DbContextFactory>();
 
-builder.Services.AddDbContext<IRemoteOrchestrationDbContext, RemoteOrchestrationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IConfigurationDbContext>(provider => 
+{
+    var factory = provider.GetRequiredService<IDbContextFactory>();
+    return factory.CreateConfigurationDbContext();
+});
+
+builder.Services.AddScoped<IRemoteOrchestrationDbContext>(provider => 
+{
+    var factory = provider.GetRequiredService<IDbContextFactory>();
+    return factory.CreateDbContext();
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
