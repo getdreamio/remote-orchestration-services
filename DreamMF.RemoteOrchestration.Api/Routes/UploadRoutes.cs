@@ -17,7 +17,7 @@ public static class UploadRoutes
 
     private static RouteGroupBuilder MapUploadApi(this RouteGroupBuilder group)
     {
-        group.MapPost("/remote/{remoteName}/{version}", UploadRemoteZip)
+        group.MapPost("/remote/{name}/{version}/{key}/{scope}", UploadRemoteZip)
             .WithTags(GroupName)
             .Produces(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
@@ -31,19 +31,21 @@ public static class UploadRoutes
     }
 
     private static async Task<IResult> UploadRemoteZip(
-        [FromRoute] string remoteName,
+        [FromRoute] string name,
         [FromRoute] string version,
+        [FromRoute] string key,
+        [FromRoute] string scope,
         IFormFile file,
         IUploadService uploadService)
     {
-        if (file == null || file.Length == 0)
-            return Results.BadRequest(new HandledResponseModel("No file was uploaded", System.Net.HttpStatusCode.BadRequest));
+        if (file == null)
+            return Results.BadRequest(new HandledResponseModel("File is required", System.Net.HttpStatusCode.BadRequest));
 
         if (!file.FileName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
             return Results.BadRequest(new HandledResponseModel("File must be a zip archive", System.Net.HttpStatusCode.BadRequest));
 
         using var stream = file.OpenReadStream();
-        await uploadService.ExtractAndSaveRemoteAsync(remoteName, version, stream);
+        await uploadService.ExtractAndSaveRemoteAsync(name, version, key, scope, stream);
         
         return Results.Ok();
     }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using DreamMF.RemoteOrchestration.Database.Entities;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace DreamMF.RemoteOrchestration.Database;
 
@@ -8,6 +9,7 @@ public interface IRemoteOrchestrationDbContext
 {
     DatabaseFacade Database { get; }
     DbSet<T> Set<T>() where T : class;
+    EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
     DbSet<Host> Hosts { get; set; }
     DbSet<Remote> Remotes { get; set; }
     DbSet<Tag> Tags { get; set; }
@@ -21,6 +23,7 @@ public interface IRemoteOrchestrationDbContext
     DbSet<EntityAnalytics> EntityAnalytics { get; set; }
     DbSet<DailyEntityAnalytics> DailyEntityAnalytics { get; set; }
     DbSet<RecentRemoteAnalytics> RecentRemoteAnalytics { get; set; }
+    DbSet<Entities.Version> Versions { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 
@@ -39,8 +42,14 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
     public DbSet<EntityAnalytics> EntityAnalytics { get; set; } = null!;
     public DbSet<DailyEntityAnalytics> DailyEntityAnalytics { get; set; } = null!;
     public DbSet<RecentRemoteAnalytics> RecentRemoteAnalytics { get; set; } = null!;
+    public DbSet<Entities.Version> Versions { get; set; } = null!;
 
     public new DatabaseFacade Database => base.Database;
+
+    public EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class
+    {
+        return base.Entry(entity);
+    }
 
     public RemoteOrchestrationDbContext(DbContextOptions<RemoteOrchestrationDbContext> options)
         : base(options)
@@ -85,6 +94,20 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
             entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Updated_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.ToTable("Remote");
+        });
+
+        modelBuilder.Entity<Entities.Version>(entity =>
+        {
+            entity.HasKey(e => e.Version_ID);
+            entity.Property(e => e.Version_ID).ValueGeneratedOnAdd();
+            entity.Property(e => e.Value).IsRequired();
+            entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Updated_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.HasOne<Remote>()
+                .WithMany()
+                .HasForeignKey(e => e.Remote_ID)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.ToTable("Version");
         });
 
         modelBuilder.Entity<Tag>(entity =>
