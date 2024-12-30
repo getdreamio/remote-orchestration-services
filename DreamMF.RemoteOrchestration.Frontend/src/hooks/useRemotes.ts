@@ -13,6 +13,16 @@ interface Remote {
     created_Date: string;
     updated_Date: string;
     modules?: RemoteModule[];
+    latest_version?: string;
+    latest_version_url?: string;
+}
+
+export interface Version {
+    version_ID: number;
+    remote_ID: number;
+    value: string;
+    created_Date: string;
+    updated_Date: string;
 }
 
 export interface RemoteModule {
@@ -165,5 +175,19 @@ export const useRemoteSubRemoteCounts = () => {
     return useQuery({
         queryKey: ['remotes', 'sub-remote-counts'],
         queryFn: fetchRemoteSubRemoteCounts,
+    });
+};
+
+export const useRemoteVersions = (remoteId: number) => {
+    return useQuery<Version[]>({
+        queryKey: ['remotes', remoteId, 'versions'],
+        queryFn: async () => {
+            const response = await fetch(`${config.backendUrl}/api/remotes/${remoteId}/versions`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        },
+        enabled: !!remoteId,
     });
 };

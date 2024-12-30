@@ -5,6 +5,7 @@ using DreamMF.RemoteOrchestration.Core.Services;
 using DreamMF.RemoteOrchestration.Database;
 using DreamMF.RemoteOrchestration.Database.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DreamMF.RemoteOrchestration.Api.Routes;
 
@@ -37,6 +38,16 @@ public static class RemoteRoutes
             .WithMetadata(new EndpointNameMetadata("Get remote by ID"))
             .WithSummary("Get Remote by ID")
             .WithDescription("Retrieves a specific remote instance by its unique identifier");
+
+        group.MapGet("/{id}/versions", GetVersionsByRemoteId)
+            .WithTags(GroupName)
+            .Produces<List<VersionResponse>>(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(404)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("Get versions for a remote"))
+            .WithSummary("Get Remote Versions")
+            .WithDescription("Retrieves all versions for a specific remote instance");
 
         group.MapPost("/", CreateRemote)
             .WithTags(GroupName)
@@ -98,5 +109,11 @@ public static class RemoteRoutes
     {
         var success = await remoteService.DeleteRemoteAsync(id);
         return success ? Results.Ok() : Results.NotFound();
+    }
+
+    private static async Task<IResult> GetVersionsByRemoteId(int id, RemoteService remoteService)
+    {
+        var result = await remoteService.GetVersionsByRemoteIdAsync(id);
+        return result != null ? Results.Ok(result) : Results.NotFound();
     }
 }

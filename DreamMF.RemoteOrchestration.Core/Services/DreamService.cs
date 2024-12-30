@@ -39,7 +39,7 @@ public class DreamService : IDreamService
             .ToListAsync();
         return await _dbContext.Remotes
             .Where(r => remotes.Contains(r.Remote_ID))
-            .Select(r => r.ToResponse())
+            .Select(r => RemoteMapper.ToResponse(r))
             .ToListAsync();
     }
 

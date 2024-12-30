@@ -161,4 +161,14 @@ public class RemoteService
         _ = _analyticsService.LogRemoteReadAsync(id, "Delete", 1);
         return true;
     }
+
+    public async Task<List<VersionResponse>> GetVersionsByRemoteIdAsync(int id)
+    {
+        var versions = await _dbContext.Versions
+            .Where(v => v.Remote_ID == id)
+            .OrderByDescending(v => v.Created_Date)
+            .ToListAsync();
+
+        return versions.Select(VersionMapper.ToResponse).ToList();
+    }
 }
