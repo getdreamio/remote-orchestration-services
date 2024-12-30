@@ -83,6 +83,9 @@ builder.Services.AddScoped<RemoteService>();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<ConfigurationService>();
 builder.Services.AddScoped<IDreamService, DreamService>();
+builder.Services.AddScoped<IUploadService, UploadService>();
+
+builder.Services.AddAntiforgery();
 
 var app = builder.Build();
 
@@ -96,11 +99,12 @@ app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Remote Orchestration API v1"));
 app.UseHttpsRedirection();
 
-app.UseLoggingMiddleware();
-app.UseMiddleware<HandledResultMiddleware>();
-
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseAntiforgery();
+
+app.UseLoggingMiddleware();
+app.UseMiddleware<HandledResultMiddleware>();
 
 app.UseCors("AllowAll");
 
@@ -112,5 +116,6 @@ app.MapHostRoutes();
 app.MapTagRoutes();
 app.MapAnalyticsRoutes();
 app.MapDreamRoutes();
+app.MapUploadRoutes();
 
 app.Run();

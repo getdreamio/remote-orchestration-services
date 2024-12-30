@@ -23,4 +23,14 @@
     <ProjectReference Include="..\DreamMF.RemoteOrchestration.Core\DreamMF.RemoteOrchestration.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="remotes\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <Target Name="EnsureRemotesFolderExists" BeforeTargets="Build">
+    <MakeDir Directories="$(MSBuildProjectDirectory)\remotes" />
+  </Target>
+
 </Project>
