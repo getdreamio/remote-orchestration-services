@@ -21,8 +21,8 @@ public static class TagMapper
             Tag_ID = entity.Tag_ID,
             Key = entity.Key,
             Display_Name = entity.Display_Name,
-            Created_Date = entity.Created_Date,
-            Updated_Date = entity.Updated_Date
+            Created_Date = DateTimeOffset.FromUnixTimeMilliseconds(entity.Created_Date),
+            Updated_Date = DateTimeOffset.FromUnixTimeMilliseconds(entity.Updated_Date)
         };
     }
 }

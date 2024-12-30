@@ -49,7 +49,7 @@ public class AnalyticsCleanupService : BackgroundService
 
     private async Task CleanupOldAnalyticsData()
     {
-        var cutoffDate = DateTime.UtcNow.AddDays(-_config.RetentionDays);
+        var cutoffDate = DateTimeOffset.UtcNow.AddDays(-_config.RetentionDays);
         _logger.LogInformation("Starting analytics cleanup for data older than {CutoffDate}", cutoffDate);
 
         using var scope = _scopeFactory.CreateScope();
@@ -57,12 +57,12 @@ public class AnalyticsCleanupService : BackgroundService
 
         // Delete old host audit reads
         var deletedHostReads = await dbContext.AuditReads_Hosts
-            .Where(ar => ar.Created_Date < cutoffDate)
+            .Where(ar => ar.Created_Date < cutoffDate.ToUnixTimeMilliseconds())
             .ExecuteDeleteAsync();
 
         // Delete old remote audit reads
         var deletedRemoteReads = await dbContext.AuditReads_Remotes
-            .Where(ar => ar.Created_Date < cutoffDate)
+            .Where(ar => ar.Created_Date < cutoffDate.ToUnixTimeMilliseconds())
             .ExecuteDeleteAsync();
 
         _logger.LogInformation(

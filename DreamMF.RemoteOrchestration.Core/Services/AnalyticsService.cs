@@ -50,7 +50,7 @@ public class AnalyticsService : IAnalyticsService
             Host_ID = hostId,
             Action = action,
             User_ID = userId,
-            Created_Date = DateTimeOffset.UtcNow
+            Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         };
 
         _dbContext.AuditReads_Hosts.Add(audit);
@@ -64,7 +64,7 @@ public class AnalyticsService : IAnalyticsService
             Remote_ID = remoteId,
             Action = action,
             User_ID = userId,
-            Created_Date = DateTimeOffset.UtcNow
+            Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         };
 
         _dbContext.AuditReads_Remotes.Add(audit);
@@ -75,7 +75,7 @@ public class AnalyticsService : IAnalyticsService
     {
         try
         {
-            var cutoffDate = DateTimeOffset.UtcNow.AddDays(-_config.RetentionDays);
+            var cutoffDate = DateTimeOffset.UtcNow.AddDays(-_config.RetentionDays).ToUnixTimeMilliseconds();
 
             // Delete old host read records
             await _dbContext.AuditReads_Hosts
@@ -237,7 +237,7 @@ public class AnalyticsService : IAnalyticsService
             CreateCount = 0,
             DeleteCount = 0,
             TotalReads = 0,
-            ReadDate = DateTimeOffset.UtcNow
+            ReadDate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         };
     }
 
@@ -257,15 +257,15 @@ public class AnalyticsService : IAnalyticsService
             CreateCount = 0,
             DeleteCount = 0,
             TotalReads = 0,
-            ReadDate = DateTimeOffset.UtcNow
+            ReadDate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         };
     }
 
     public async Task<RecentRemoteAnalytics> GetRecentRemoteAnalyticsAsync()
     {
         var now = DateTimeOffset.UtcNow;
-        var last24Hours = now.AddHours(-24);
-        var last30Days = now.AddDays(-30);
+        var last24Hours = now.AddHours(-24).ToUnixTimeMilliseconds();
+        var last30Days = now.AddDays(-30).ToUnixTimeMilliseconds();
 
         var sql = @"
             SELECT 

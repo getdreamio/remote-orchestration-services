@@ -31,8 +31,8 @@ CREATE TABLE Version (
     Version_ID INT AUTO_INCREMENT PRIMARY KEY,
     Remote_ID INT,
     Value VARCHAR(255) NOT NULL,
-    Created_Date TIMESTAMP NOT NULL,
-    Updated_Date TIMESTAMP NOT NULL
+    Created_Date BIGINT NOT NULL,
+    Updated_Date BIGINT NOT NULL
 );
 
 CREATE TABLE Audit_Remote (
@@ -40,7 +40,7 @@ CREATE TABLE Audit_Remote (
     Remote_ID INT,
     `Change` VARCHAR(255) NOT NULL,
     Change_User_ID INT,
-    Created_Date TIMESTAMP NOT NULL,
+    Created_Date BIGINT NOT NULL,
     FOREIGN KEY (Remote_ID) REFERENCES Remote(Remote_ID)
 );
 
@@ -50,7 +50,7 @@ CREATE TABLE AuditReads_Host (
     Host_ID INT NOT NULL,
     Action VARCHAR(50) NOT NULL,
     User_ID INT NOT NULL,
-    Created_Date TIMESTAMP NOT NULL,
+    Created_Date BIGINT NOT NULL,
     FOREIGN KEY (Host_ID) REFERENCES Host(Host_ID)
 );
 
@@ -63,7 +63,7 @@ CREATE TABLE AuditReads_Remote (
     Remote_ID INT NOT NULL,
     Action VARCHAR(50) NOT NULL,
     User_ID INT NOT NULL,
-    Created_Date TIMESTAMP NOT NULL,
+    Created_Date BIGINT NOT NULL,
     FOREIGN KEY (Remote_ID) REFERENCES Remote(Remote_ID)
 );
 
@@ -75,15 +75,15 @@ CREATE TABLE Tag (
     Tag_ID INT AUTO_INCREMENT PRIMARY KEY,
     `Key` VARCHAR(255) NOT NULL,
     Display_Name VARCHAR(500) NOT NULL,
-    Created_Date TIMESTAMP NOT NULL,
-    Updated_Date TIMESTAMP NOT NULL
+    Created_Date BIGINT NOT NULL,
+    Updated_Date BIGINT NOT NULL
 );
 
 CREATE TABLE Module (
     Module_ID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
-    Created_Date TIMESTAMP NOT NULL,
-    Updated_Date TIMESTAMP NOT NULL
+    Created_Date BIGINT NOT NULL,
+    Updated_Date BIGINT NOT NULL
 );
 
 CREATE TABLE Audit_Host (
@@ -91,7 +91,7 @@ CREATE TABLE Audit_Host (
     Host_ID INT,
     `Change` VARCHAR(255) NOT NULL,
     Change_User_ID INT,
-    Created_Date TIMESTAMP NOT NULL,
+    Created_Date BIGINT NOT NULL,
     FOREIGN KEY (Host_ID) REFERENCES Host(Host_ID)
 );
 
@@ -101,8 +101,8 @@ CREATE TABLE `User` (
     Auth_User_ID VARCHAR(255) NOT NULL,
     Email VARCHAR(255) NOT NULL,
     Name VARCHAR(255) NOT NULL,
-    Created_Date TIMESTAMP NOT NULL,
-    Updated_Date TIMESTAMP NOT NULL
+    Created_Date BIGINT NOT NULL,
+    Updated_Date BIGINT NOT NULL
 );
 
 CREATE TABLE Host (
@@ -116,8 +116,8 @@ CREATE TABLE Host (
     Contact_Name VARCHAR(255),
     Contact_Email VARCHAR(255),
     Documentation_Url VARCHAR(255),
-    Created_Date TIMESTAMP NOT NULL,
-    Updated_Date TIMESTAMP NOT NULL
+    Created_Date BIGINT NOT NULL,
+    Updated_Date BIGINT NOT NULL
 );
 
 CREATE TABLE Remote (
@@ -129,16 +129,16 @@ CREATE TABLE Remote (
     Contact_Name VARCHAR(255),
     Contact_Email VARCHAR(255),
     Documentation_Url VARCHAR(255),
-    Created_Date TIMESTAMP NOT NULL,
-    Updated_Date TIMESTAMP NOT NULL
+    Created_Date BIGINT NOT NULL,
+    Updated_Date BIGINT NOT NULL
 );
 
 CREATE TABLE Remote_Module (
     Remote_Module_ID INT AUTO_INCREMENT PRIMARY KEY,
     Remote_ID INT NOT NULL,
     Module_ID INT NOT NULL,
-    Created_Date TIMESTAMP NOT NULL,
-    Updated_Date TIMESTAMP NOT NULL,
+    Created_Date BIGINT NOT NULL,
+    Updated_Date BIGINT NOT NULL,
     FOREIGN KEY (Remote_ID) REFERENCES Remote(Remote_ID),
     FOREIGN KEY (Module_ID) REFERENCES Module(Module_ID)
 );
@@ -147,8 +147,8 @@ CREATE TABLE Host_Remote (
     Host_Remote_ID INT AUTO_INCREMENT PRIMARY KEY,
     Host_ID INT,
     Remote_ID INT,
-    Created_Date TIMESTAMP NOT NULL,
-    Updated_Date TIMESTAMP NOT NULL,
+    Created_Date BIGINT NOT NULL,
+    Updated_Date BIGINT NOT NULL,
     FOREIGN KEY (Host_ID) REFERENCES Host(Host_ID),
     FOREIGN KEY (Remote_ID) REFERENCES Remote(Remote_ID)
 );
@@ -158,8 +158,8 @@ CREATE TABLE Tags_Host (
     Host_ID INT,
     Tag_ID INT,
     `Value` VARCHAR(500) NOT NULL,
-    Created_Date TIMESTAMP NOT NULL,
-    Updated_Date TIMESTAMP NOT NULL,
+    Created_Date BIGINT NOT NULL,
+    Updated_Date BIGINT NOT NULL,
     FOREIGN KEY (Host_ID) REFERENCES Host(Host_ID),
     FOREIGN KEY (Tag_ID) REFERENCES Tag(Tag_ID)
 );
@@ -169,8 +169,8 @@ CREATE TABLE Tags_Remote (
     Remote_ID INT,
     Tag_ID INT,
     `Value` VARCHAR(500) NOT NULL,
-    Created_Date TIMESTAMP NOT NULL,
-    Updated_Date TIMESTAMP NOT NULL,
+    Created_Date BIGINT NOT NULL,
+    Updated_Date BIGINT NOT NULL,
     FOREIGN KEY (Remote_ID) REFERENCES Remote(Remote_ID),
     FOREIGN KEY (Tag_ID) REFERENCES Tag(Tag_ID)
 );
@@ -179,47 +179,48 @@ CREATE TABLE Configuration (
     Configuration_ID INT AUTO_INCREMENT PRIMARY KEY,
     `Key` VARCHAR(500) NOT NULL,
     `Value` VARCHAR(1000) NOT NULL,
-    Created_Date TIMESTAMP NOT NULL,
-    Updated_Date TIMESTAMP NOT NULL
+    Created_Date BIGINT NOT NULL,
+    Updated_Date BIGINT NOT NULL
 );
 
 -- Insert default tags
 INSERT INTO Tag (`Key`, Display_Name, Created_Date, Updated_Date)
 VALUES 
-    ('Technology', 'Main Technology', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('Language', 'Programming Language', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('Framework', 'Framework', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('TeamName', 'Team or Project Name', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('Department', 'Department or Team', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('Organization', 'Organization Name', '2024-12-23 08:49:27', '2024-12-23 08:49:27');
+    ('Technology', 'Main Technology', 1671435095, 1671435095),
+    ('Language', 'Programming Language', 1671435095, 1671435095),
+    ('Framework', 'Framework', 1671435095, 1671435095),
+    ('TeamName', 'Team or Project Name', 1671435095, 1671435095),
+    ('Department', 'Department or Team', 1671435095, 1671435095),
+    ('Organization', 'Organization Name', 1671435095, 1671435095);
 
 -- Insert default configuration settings
 INSERT INTO Configuration (`Key`, `Value`, Created_Date, Updated_Date)
 VALUES 
     -- Storage Settings
-    ('storage:type', 'local', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('storage:azure:container_name', '', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('storage:azure:blob_name', '', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('storage:aws:bucket_name', '', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('storage:aws:bucket_key', '', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
+    ('storage:type', 'local', 1671645260, 1671645260),
+    ('storage:azure:container_name', '', 1671645260, 1671645260),
+    ('storage:azure:blob_name', '', 1671645260, 1671645260),
+    ('storage:aws:bucket_name', '', 1671645260, 1671645260),
+    ('storage:aws:bucket_key', '', 1671645260, 1671645260),
     
     -- Database Settings
-    ('database:type', 'mysql', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('database:host', 'localhost', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('database:port', '3306', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('database:name', '', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('database:user', '', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('database:password', '', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
+    ('database:type', 'mysql', 1671645260, 1671645260),
+    ('database:filename', '', 1671645260, 1671645260),
+    ('database:host', 'localhost', 1671645260, 1671645260),
+    ('database:port', '3306', 1671645260, 1671645260),
+    ('database:name', '', 1671645260, 1671645260),
+    ('database:user', '', 1671645260, 1671645260),
+    ('database:password', '', 1671645260, 1671645260),
     
     -- API Settings
-    ('api:base_url', 'http://localhost:5000', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('api:version', 'v1', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('api:timeout', '30000', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
+    ('api:base_url', 'http://localhost:5000', 1671645260, 1671645260),
+    ('api:version', 'v1', 1671645260, 1671645260),
+    ('api:timeout', '30000', 1671645260, 1671645260),
     
     -- Application Settings
-    ('app:name', 'Dream Remote Orchestration Services', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('app:environment', 'development', '2024-12-23 08:49:27', '2024-12-23 08:49:27'),
-    ('app:debug_mode', 'false', '2024-12-23 08:49:27', '2024-12-23 08:49:27');
+    ('app:name', 'Dream Remote Orchestration Services', 1671645260, 1671645260),
+    ('app:environment', 'development', 1671645260, 1671645260),
+    ('app:debug_mode', 'false', 1671645260, 1671645260);
 
 -- Analytics Views
 
@@ -233,7 +234,7 @@ SELECT
     COUNT(CASE WHEN ar.Action = 'Create' THEN 1 END) as TotalCreates,
     COUNT(CASE WHEN ar.Action = 'Delete' THEN 1 END) as TotalDeletes,
     COUNT(CASE 
-        WHEN ar.Created_Date >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        WHEN ar.Created_Date >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 30 DAY))
         THEN 1 
     END) as Last30DaysActions
 FROM Remote r
@@ -250,7 +251,7 @@ SELECT
     COUNT(CASE WHEN ar.Action = 'Create' THEN 1 END) as TotalCreates,
     COUNT(CASE WHEN ar.Action = 'Delete' THEN 1 END) as TotalDeletes,
     COUNT(CASE 
-        WHEN ar.Created_Date >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        WHEN ar.Created_Date >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 30 DAY))
         THEN 1 
     END) as Last30DaysActions
 FROM Host h
@@ -260,7 +261,7 @@ GROUP BY h.Host_ID, h.Name;
 -- View for daily Host reads
 CREATE VIEW v_DailyHostReads AS
 SELECT 
-    DATE(ar.Created_Date) as ReadDate,
+    FROM_UNIXTIME(ar.Created_Date) as ReadDate,
     h.Host_ID,
     h.Name as HostName,
     COUNT(*) as TotalReads,
@@ -270,13 +271,13 @@ SELECT
     COUNT(CASE WHEN ar.Action = 'Delete' THEN 1 END) as DeleteCount
 FROM Host h
 LEFT JOIN AuditReads_Host ar ON h.Host_ID = ar.Host_ID
-GROUP BY DATE(ar.Created_Date), h.Host_ID, h.Name
+GROUP BY FROM_UNIXTIME(ar.Created_Date), h.Host_ID, h.Name
 ORDER BY ReadDate DESC;
 
 -- View for daily Remote reads
 CREATE VIEW v_DailyRemoteReads AS
 SELECT 
-    DATE(ar.Created_Date) as ReadDate,
+    FROM_UNIXTIME(ar.Created_Date) as ReadDate,
     r.Remote_ID,
     r.Name as RemoteName,
     COUNT(*) as TotalReads,
@@ -286,5 +287,5 @@ SELECT
     COUNT(CASE WHEN ar.Action = 'Delete' THEN 1 END) as DeleteCount
 FROM Remote r
 LEFT JOIN AuditReads_Remote ar ON r.Remote_ID = ar.Remote_ID
-GROUP BY DATE(ar.Created_Date), r.Remote_ID, r.Name
+GROUP BY FROM_UNIXTIME(ar.Created_Date), r.Remote_ID, r.Name
 ORDER BY ReadDate DESC;

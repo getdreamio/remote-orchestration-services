@@ -15,7 +15,7 @@ public class EntityAnalytics
 
 public class DailyEntityAnalytics
 {
-    public DateTimeOffset ReadDate { get; set; }
+    public long ReadDate { get; set; }
     public int EntityId { get; set; }
     public string EntityName { get; set; }
     public int TotalReads { get; set; }

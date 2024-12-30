@@ -10,6 +10,6 @@ public class HostRequest
     public string ContactName { get; set; } = string.Empty;
     public string ContactEmail { get; set; } = string.Empty;
     public string DocumentationUrl { get; set; } = string.Empty;
-    public DateTimeOffset Created_Date { get; set; } = DateTimeOffset.UtcNow;
-    public DateTimeOffset Updated_Date { get; set; } = DateTimeOffset.UtcNow;
+    public long Created_Date { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+    public long Updated_Date { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 }

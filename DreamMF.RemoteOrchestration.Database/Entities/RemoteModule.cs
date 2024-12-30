@@ -10,8 +10,8 @@ public class RemoteModule
     public int Remote_Module_ID { get; set; }
     public int Remote_ID { get; set; }
     public int Module_ID { get; set; }
-    public DateTimeOffset Created_Date { get; set; }
-    public DateTimeOffset Updated_Date { get; set; }
+    public long Created_Date { get; set; }
+    public long Updated_Date { get; set; }
 
     [ForeignKey("Remote_ID")]
     public Remote? Remote { get; set; }

@@ -77,8 +77,8 @@ public class UploadService : IUploadService
                     Name = name,
                     Key = key,
                     Scope = scope,
-                    Created_Date = DateTimeOffset.UtcNow,
-                    Updated_Date = DateTimeOffset.UtcNow
+                    Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
                 };
                 _dbContext.Remotes.Add(remote);
                 await _dbContext.SaveChangesAsync();
@@ -109,8 +109,8 @@ public class UploadService : IUploadService
                 {
                     Remote_ID = remote.Remote_ID,
                     Value = version,
-                    Created_Date = DateTimeOffset.UtcNow,
-                    Updated_Date = DateTimeOffset.UtcNow
+                    Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
                 };
 
                 try 
@@ -192,7 +192,7 @@ public class UploadService : IUploadService
                 _logger.LogInformation("Successfully extracted files to: {Path}", targetPath);
 
                 // Update the remote's updated date
-                remote.Updated_Date = DateTimeOffset.UtcNow;
+                remote.Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 await _dbContext.SaveChangesAsync();
             }
             catch (HandledException)

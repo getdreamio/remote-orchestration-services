@@ -90,8 +90,8 @@ public class RootConfigurationService : IRootConfigurationService
         {
             Key = request.Key,
             Value = request.Value,
-            Created_Date = DateTimeOffset.UtcNow,
-            Updated_Date = DateTimeOffset.UtcNow
+            Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         };
 
         _dbContext.Configurations.Add(configuration);
@@ -116,7 +116,7 @@ public class RootConfigurationService : IRootConfigurationService
             return null;
 
         configuration.Value = value;
-        configuration.Updated_Date = DateTimeOffset.UtcNow;
+        configuration.Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         await _dbContext.SaveChangesAsync();
 

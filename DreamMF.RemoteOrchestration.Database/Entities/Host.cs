@@ -18,8 +18,8 @@ public class Host
     public string? Contact_Name { get; set; }
     public string? Contact_Email { get; set; }
     public string? Documentation_Url { get; set; }
-    public DateTimeOffset Created_Date { get; set; }
-    public DateTimeOffset Updated_Date { get; set; }
+    public long Created_Date { get; set; }
+    public long Updated_Date { get; set; }
 
     public static string GenerateKey()
     {

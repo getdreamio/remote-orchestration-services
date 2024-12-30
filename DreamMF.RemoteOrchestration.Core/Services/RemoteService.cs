@@ -51,8 +51,8 @@ public class RemoteService
             var newModule = new Module
             {
                 Name = module.Name,
-                Created_Date = DateTimeOffset.UtcNow,
-                Updated_Date = DateTimeOffset.UtcNow
+                Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
             };
             _dbContext.Modules.Add(newModule);
             await _dbContext.SaveChangesAsync();
@@ -60,8 +60,8 @@ public class RemoteService
             remote.RemoteModules.Add(new RemoteModule
             {
                 Module_ID = newModule.Module_ID,
-                Created_Date = DateTimeOffset.UtcNow,
-                Updated_Date = DateTimeOffset.UtcNow
+                Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
             });
         }
 
@@ -85,7 +85,7 @@ public class RemoteService
         remote.Name = request.Name;
         remote.Key = request.Key;
         remote.Scope = request.Scope;
-        remote.Updated_Date = DateTimeOffset.UtcNow;
+        remote.Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         remote.Repository = request.Repository;
         remote.Contact_Name = request.ContactName;
         remote.Contact_Email = request.ContactEmail;
@@ -131,8 +131,8 @@ public class RemoteService
                     module = new Module
                     {
                         Name = moduleName,
-                        Created_Date = DateTimeOffset.UtcNow,
-                        Updated_Date = DateTimeOffset.UtcNow
+                        Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                        Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
                     };
                     _dbContext.Modules.Add(module);
                 }
@@ -140,8 +140,8 @@ public class RemoteService
                 remote.RemoteModules.Add(new RemoteModule
                 {
                     Module = module,
-                    Created_Date = DateTimeOffset.UtcNow,
-                    Updated_Date = DateTimeOffset.UtcNow
+                    Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
                 });
             }
         }

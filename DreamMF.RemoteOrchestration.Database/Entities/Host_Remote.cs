@@ -13,6 +13,6 @@ public class Host_Remote
 
     [ForeignKey("Remote_ID")]
     public Remote? Remote { get; set; }
-    public DateTimeOffset Created_Date { get; set; }
-    public DateTimeOffset Updated_Date { get; set; }
+    public long Created_Date { get; set; }
+    public long Updated_Date { get; set; }
 }

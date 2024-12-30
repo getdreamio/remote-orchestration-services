@@ -17,8 +17,8 @@ public static class RemoteMapper
             Contact_Name = request.ContactName,
             Contact_Email = request.ContactEmail,
             Documentation_Url = request.DocumentationUrl,
-            Created_Date = DateTimeOffset.UtcNow,
-            Updated_Date = DateTimeOffset.UtcNow
+            Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         };
     }
 

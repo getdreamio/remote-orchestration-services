@@ -12,6 +12,6 @@ public class User
     public string Auth_User_ID { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
-    public DateTimeOffset Created_Date { get; set; }
-    public DateTimeOffset Updated_Date { get; set; }
+    public long Created_Date { get; set; }
+    public long Updated_Date { get; set; }
 }

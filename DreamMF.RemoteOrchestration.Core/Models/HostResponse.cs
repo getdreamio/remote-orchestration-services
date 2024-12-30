@@ -12,6 +12,6 @@ public class HostResponse
     public string ContactName { get; set; } = string.Empty;
     public string ContactEmail { get; set; } = string.Empty;
     public string DocumentationUrl { get; set; } = string.Empty;
-    public DateTimeOffset Created_Date { get; set; }
-    public DateTimeOffset Updated_Date { get; set; }
+    public long Created_Date { get; set; }
+    public long Updated_Date { get; set; }
 }

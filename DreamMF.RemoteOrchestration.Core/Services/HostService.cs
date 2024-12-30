@@ -73,7 +73,7 @@ public class HostService
         existingHost.Contact_Name = request.ContactName;
         existingHost.Contact_Email = request.ContactEmail;
         existingHost.Documentation_Url = request.DocumentationUrl;
-        existingHost.Updated_Date = DateTimeOffset.UtcNow;
+        existingHost.Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         await _dbContext.SaveChangesAsync();
         _ = _analyticsService.LogHostReadAsync(id, "Update", 1);

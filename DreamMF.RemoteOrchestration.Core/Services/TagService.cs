@@ -76,7 +76,7 @@ public class TagService
             var existingTag = await _dbContext.Tags.FindAsync(id);
             if (existingTag == null) return false;
 
-            existingTag.Updated_Date = DateTimeOffset.UtcNow;
+            existingTag.Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             existingTag.Key = request.Key;
             existingTag.Display_Name = request.Display_Name;
             

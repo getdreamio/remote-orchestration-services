@@ -61,7 +61,7 @@ public class ConfigurationService
             return null;
 
         configuration.Value = request.Value;
-        configuration.Updated_Date = DateTimeOffset.UtcNow;
+        configuration.Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         await _dbContext.SaveChangesAsync();
 

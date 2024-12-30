@@ -11,5 +11,5 @@ public class Audit_Host
     public int Host_ID { get; set; }
     public string Change { get; set; } = string.Empty;
     public int Change_User_ID { get; set; }
-    public DateTimeOffset Created_Date { get; set; }
+    public long Created_Date { get; set; }
 }

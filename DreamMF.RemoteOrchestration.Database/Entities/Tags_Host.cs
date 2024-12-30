@@ -19,6 +19,6 @@ public class Tags_Host
     [ForeignKey(nameof(Host_ID))]
     public Host? Host { get; set; }
 
-    public DateTimeOffset Created_Date { get; set; } = DateTimeOffset.UtcNow;
-    public DateTimeOffset Updated_Date { get; set; } = DateTimeOffset.UtcNow;
+    public long Created_Date { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+    public long Updated_Date { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 }
