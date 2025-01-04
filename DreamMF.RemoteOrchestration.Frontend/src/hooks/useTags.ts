@@ -5,13 +5,11 @@ import { message } from 'antd';
 export interface Tag {
     tag_ID: number;
     key: string;
-    display_Name: string;
     created_Date: Date;
     updated_Date: Date;
 }
 export interface TagRequest {
     key: string;
-    display_Name: string;
 }
 
 export interface TagAssociation {

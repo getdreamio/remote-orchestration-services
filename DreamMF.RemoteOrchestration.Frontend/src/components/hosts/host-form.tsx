@@ -145,7 +145,7 @@ const HostForm: React.FC<HostFormProps> = ({ onSuccess, editingHost, renderFoote
                         name="tags"
                         initialValue={[]}
                     >
-                        <TagInput />
+                        <TagInput entityType={'host'} entityId={editingHost?.id || -1} existingTags={formattedExistingTags} className='w-full' />
                     </Form.Item>
                 </>
             )}

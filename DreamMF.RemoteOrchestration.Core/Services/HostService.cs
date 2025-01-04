@@ -134,7 +134,12 @@ public class HostService
             return false;
         }
 
-        var hostRemote = new Host_Remote { Host_ID = hostId, Remote_ID = remoteId };
+        var hostRemote = new Host_Remote { 
+            Host_ID = hostId, 
+            Remote_ID = remoteId,
+            Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+        };
         _dbContext.Host_Remotes.Add(hostRemote);
         await _dbContext.SaveChangesAsync();
         return true;

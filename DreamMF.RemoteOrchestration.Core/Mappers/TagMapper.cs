@@ -10,7 +10,9 @@ public static class TagMapper
         return new Tag
         {
             Key = request.Key,
-            Display_Name = request.Display_Name
+            Display_Name = request.Display_Name,
+            Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         };
     }
 

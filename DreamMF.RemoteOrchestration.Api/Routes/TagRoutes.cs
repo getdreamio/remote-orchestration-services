@@ -89,21 +89,13 @@ public static class TagRoutes
             .WithSummary("Get Tag Remotes")
             .WithDescription("Retrieves all remotes that are using this tag");
 
-        group.MapPost("remote/{remoteId}/add/{tagId}", AddTagToRemote)
+        group.MapPost("/add-to-entity", AddTagToEntity)
             .Produces(StatusCodes.Status204NoContent)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(500)
-            .WithMetadata(new EndpointNameMetadata("Add tag to remote"))
-            .WithSummary("Add Tag to Remote")
+            .WithMetadata(new EndpointNameMetadata("Add tag to Entity"))
+            .WithSummary("Add Tag to Entity")
             .WithDescription("Adds a tag to a remote entity");
-
-        group.MapPost("host/{hostId}/add/{tagId}", AddTagToHost)
-            .Produces(StatusCodes.Status204NoContent)
-            .Produces<HandledResponseModel>(400)
-            .Produces<HandledResponseModel>(500)
-            .WithMetadata(new EndpointNameMetadata("Add tag to host"))
-            .WithSummary("Add Tag to Host")
-            .WithDescription("Adds a tag to a host entity");
 
         group.MapGet("host/{hostId}", GetTagsByHostId)
             .Produces<List<TagResponse>>(StatusCodes.Status200OK)
@@ -169,16 +161,32 @@ public static class TagRoutes
         var success = await tagService.DeleteTagAsync(id);
         return success ? Results.NoContent() : Results.NotFound();
     }
-
-    private static async Task<IResult> AddTagToRemote(int remoteId, int tagId, TagService tagService)
+    
+    private static async Task<IResult> AddTagToEntity(AttachTagRequest model, TagService tagService)
     {
-        var success = await tagService.AddTagToRemoteAsync(remoteId, tagId);
+        if (model.EntityType == "host")
+        {
+            return await AddTagToHost(model.EntityId, model.TagId, model.Value, tagService);
+        }
+        else if (model.EntityType == "remote")
+        {
+            return await AddTagToRemote(model.EntityId, model.TagId, model.Value, tagService);
+        }
+        else
+        {
+            return Results.BadRequest();
+        }
+    }
+
+    private static async Task<IResult> AddTagToRemote(int remoteId, int tagId, string value, TagService tagService)
+    {
+        var success = await tagService.AddTagToRemoteAsync(remoteId, tagId, value);
         return success ? Results.NoContent() : Results.BadRequest();
     }
 
-    private static async Task<IResult> AddTagToHost(int hostId, int tagId, TagService tagService)
+    private static async Task<IResult> AddTagToHost(int hostId, int tagId, string value, TagService tagService)
     {
-        var success = await tagService.AddTagToHostAsync(hostId, tagId);
+        var success = await tagService.AddTagToHostAsync(hostId, tagId, value);
         return success ? Results.NoContent() : Results.BadRequest();
     }
 

@@ -10,6 +10,7 @@ public class Tags_Host
     public int Tag_Host_ID { get; set; }
     
     public int Tag_ID { get; set; }
+    public string Value { get; set; }
 
     [ForeignKey(nameof(Tag_ID))]
     public Tag? Tag { get; set; }

@@ -9,7 +9,10 @@ public class Tags_Remote
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Tag_Remote_ID { get; set; }
     
+    public string Value { get; set; }
+
     public int Tag_ID { get; set; }
+
     [ForeignKey(nameof(Tag_ID))]
     public Tag Tag { get; set; } = null!;
     

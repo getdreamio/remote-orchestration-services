@@ -110,7 +110,7 @@ public class TagService
         }
     }
 
-    public async Task<bool> AddTagToRemoteAsync(int remoteId, int tagId)
+    public async Task<bool> AddTagToRemoteAsync(int remoteId, int tagId, string value)
     {
         if (remoteId <= 0 || tagId <= 0)
         {
@@ -124,7 +124,13 @@ public class TagService
                 return false;
             }
 
-            var tagRemote = new Tags_Remote { Remote_ID = remoteId, Tag_ID = tagId };
+            var tagRemote = new Tags_Remote { 
+                Remote_ID = remoteId, 
+                Tag_ID = tagId,
+                Value = value,
+                Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+            };
             _dbContext.Tags_Remotes.Add(tagRemote);
             await _dbContext.SaveChangesAsync();
             return true;
@@ -135,7 +141,7 @@ public class TagService
         }
     }
 
-    public async Task<bool> AddTagToHostAsync(int hostId, int tagId)
+    public async Task<bool> AddTagToHostAsync(int hostId, int tagId, string value)
     {
         if (hostId <= 0 || tagId <= 0)
         {
@@ -149,7 +155,13 @@ public class TagService
                 return false;
             }
 
-            var tagHost = new Tags_Host { Host_ID = hostId, Tag_ID = tagId };
+            var tagHost = new Tags_Host { 
+                Host_ID = hostId, 
+                Tag_ID = tagId,
+                Value = value,
+                Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+            };
             _dbContext.Tags_Hosts.Add(tagHost);
             await _dbContext.SaveChangesAsync();
             return true;

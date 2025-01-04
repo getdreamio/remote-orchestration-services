@@ -203,14 +203,6 @@ const NewRemotePage: React.FC = () => {
                                 </div>
                             </div>
 
-                            <Form.Item label="Tags">
-                                <TagInput
-                                    tags={tags}
-                                    onChange={setTags}
-                                    existingTags={formattedExistingTags}
-                                />
-                            </Form.Item>
-
                             <div className="flex justify-end space-x-2 pt-4">
                                 <Button onClick={() => navigate('/remotes')}>
                                     Cancel

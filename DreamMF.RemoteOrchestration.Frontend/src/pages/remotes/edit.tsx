@@ -231,6 +231,8 @@ const EditRemotePage: React.FC = () => {
                                 <Form.Item label="Tags">
                                     <TagInput
                                         tags={tags}
+                                        entityType="remote"
+                                        entityId={id}
                                         onChange={setTags}
                                         existingTags={formattedExistingTags}
                                     />
