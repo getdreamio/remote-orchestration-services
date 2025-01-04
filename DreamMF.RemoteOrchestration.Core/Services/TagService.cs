@@ -110,18 +110,20 @@ public class TagService
         }
     }
 
-    public async Task<bool> AddTagToRemoteAsync(int remoteId, int tagId, string value)
+    public async Task<TagEntityResponse?> AddTagToRemoteAsync(int remoteId, int tagId, string value)
     {
         if (remoteId <= 0 || tagId <= 0)
         {
-            throw new HandledException(ExceptionType.Validation, "IDs must be greater than zero.");
+            throw new ArgumentException("Invalid remoteId or tagId");
         }
         try
         {
-            if (!await _dbContext.Remotes.AnyAsync(r => r.Remote_ID == remoteId) ||
-                !await _dbContext.Tags.AnyAsync(t => t.Tag_ID == tagId))
+            var tag = await _dbContext.Tags.FirstOrDefaultAsync(t => t.Tag_ID == tagId);
+            var remote = await _dbContext.Remotes.FirstOrDefaultAsync(r => r.Remote_ID == remoteId);
+            
+            if (tag == null || remote == null)
             {
-                return false;
+                return null;
             }
 
             var tagRemote = new Tags_Remote { 
@@ -133,26 +135,35 @@ public class TagService
             };
             _dbContext.Tags_Remotes.Add(tagRemote);
             await _dbContext.SaveChangesAsync();
-            return true;
+
+            return new TagEntityResponse
+            {
+                Id = tagRemote.Tag_Remote_ID,
+                Tag_ID = tag.Tag_ID,
+                Key = tag.Key,
+                Value = value
+            };
         }
         catch (Exception ex)
         {
-            throw new HandledException(ExceptionType.Database, "Failed to add tag to remote", ex);
+            throw new Exception($"Error adding tag to remote: {ex.Message}");
         }
     }
 
-    public async Task<bool> AddTagToHostAsync(int hostId, int tagId, string value)
+    public async Task<TagEntityResponse?> AddTagToHostAsync(int hostId, int tagId, string value)
     {
         if (hostId <= 0 || tagId <= 0)
         {
-            throw new HandledException(ExceptionType.Validation, "IDs must be greater than zero.");
+            throw new ArgumentException("Invalid hostId or tagId");
         }
         try
         {
-            if (!await _dbContext.Hosts.AnyAsync(h => h.Host_ID == hostId) ||
-                !await _dbContext.Tags.AnyAsync(t => t.Tag_ID == tagId))
+            var tag = await _dbContext.Tags.FirstOrDefaultAsync(t => t.Tag_ID == tagId);
+            var host = await _dbContext.Hosts.FirstOrDefaultAsync(h => h.Host_ID == hostId);
+            
+            if (tag == null || host == null)
             {
-                return false;
+                return null;
             }
 
             var tagHost = new Tags_Host { 
@@ -164,11 +175,18 @@ public class TagService
             };
             _dbContext.Tags_Hosts.Add(tagHost);
             await _dbContext.SaveChangesAsync();
-            return true;
+
+            return new TagEntityResponse
+            {
+                Id = tagHost.Tag_Host_ID,
+                Tag_ID = tag.Tag_ID,
+                Key = tag.Key,
+                Value = value
+            };
         }
         catch (Exception ex)
         {
-            throw new HandledException(ExceptionType.Database, "Failed to add tag to host", ex);
+            throw new Exception($"Error adding tag to host: {ex.Message}");
         }
     }
 

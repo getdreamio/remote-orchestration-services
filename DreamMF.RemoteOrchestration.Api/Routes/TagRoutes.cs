@@ -90,7 +90,7 @@ public static class TagRoutes
             .WithDescription("Retrieves all remotes that are using this tag");
 
         group.MapPost("/add-to-entity", AddTagToEntity)
-            .Produces(StatusCodes.Status204NoContent)
+            .Produces<TagEntityResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(500)
             .WithMetadata(new EndpointNameMetadata("Add tag to Entity"))
@@ -181,13 +181,13 @@ public static class TagRoutes
     private static async Task<IResult> AddTagToRemote(int remoteId, int tagId, string value, TagService tagService)
     {
         var success = await tagService.AddTagToRemoteAsync(remoteId, tagId, value);
-        return success ? Results.NoContent() : Results.BadRequest();
+        return success != null ? Results.Ok(success) : Results.BadRequest();
     }
 
     private static async Task<IResult> AddTagToHost(int hostId, int tagId, string value, TagService tagService)
     {
         var success = await tagService.AddTagToHostAsync(hostId, tagId, value);
-        return success ? Results.NoContent() : Results.BadRequest();
+        return success != null ? Results.Ok(success) : Results.BadRequest();
     }
 
     private static async Task<IResult> GetTagsByHostId(int hostId, TagService tagService)

@@ -2,6 +2,7 @@ namespace DreamMF.RemoteOrchestration.Core.Models;
 
 public class TagEntityResponse
 {
+    public int Id { get; set; }
     public int Tag_ID { get; set; }
     public string Key { get; set; }
     public string Display_Name { get; set; }

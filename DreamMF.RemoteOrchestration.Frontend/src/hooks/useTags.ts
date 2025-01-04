@@ -8,6 +8,7 @@ export interface Tag {
     created_Date: Date;
     updated_Date: Date;
 }
+
 export interface TagRequest {
     key: string;
 }
@@ -16,6 +17,14 @@ export interface TagAssociation {
     id: number;
     name: string;
     type: 'host' | 'remote';
+}
+
+export interface TagEntityResponse {
+    id: number;
+    tag_ID: number;
+    key: string;
+    display_Name?: string;
+    value: string;
 }
 
 export const useTags = () => {
@@ -145,7 +154,11 @@ export const useRemoveTagAssociation = () => {
 
     return useMutation({
         mutationFn: async ({ tagId, itemId, type }: { tagId: number; itemId: number; type: 'host' | 'remote' }) => {
-            const response = await fetch(`${config.backendUrl}/api/tags/${tagId}/associations/${type}/${itemId}`, {
+            const endpoint = type === 'host'
+                ? `${config.backendUrl}/api/tags/host/${itemId}/remove/${tagId}`
+                : `${config.backendUrl}/api/tags/remote/${itemId}/remove/${tagId}`;
+
+            const response = await fetch(endpoint, {
                 method: 'DELETE',
             });
             if (!response.ok) {
@@ -153,7 +166,7 @@ export const useRemoveTagAssociation = () => {
             }
         },
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['tag-associations', variables.tagId] });
+            queryClient.invalidateQueries({ queryKey: ['tags', variables.type, variables.itemId] });
             message.success(`Tag removed from ${variables.type} successfully`);
         },
         onError: (_, variables) => {
@@ -190,17 +203,56 @@ export const useTagsByRemote = (remoteId: number) => {
     });
 };
 
+export const useAddTagToEntity = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ entityType, entityId, tagId, value }: { entityType: 'host' | 'remote', entityId: number, tagId: number, value: string }) => {
+            const response = await fetch(`${config.backendUrl}/api/tags/add-to-entity`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    entityType,
+                    entityId,
+                    tagId,
+                    value
+                })
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to add tag to ${entityType}`);
+            }
+            return response.json() as Promise<TagEntityResponse>;
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ 
+                queryKey: ['tags', variables.entityType, variables.entityId] 
+            });
+            message.success('Tag added successfully');
+        },
+        onError: () => {
+            message.error('Failed to add tag');
+        },
+    });
+};
+
 export const useAddTagToHost = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ hostId, tagId }: { hostId: number; tagId: number }) => {
+        mutationFn: async ({ hostId, tagId, value }: { hostId: number; tagId: number; value: string }) => {
             const response = await fetch(`${config.backendUrl}/api/tags/host/${hostId}/add/${tagId}`, {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ value })
             });
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
+            return response.json() as Promise<TagEntityResponse>;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['tags', 'host', variables.hostId] });

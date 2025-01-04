@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Select, Tag as AntDTag, Tooltip, Input } from 'antd';
 import { TagOutlined } from '@ant-design/icons';
-import { useTags, useCreateTag, useTagsByHost, useTagsByRemote, type Tag, type TagRequest } from '@/hooks/useTags';
+import { useTags, useCreateTag, useTagsByHost, useTagsByRemote, useRemoveTagAssociation, useAddTagToEntity, type Tag, type TagRequest } from '@/hooks/useTags';
 import { config } from '@/config/env';
 
 interface TagInputProps {
@@ -22,6 +22,8 @@ export const TagInput: React.FC<TagInputProps> = ({ value: tags = [], onChange =
     const { data: hostTags } = useTagsByHost(entityType === 'host' ? entityId : 0);
     const { data: remoteTags } = useTagsByRemote(entityType === 'remote' ? entityId : 0);
     const createTag = useCreateTag();
+    const removeTagAssociation = useRemoveTagAssociation();
+    const addTag = useAddTagToEntity();
 
     useEffect(() => {
         if (entityType === 'host' && hostTags) {
@@ -33,8 +35,17 @@ export const TagInput: React.FC<TagInputProps> = ({ value: tags = [], onChange =
 
     const selectedTag = allTags?.find(t => t.tag_ID === selectedTagId);
 
-    const handleClose = (removedTag: Tag) => {
-        onChange(tags.filter(tag => tag !== removedTag));
+    const handleClose = async (removedTag: Tag) => {
+        try {
+            await removeTagAssociation.mutateAsync({
+                tagId: removedTag.tag_ID,
+                itemId: entityId,
+                type: entityType
+            });
+            onChange(tags.filter(tag => tag !== removedTag));
+        } catch (error) {
+            console.error('Failed to remove tag:', error);
+        }
     };
 
     const handleTagSelect = (values: string[]) => {
@@ -46,54 +57,30 @@ export const TagInput: React.FC<TagInputProps> = ({ value: tags = [], onChange =
         setTagKey(value);
     };
 
-    const attachTagToEntity = async (entityType: string, entityId: number, tagId: number, value: string) => {
-        const response = await fetch(`${config.backendUrl}/api/tags/add-to-entity`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                entityType,
-                entityId,
-                tagId: tagId.toString(),
-                value
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to attach tag to entity');
-        }
-    };
-
     const handleAdd = async () => {
         if (!tagKey || !tagValue) return;
 
         try {
-            let tagToAdd: Tag;
             let tagId: number;
             
             if (selectedTag) {
                 tagId = selectedTag.tag_ID;
-                tagToAdd = {
-                    ...selectedTag,
-                    value: tagValue
-                };
             } else {
                 // Create new tag first
                 const newTag = await createTag.mutateAsync({
                     key: tagKey
                 });
                 tagId = newTag.tag_ID;
-                tagToAdd = {
-                    ...newTag,
-                    value: tagValue
-                };
             }
 
             // Attach the tag to the entity
-            await attachTagToEntity(entityType, entityId, tagId, tagValue);
+            await addTag.mutateAsync({
+                entityType,
+                entityId,
+                tagId,
+                value: tagValue
+            });
 
-            onChange([...tags, tagToAdd]);
             setSelectedTagId(undefined);
             setTagKey('');
             setTagValue('');
@@ -101,7 +88,6 @@ export const TagInput: React.FC<TagInputProps> = ({ value: tags = [], onChange =
             setInputVisible(false);
         } catch (error) {
             console.error('Failed to add tag:', error);
-            // You might want to show an error message to the user here
         }
     };
 
