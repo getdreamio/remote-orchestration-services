@@ -176,6 +176,20 @@ export const useTagsByHost = (hostId: number) => {
     });
 };
 
+export const useTagsByRemote = (remoteId: number) => {
+    return useQuery<Tag[]>({
+        queryKey: ['tags', 'remote', remoteId],
+        queryFn: async () => {
+            const response = await fetch(`${config.backendUrl}/api/tags/remote/${remoteId}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        },
+        enabled: !!remoteId
+    });
+};
+
 export const useAddTagToHost = () => {
     const queryClient = useQueryClient();
 

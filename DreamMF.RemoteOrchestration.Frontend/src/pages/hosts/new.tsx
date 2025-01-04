@@ -21,15 +21,6 @@ interface Version {
 const NewHostPage: React.FC = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('general');
-    const [tags, setTags] = useState<TagItem[]>([]);
-    const [versions] = useState<Version[]>([]);
-    const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
-    const { data: existingTags = [] } = useTags();
-
-    const formattedExistingTags = existingTags.map(tag => ({
-        key: 'tag',
-        value: tag.text
-    }));
 
     const handleSuccess = () => {
         navigate('/hosts');

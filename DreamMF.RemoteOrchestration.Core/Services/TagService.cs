@@ -172,7 +172,7 @@ public class TagService
         }
     }
 
-    public async Task<List<TagResponse>> GetTagsByHostIdAsync(int hostId)
+    public async Task<List<TagEntityResponse>> GetTagsByHostIdAsync(int hostId)
     {
         if (hostId <= 0)
         {
@@ -182,7 +182,7 @@ public class TagService
         {
             var tags = await _dbContext.Tags_Hosts
                 .Where(th => th.Host_ID == hostId)
-                .Select(th => th.Tag)
+                .Include(th => th.Tag)
                 .ToListAsync();
             return tags.Select(TagMapper.ToResponse).ToList();
         }
@@ -214,7 +214,7 @@ public class TagService
         }
     }
 
-    public async Task<List<TagResponse>> GetTagsByRemoteIdAsync(int remoteId)
+    public async Task<List<TagEntityResponse>> GetTagsByRemoteIdAsync(int remoteId)
     {
         if (remoteId <= 0)
         {
@@ -224,7 +224,7 @@ public class TagService
         {
             var tags = await _dbContext.Tags_Remotes
                 .Where(tr => tr.Remote_ID == remoteId)
-                .Select(tr => tr.Tag)
+                .Include(tr => tr.Tag)
                 .ToListAsync();
             return tags.Select(TagMapper.ToResponse).ToList();
         }

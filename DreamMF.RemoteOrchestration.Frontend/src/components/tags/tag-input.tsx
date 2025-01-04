@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Select, Tag as AntDTag, Tooltip, Input } from 'antd';
 import { TagOutlined } from '@ant-design/icons';
-import { useTags, useCreateTag, type Tag, type TagRequest } from '@/hooks/useTags';
+import { useTags, useCreateTag, useTagsByHost, useTagsByRemote, type Tag, type TagRequest } from '@/hooks/useTags';
 import { config } from '@/config/env';
 
 interface TagInputProps {
@@ -19,7 +19,17 @@ export const TagInput: React.FC<TagInputProps> = ({ value: tags = [], onChange =
     const [displayName, setDisplayName] = useState<string>('');
 
     const { data: allTags } = useTags();
+    const { data: hostTags } = useTagsByHost(entityType === 'host' ? entityId : 0);
+    const { data: remoteTags } = useTagsByRemote(entityType === 'remote' ? entityId : 0);
     const createTag = useCreateTag();
+
+    useEffect(() => {
+        if (entityType === 'host' && hostTags) {
+            onChange(hostTags);
+        } else if (entityType === 'remote' && remoteTags) {
+            onChange(remoteTags);
+        }
+    }, [entityType, hostTags, remoteTags, onChange]);
 
     const selectedTag = allTags?.find(t => t.tag_ID === selectedTagId);
 
@@ -103,6 +113,8 @@ export const TagInput: React.FC<TagInputProps> = ({ value: tags = [], onChange =
                         <AntDTag
                             key={`${tag.tag_ID}`}
                             closable
+                            color="purple"
+                            style={{ padding: '5px 10px' }}
                             onClose={() => handleClose(tag)}
                             className="flex items-center gap-1"
                         >
@@ -120,6 +132,7 @@ export const TagInput: React.FC<TagInputProps> = ({ value: tags = [], onChange =
                 {!inputVisible && (
                     <AntDTag
                         className="bg-transparent border-dashed cursor-pointer hover:border-primary"
+                        style={{ padding: '5px 10px' }}
                         onClick={() => setInputVisible(true)}
                     >
                         <TagOutlined /> Add Tag

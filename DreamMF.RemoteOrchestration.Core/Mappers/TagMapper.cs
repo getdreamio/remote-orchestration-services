@@ -27,4 +27,26 @@ public static class TagMapper
             Updated_Date = DateTimeOffset.FromUnixTimeMilliseconds(entity.Updated_Date)
         };
     }
+
+    public static TagEntityResponse ToResponse(this Tags_Host entity)
+    {
+        return new TagEntityResponse
+        {
+            Tag_ID = entity.Tag_ID,
+            Key = entity.Tag.Key,
+            Display_Name = entity.Tag.Display_Name,
+            Value = entity.Value
+        };
+    }
+
+    public static TagEntityResponse ToResponse(this Tags_Remote entity)
+    {
+        return new TagEntityResponse
+        {
+            Tag_ID = entity.Tag_ID,
+            Key = entity.Tag.Key,
+            Display_Name = entity.Tag.Display_Name,
+            Value = entity.Value
+        };
+    }
 }
