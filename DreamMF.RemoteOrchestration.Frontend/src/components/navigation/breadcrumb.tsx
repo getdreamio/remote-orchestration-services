@@ -9,7 +9,7 @@ const routeLabels: Record<string, string> = {
     'users': 'Users',
     'settings': 'Settings',
     'analytics': 'Analytics',
-    'search': 'Search by Tags',
+    'search': 'Search Results',
 };
 
 const getSegmentLabel = (segment: string, index: number, segments: string[]): string => {
