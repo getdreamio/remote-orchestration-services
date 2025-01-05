@@ -11,6 +11,7 @@ export interface Tag {
 
 export interface TagRequest {
     key: string;
+    display_Name?: string;
 }
 
 export interface TagAssociation {
@@ -86,21 +87,29 @@ export const useCreateTag = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (tag: TagRequest) => {
+        mutationFn: async (request: TagRequest) => {
+            const payload = {
+                key: request.key,
+                display_Name: request.display_Name || request.key
+            };
             const response = await fetch(`${config.backendUrl}/api/tags`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(tag),
+                body: JSON.stringify(payload),
             });
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error('Failed to create tag');
             }
             return response.json();
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tags'] });
+            message.success('Tag created successfully');
+        },
+        onError: () => {
+            message.error('Failed to create tag');
         },
     });
 };
@@ -213,11 +222,11 @@ export const useAddTagToEntity = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
+                body: JSON.stringify({ 
+                    value,
                     entityType,
                     entityId,
-                    tagId,
-                    value
+                    tagId 
                 })
             });
             if (!response.ok) {
@@ -247,7 +256,12 @@ export const useAddTagToHost = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ value })
+                body: JSON.stringify({ 
+                    value,
+                    entityType: 'host',
+                    entityId: hostId,
+                    tagId 
+                })
             });
             if (!response.ok) {
                 throw new Error('Network response was not ok');

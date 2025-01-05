@@ -32,6 +32,7 @@ public static class TagMapper
     {
         return new TagEntityResponse
         {
+            Id = entity.Tag_Host_ID,
             Tag_ID = entity.Tag_ID,
             Key = entity.Tag.Key,
             Display_Name = entity.Tag.Display_Name,
@@ -43,6 +44,7 @@ public static class TagMapper
     {
         return new TagEntityResponse
         {
+            Id = entity.Tag_Remote_ID,
             Tag_ID = entity.Tag_ID,
             Key = entity.Tag.Key,
             Display_Name = entity.Tag.Display_Name,

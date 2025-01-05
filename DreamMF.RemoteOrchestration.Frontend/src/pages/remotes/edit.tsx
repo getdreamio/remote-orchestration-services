@@ -25,10 +25,8 @@ const EditRemotePage: React.FC = () => {
     const [form] = Form.useForm();
     const updateRemote = useUpdateRemote();
     const { data: remote, isLoading, error } = useRemote(Number(id));
-    const { data: existingTags = [] } = useTags();
     const [activeTab, setActiveTab] = useState('general');
     const [modules, setModules] = useState<RemoteModule[]>([]);
-    const [tags, setTags] = useState<TagItem[]>([]);
     const [versions] = useState<Version[]>([]); // This would be populated from your API
     const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
 
@@ -44,7 +42,6 @@ const EditRemotePage: React.FC = () => {
                 documentation_url: remote.documentation_url
             });
             setModules(remote.modules || []);
-            setTags(remote.tags || []);
             setSelectedVersion(remote.activeVersion || null);
         }
     }, [remote, form]);
@@ -56,7 +53,6 @@ const EditRemotePage: React.FC = () => {
                 remote: {
                     ...values,
                     modules,
-                    tags
                 }
             });
             message.success('Remote updated successfully');
@@ -123,12 +119,6 @@ const EditRemotePage: React.FC = () => {
             setSelectedVersion(selectedRowKeys[0] as string);
         },
     };
-
-    // Convert the existing tags to the format expected by TagInput
-    const formattedExistingTags = existingTags.map(tag => ({
-        key: 'tag',
-        value: tag.text
-    }));
 
     if (isLoading) {
         return <EditRemoteSkeleton />;
@@ -230,11 +220,8 @@ const EditRemotePage: React.FC = () => {
 
                                 <Form.Item label="Tags">
                                     <TagInput
-                                        tags={tags}
                                         entityType="remote"
-                                        entityId={id}
-                                        onChange={setTags}
-                                        existingTags={formattedExistingTags}
+                                        entityId={Number(id)}
                                     />
                                 </Form.Item>
 

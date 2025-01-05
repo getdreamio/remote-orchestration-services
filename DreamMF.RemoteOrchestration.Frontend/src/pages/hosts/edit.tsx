@@ -171,10 +171,6 @@ const EditHostPage: React.FC = () => {
                                 url: host.url,
                                 key: host.key,
                                 environment: host.environment,
-                                tags: host.tags?.map(tag => ({
-                                    key: 'tag',
-                                    value: tag.key
-                                })),
                                 repository: host.repository,
                                 contactName: host.contactName,
                                 contactEmail: host.contactEmail,
@@ -200,10 +196,6 @@ const EditHostPage: React.FC = () => {
                                 url: host.url,
                                 key: host.key,
                                 environment: host.environment,
-                                tags: host.tags?.map(tag => ({
-                                    key: 'tag',
-                                    value: tag.key
-                                })),
                                 repository: host.repository,
                                 contactName: host.contactName,
                                 contactEmail: host.contactEmail,

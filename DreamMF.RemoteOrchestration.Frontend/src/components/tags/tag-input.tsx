@@ -1,38 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Select, Tag as AntDTag, Tooltip, Input } from 'antd';
 import { TagOutlined } from '@ant-design/icons';
-import { useTags, useCreateTag, useTagsByHost, useTagsByRemote, useRemoveTagAssociation, useAddTagToEntity, type Tag, type TagRequest } from '@/hooks/useTags';
-import { config } from '@/config/env';
+import { useTags, useCreateTag, useTagsByHost, useTagsByRemote, useRemoveTagAssociation, useAddTagToEntity, type Tag } from '@/hooks/useTags';
 
 interface TagInputProps {
-    value?: Tag[];
-    onChange?: (tags: Tag[]) => void;
     entityType: 'host' | 'remote';
     entityId: number;
 }
 
-export const TagInput: React.FC<TagInputProps> = ({ value: tags = [], onChange = () => {}, entityType, entityId }) => {
+export const TagInput: React.FC<TagInputProps> = ({ entityType, entityId }) => {
     const [inputVisible, setInputVisible] = useState(false);
     const [selectedTagId, setSelectedTagId] = useState<number>();
     const [tagKey, setTagKey] = useState<string>('');
     const [tagValue, setTagValue] = useState<string>('');
-    const [displayName, setDisplayName] = useState<string>('');
 
-    const { data: allTags } = useTags();
-    const { data: hostTags } = useTagsByHost(entityType === 'host' ? entityId : 0);
-    const { data: remoteTags } = useTagsByRemote(entityType === 'remote' ? entityId : 0);
+    const { data: allTags = [] } = useTags();
+    const { data: hostTags = [] } = useTagsByHost(entityType === 'host' ? entityId : 0);
+    const { data: remoteTags = [] } = useTagsByRemote(entityType === 'remote' ? entityId : 0);
     const createTag = useCreateTag();
     const removeTagAssociation = useRemoveTagAssociation();
     const addTag = useAddTagToEntity();
 
-    useEffect(() => {
-        if (entityType === 'host' && hostTags) {
-            onChange(hostTags);
-        } else if (entityType === 'remote' && remoteTags) {
-            onChange(remoteTags);
-        }
-    }, [entityType, hostTags, remoteTags, onChange]);
-
+    const tags = entityType === 'host' ? hostTags : remoteTags;
     const selectedTag = allTags?.find(t => t.tag_ID === selectedTagId);
 
     const handleClose = async (removedTag: Tag) => {
@@ -42,7 +31,6 @@ export const TagInput: React.FC<TagInputProps> = ({ value: tags = [], onChange =
                 itemId: entityId,
                 type: entityType
             });
-            onChange(tags.filter(tag => tag !== removedTag));
         } catch (error) {
             console.error('Failed to remove tag:', error);
         }
@@ -68,7 +56,8 @@ export const TagInput: React.FC<TagInputProps> = ({ value: tags = [], onChange =
             } else {
                 // Create new tag first
                 const newTag = await createTag.mutateAsync({
-                    key: tagKey
+                    key: tagKey,
+                    display_Name: tagKey
                 });
                 tagId = newTag.tag_ID;
             }
@@ -84,7 +73,6 @@ export const TagInput: React.FC<TagInputProps> = ({ value: tags = [], onChange =
             setSelectedTagId(undefined);
             setTagKey('');
             setTagValue('');
-            setDisplayName('');
             setInputVisible(false);
         } catch (error) {
             console.error('Failed to add tag:', error);
@@ -104,75 +92,72 @@ export const TagInput: React.FC<TagInputProps> = ({ value: tags = [], onChange =
                             onClose={() => handleClose(tag)}
                             className="flex items-center gap-1"
                         >
-                            <span className="font-medium">{tag.key}</span>
-                            <span className="text-muted-foreground">:</span>
-                            <span>{tag.value}</span>
+                            <TagOutlined className="mr-1" />
+                            <span>{tag.key}</span>
+                            {tag.value && (
+                                <span className="ml-1 text-gray-500">
+                                 {tag.value}
+                                </span>
+                            )}
                         </AntDTag>
                     );
-                    return (
-                        <Tooltip key={`${tag.key}:${tag.display_Name}`} title={`${tag.key}: ${tag.display_Name}`}>
+                    return tag.value ? (
+                        <Tooltip key={tag.tag_ID} title={`Value: ${tag.value}`}>
                             {tagElement}
                         </Tooltip>
+                    ) : (
+                        tagElement
                     );
                 })}
-                {!inputVisible && (
-                    <AntDTag
-                        className="bg-transparent border-dashed cursor-pointer hover:border-primary"
-                        style={{ padding: '5px 10px' }}
-                        onClick={() => setInputVisible(true)}
-                    >
-                        <TagOutlined /> Add Tag
-                    </AntDTag>
-                )}
             </div>
 
-            {inputVisible && (
-                <div className="flex gap-2 items-start">
-                    <div className="flex-1">
-                        <Select
-                            className="w-full"
-                            placeholder="Select or enter tag"
-                            value={tagKey ? [tagKey] : []}
-                            onChange={handleTagSelect}
-                            mode="tags"
-                            showSearch
-                            allowClear
-                            maxTagCount={1}
-                            options={allTags?.map(tag => ({
-                                value: tag.key,
-                                label: tag.key
-                            }))}
-                        />
-                    </div>
-                    <div className="flex-1">
-                        <Input
-                            placeholder="Enter value"
-                            value={tagValue}
-                            onChange={(e) => setTagValue(e.target.value)}
-                        />
-                    </div>
+            {inputVisible ? (
+                <div className="flex gap-2">
+                    <Select
+                        className="w-full"
+                        placeholder="Select or enter tag"
+                        value={tagKey ? [tagKey] : []}
+                        onChange={handleTagSelect}
+                        mode="tags"
+                        showSearch
+                        allowClear
+                        maxTagCount={1}
+                        options={allTags?.map(tag => ({
+                            value: tag.key,
+                            label: tag.key
+                        }))}
+                    />
+                    <Input
+                        value={tagValue}
+                        onChange={(e) => setTagValue(e.target.value)}
+                        placeholder="Enter value"
+                        onPressEnter={handleAdd}
+                    />
                     <button
-                        type="button"
                         onClick={handleAdd}
-                        disabled={!tagKey || !tagValue}
+                        type="button"
                         className="px-4 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Add
                     </button>
                     <button
-                        type="button"
                         onClick={() => {
                             setInputVisible(false);
-                            setSelectedTagId(undefined);
                             setTagKey('');
                             setTagValue('');
-                            setDisplayName('');
                         }}
                         className="px-4 py-1 bg-muted text-muted-foreground rounded hover:bg-muted/90"
                     >
                         Cancel
                     </button>
                 </div>
+            ) : (
+                <button
+                    onClick={() => setInputVisible(true)}
+                    className="px-3 py-1 border border-dashed border-gray-300 rounded hover:border-blue-500 hover:text-blue-500"
+                >
+                    + New Tag
+                </button>
             )}
         </div>
     );
