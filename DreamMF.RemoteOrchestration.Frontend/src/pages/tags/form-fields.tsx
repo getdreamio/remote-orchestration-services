@@ -12,13 +12,8 @@ const TagFormFields: React.FC = () => {
 				name="key"
 				rules={[
 					{ required: true, message: "Please provide a key." },
-					{
-						pattern: /^[a-zA-Z0-9_-]+$/,
-						message:
-							"Key can only contain letters, numbers, underscores and hyphens",
-					},
 				]}
-				tooltip="The key identifies the tag. It can contain letters, numbers, underscores and hyphens."
+				tooltip="The key identifies the tag."
 			>
 				<Input placeholder="e.g., env-type" />
 			</Form.Item>

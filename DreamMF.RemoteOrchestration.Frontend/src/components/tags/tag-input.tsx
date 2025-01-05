@@ -102,7 +102,7 @@ export const TagInput: React.FC<TagInputProps> = ({ entityType, entityId }) => {
                         </AntDTag>
                     );
                     return tag.value ? (
-                        <Tooltip key={tag.tag_ID} title={`Value: ${tag.value}`}>
+                        <Tooltip key={tag.tag_ID} title={tag.display_Name}>
                             {tagElement}
                         </Tooltip>
                     ) : (

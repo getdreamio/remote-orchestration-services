@@ -190,9 +190,10 @@ VALUES
     ('Technology', 'Main Technology', 1671435095, 1671435095),
     ('Language', 'Programming Language', 1671435095, 1671435095),
     ('Framework', 'Framework', 1671435095, 1671435095),
-    ('TeamName', 'Team or Project Name', 1671435095, 1671435095),
+    ('Team Name', 'Team or Project Name', 1671435095, 1671435095),
     ('Department', 'Department or Team', 1671435095, 1671435095),
-    ('Organization', 'Organization Name', 1671435095, 1671435095);
+    ('Organization', 'Organization Name', 1671435095, 1671435095),
+    ('Project', 'Project Name or Code', 1671435095, 1671435095);
 
 -- Insert default configuration settings
 INSERT INTO Configuration ([Key], [Value], Created_Date, Updated_Date)
