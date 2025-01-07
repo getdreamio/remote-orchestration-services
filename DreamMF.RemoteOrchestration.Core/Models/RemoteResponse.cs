@@ -6,6 +6,7 @@ public class RemoteResponse
     public string Name { get; set; } = string.Empty;
     public string Key { get; set; } = string.Empty;
     public string Scope { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
     public string Repository { get; set; } = string.Empty;
     public string ContactName { get; set; } = string.Empty;
     public string ContactEmail { get; set; } = string.Empty;
@@ -21,6 +22,7 @@ public class RemoteSummaryResponse
     public string Name { get; set; } = string.Empty;
     public string Key { get; set; } = string.Empty;
     public string Scope { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
     public List<ModuleResponse> Modules { get; set; } = new List<ModuleResponse>();
     public long Created_Date { get; set; }
     public long Updated_Date { get; set; }

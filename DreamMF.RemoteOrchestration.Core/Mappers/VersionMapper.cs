@@ -12,6 +12,7 @@ public static class VersionMapper
             Version_ID = version.Version_ID,
             Remote_ID = version.Remote_ID,
             Value = version.Value,
+            Url = version.Url,
             Created_Date = version.Created_Date,
             Updated_Date = version.Updated_Date
         };

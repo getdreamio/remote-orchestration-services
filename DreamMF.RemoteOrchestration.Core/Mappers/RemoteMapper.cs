@@ -30,6 +30,7 @@ public static class RemoteMapper
             Name = entity.Name,
             Scope = entity.Scope,
             Key = entity.Key,
+            Url = entity.Url,
             Updated_Date = entity.Updated_Date,
             Modules = entity.RemoteModules
                 .Select(rm => new ModuleResponse
@@ -51,6 +52,7 @@ public static class RemoteMapper
             Name = entity.Name,
             Scope = entity.Scope,
             Key = entity.Key,
+            Url = entity.Url,
             Repository = entity.Repository,
             ContactName = entity.Contact_Name,
             ContactEmail = entity.Contact_Email,

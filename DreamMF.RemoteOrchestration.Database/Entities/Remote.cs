@@ -11,6 +11,7 @@ public class Remote
     public int Remote_ID { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Key { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
     public string Scope { get; set; } = string.Empty; // e.g., AzureBlob, AWSS3
     public string? Repository { get; set; }
     public string? Contact_Name { get; set; }

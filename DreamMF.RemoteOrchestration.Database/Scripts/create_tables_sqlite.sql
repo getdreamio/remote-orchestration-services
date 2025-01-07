@@ -31,6 +31,7 @@ CREATE TABLE Version (
     Version_ID INTEGER PRIMARY KEY AUTOINCREMENT,
     Remote_ID INT,
     Value VARCHAR(255) NOT NULL,
+    Url VARCHAR(1000),
     Created_Date INTEGER NOT NULL,
     Updated_Date INTEGER NOT NULL
 );
@@ -125,6 +126,7 @@ CREATE TABLE Remote (
     Name VARCHAR(255) NOT NULL,
     [Key] VARCHAR(255) NOT NULL,
     Scope VARCHAR(255) NOT NULL,
+    Url VARCHAR(1000),
     Repository VARCHAR(255),
     Contact_Name VARCHAR(255),
     Contact_Email VARCHAR(255),
