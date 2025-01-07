@@ -180,6 +180,12 @@ const EditRemotePage: React.FC = () => {
                                     <Input />
                                 </Form.Item>
 
+                                <Form.Item
+                                    label="URL"
+                                >
+                                    <Input disabled placeholder="URL will be generated on the backend" />
+                                </Form.Item>
+
                                 <div className="space-y-2 max-w-[50%]">
                                     <label className="block">Modules</label>
                                     <div className="flex gap-2">

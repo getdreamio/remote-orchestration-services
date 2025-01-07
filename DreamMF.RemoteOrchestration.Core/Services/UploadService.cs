@@ -259,4 +259,10 @@ public class UploadService : IUploadService
             return Path.GetFullPath(Path.Combine(_environment.ContentRootPath, DefaultRemotesFolder));
         }
     }
+
+    private async Task<string> CalculateAndUpdateRemotePath(Remote remote)
+    {
+        return string.Empty;
+    }
+
 }

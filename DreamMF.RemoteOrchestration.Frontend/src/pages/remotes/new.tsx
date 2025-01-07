@@ -152,17 +152,11 @@ const NewRemotePage: React.FC = () => {
                                 name="scope"
                                 rules={[
                                     { required: true, message: 'Please input the scope!' },
-                                    { pattern: /^[A-Za-z]+$/, message: 'Scope can only contain alphabetical characters!' }
+                                    { pattern: /^[A-Za-z_]+$/, message: 'Scope can only contain alphabetical characters!' }
                                 ]}
-                                help="Only letters (A-Z, a-z) are allowed"
+                                help="Only letters (A-Z, _, a-z) are allowed"
                             >
                                 <Input placeholder="Enter alphabetical characters only" />
-                            </Form.Item>
-
-                            <Form.Item
-                                label="URL"
-                            >
-                                <Input disabled placeholder="URL will be generated on the backend" />
                             </Form.Item>
 
                             <div className="space-y-2">

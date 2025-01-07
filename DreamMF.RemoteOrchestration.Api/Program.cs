@@ -6,6 +6,8 @@ using DreamMF.RemoteOrchestration.Core.Middleware;
 using DreamMF.RemoteOrchestration.Core.Services;
 using DreamMF.RemoteOrchestration.Core.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.StaticFiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -119,5 +121,27 @@ app.MapSearchRoutes();
 app.MapAnalyticsRoutes();
 app.MapDreamRoutes();
 app.MapUploadRoutes();
+
+var provider = new FileExtensionContentTypeProvider();
+provider.Mappings[".js"] = "application/javascript";
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "remotes")),
+    RequestPath = "/remotes",
+    ServeUnknownFileTypes = true,
+    ContentTypeProvider = provider,
+    DefaultContentType = "application/octet-stream",
+    OnPrepareResponse = ctx =>
+    {
+        Console.WriteLine($"Serving file: {ctx.File.PhysicalPath} - {ctx.File.Name}");
+    }
+});
+
+app.UseDirectoryBrowser(new DirectoryBrowserOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "remotes")),
+    RequestPath = "/remotes"
+});
 
 app.Run();

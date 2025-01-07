@@ -226,6 +226,11 @@ VALUES
     ('app:environment', 'development', 1671645260, 1671645260),
     ('app:debug_mode', 'false', 1671645260, 1671645260);
 
+
+-- Seed scripts
+
+
+
 -- Analytics Views
 
 -- View for Remote read/update analytics

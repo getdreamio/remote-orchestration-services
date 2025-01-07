@@ -13,6 +13,7 @@ public static class RemoteMapper
             Name = request.Name,
             Scope = request.Scope,
             Key = request.Key,
+            Url = request.Url,
             Repository = request.Repository,
             Contact_Name = request.ContactName,
             Contact_Email = request.ContactEmail,
