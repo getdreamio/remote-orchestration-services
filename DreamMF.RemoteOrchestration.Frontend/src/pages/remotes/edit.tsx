@@ -180,7 +180,7 @@ const EditRemotePage: React.FC = () => {
                                     <Input />
                                 </Form.Item>
 
-                                <div className="space-y-2">
+                                <div className="space-y-2 max-w-[50%]">
                                     <label className="block">Modules</label>
                                     <div className="flex gap-2">
                                         <AntInput
