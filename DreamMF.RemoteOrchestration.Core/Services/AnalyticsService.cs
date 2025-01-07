@@ -1,6 +1,7 @@
 using DreamMF.RemoteOrchestration.Database;
 using DreamMF.RemoteOrchestration.Database.Entities;
 using DreamMF.RemoteOrchestration.Core.Configuration;
+using DreamMF.RemoteOrchestration.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -25,6 +26,7 @@ public interface IAnalyticsService
     Task<DailyEntityAnalytics?> GetHostAnalyticsByIdAsync(string hostId);
     Task<DailyEntityAnalytics?> GetRemoteAnalyticsByIdAsync(string remoteId);
     Task<RecentRemoteAnalytics> GetRecentRemoteAnalyticsAsync();
+    Task<RelationshipsModel> GetRelationships();
 }
 
 public class AnalyticsService : IAnalyticsService
@@ -289,5 +291,49 @@ public class AnalyticsService : IAnalyticsService
             Last30DaysCount = 0,
             QueryTime = now
         };
+    }
+
+    public async Task<RelationshipsModel?> GetRelationships()
+    {
+        var relationships = new RelationshipsModel();
+        var hosts = await _dbContext.Hosts.ToListAsync();
+        var remotes = await _dbContext.Remotes.ToListAsync();
+        var hostRemotes = await _dbContext.Set<Host_Remote>().ToListAsync();
+
+        // Process hosts
+        foreach (var host in hosts)
+        {
+            var connectedRemotes = hostRemotes
+                .Where(hr => hr.Host_ID == host.Host_ID)
+                .Select(hr => hr.Remote_ID)
+                .ToList();
+
+            relationships.Hosts.Add(new HostRelationship
+            {
+                HostId = host.Host_ID.ToString(),
+                Name = host.Name,
+                Environment = host.Environment,
+                ConnectedRemoteIds = connectedRemotes.Select(id => id.ToString()).ToList()
+            });
+        }
+
+        // Process remotes
+        foreach (var remote in remotes)
+        {
+            var connectedHosts = hostRemotes
+                .Where(hr => hr.Remote_ID == remote.Remote_ID)
+                .Select(hr => hr.Host_ID.ToString())
+                .ToList();
+
+            relationships.Remotes.Add(new RemoteRelationship
+            {
+                RemoteId = remote.Remote_ID.ToString(),
+                Name = remote.Name,
+                Key = remote.Key,
+                ConnectedHostIds = connectedHosts
+            });
+        }
+
+        return relationships;
     }
 }

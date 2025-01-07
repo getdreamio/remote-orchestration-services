@@ -78,6 +78,13 @@ public static class AnalyticsRoutes
             .WithSummary("Get Recent Remote Analytics")
             .WithDescription("Gets recent remote analytics");
 
+        group.MapGet("relationships", GetRelationships)
+            .Produces<RelationshipsModel>(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("Get Relationships"))
+            .WithSummary("Get Host and Remote Relationships")
+            .WithDescription("Gets a graph of relationships between hosts and remotes");
+
         return group;
     }
 
@@ -133,5 +140,11 @@ public static class AnalyticsRoutes
     {
         var analytics = await analyticsService.GetRecentRemoteAnalyticsAsync();
         return analytics != null ? Results.Ok(analytics) : Results.NotFound();
+    }
+
+    private static async Task<IResult> GetRelationships(IAnalyticsService analyticsService)
+    {
+        var relationships = await analyticsService.GetRelationships();
+        return relationships != null ? Results.Ok(relationships) : Results.NotFound();
     }
 }

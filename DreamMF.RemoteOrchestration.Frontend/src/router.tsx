@@ -19,6 +19,7 @@ import ErrorDisplay from './components/error/error-display';
 import EditTagPage from './pages/tags/edit';
 import NewTagPage from './pages/tags/new';
 import SearchPage from './pages/search';
+import RelationshipsPage from './pages/relationships';
 
 export const router = createBrowserRouter([
     {
@@ -93,6 +94,10 @@ export const router = createBrowserRouter([
             {
                 path: 'search',
                 element: <SearchPage />,
+            },
+            {
+                path: 'relationships',
+                element: <RelationshipsPage />,
             },
             {
                 path: '*',
