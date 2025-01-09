@@ -27,6 +27,26 @@ const Relationships = () => {
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const { data: relationships, isLoading } = useRelationships();
 
+    const onNodeMouseEnter = (event: any, node: Node) => {
+        const connectedEdges = edges.filter(edge => 
+            edge.source === node.id || edge.target === node.id
+        );
+        
+        setEdges(edges.map(edge => ({
+            ...edge,
+            style: connectedEdges.find(e => e.id === edge.id)
+                ? { ...edge.style, stroke: '#22c55e', strokeWidth: 3 }
+                : edge.style
+        })));
+    };
+
+    const onNodeMouseLeave = () => {
+        setEdges(edges.map(edge => ({
+            ...edge,
+            style: { ...edge.style, stroke: '#9333ea', strokeWidth: undefined }
+        })));
+    };
+
     useEffect(() => {
         if (!relationships) return;
 
@@ -110,7 +130,13 @@ const Relationships = () => {
                         target: `remote-${remote.remoteId}`,
                         type: 'smoothstep',
                         animated: true,
-                        style: { stroke: '#9333ea' },
+                        style: { 
+                            stroke: '#9333ea',
+                            transition: 'stroke 0.3s ease',
+                            '&:hover': {
+                                stroke: '#22c55e'
+                            }
+                        },
                         markerEnd: {
                             type: MarkerType.ArrowClosed,
                             color: '#9333ea',
@@ -142,18 +168,55 @@ const Relationships = () => {
                 <h1 className="text-2xl font-semibold">Relationships</h1>
             </div>
             <div style={{ height: 'calc(100vh - 200px)' }} className="border rounded-lg overflow-hidden dark:border-gray-700">
+                <style>
+                    {`
+                        .react-flow__edge:hover {
+                            z-index: 1000 !important;
+                        }
+                        .react-flow__edge:hover path,
+                        .react-flow__node:hover + .react-flow__edge path,
+                        .react-flow__node:hover ~ .react-flow__edge path {
+                            stroke: #22c55e !important;
+                            stroke-width: 3 !important;
+                            transition: all 0.3s ease;
+                        }
+                        .react-flow__edge:hover path.react-flow__edge-path,
+                        .react-flow__node:hover + .react-flow__edge path.react-flow__edge-path,
+                        .react-flow__node:hover ~ .react-flow__edge path.react-flow__edge-path {
+                            stroke: #22c55e !important;
+                            stroke-width: 3 !important;
+                        }
+                        .react-flow__edge:hover .react-flow__edge-path,
+                        .react-flow__node:hover + .react-flow__edge .react-flow__edge-path,
+                        .react-flow__node:hover ~ .react-flow__edge .react-flow__edge-path {
+                            stroke: #22c55e !important;
+                            stroke-width: 3 !important;
+                        }
+                        .react-flow__node:hover {
+                            z-index: 1000 !important;
+                        }
+                    `}
+                </style>
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
                     nodeTypes={nodeTypes}
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
+                    onNodeMouseEnter={onNodeMouseEnter}
+                    onNodeMouseLeave={onNodeMouseLeave}
                     fitView
                     attributionPosition="bottom-right"
                     defaultEdgeOptions={{
                         type: 'smoothstep',
                         animated: true,
-                        style: { stroke: '#9333ea' },
+                        style: { 
+                            stroke: '#9333ea',
+                            transition: 'stroke 0.3s ease',
+                            '&:hover': {
+                                stroke: '#22c55e'
+                            }
+                        },
                         markerEnd: {
                             type: MarkerType.ArrowClosed,
                             color: '#9333ea',
