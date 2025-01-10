@@ -114,7 +114,8 @@ const Relationships = () => {
                     data: { 
                         label: remote.name,
                         type: 'remote',
-                        key: remote.key
+                        key: remote.key,
+                        id: remote.remoteId
                     },
                     position,
                     type: 'remoteNode',
