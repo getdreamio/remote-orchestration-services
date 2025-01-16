@@ -225,7 +225,8 @@ const EditRemotePage: React.FC = () => {
                                     />
                                     <Input 
                                         value={remote?.url || ''} 
-                                        readOnly 
+                                        readOnly
+                                        disabled
                                         className="flex-1"
                                     />
                                 </div>
