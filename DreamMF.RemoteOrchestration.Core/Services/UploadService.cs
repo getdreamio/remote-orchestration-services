@@ -47,9 +47,9 @@ public class UploadService : IUploadService
     public async Task ExtractAndSaveRemoteAsync(string name, string version, string key, string scope, Stream zipContent)
     {
         // Validate inputs
-        if (!IsValidName(name))
-            throw new HandledException(ExceptionType.Validation, 
-                "Remote name is invalid. Use only letters, numbers, hyphens, underscores, and periods.");
+        // if (!IsValidName(name))
+        //     throw new HandledException(ExceptionType.Validation, 
+        //         "Remote name is invalid. Use only letters, numbers, hyphens, underscores, and periods.");
             
         if (!IsValidName(version))
             throw new HandledException(ExceptionType.Validation, 
@@ -87,6 +87,10 @@ public class UploadService : IUploadService
                 _logger.LogInformation("Created new remote with ID: {Id}", remote.Remote_ID);
             }
 
+            // Calculate the remote path
+            remote.Url = await CalculateAndUpdateRemotePath(remote, version);
+            await _dbContext.SaveChangesAsync();
+
             // Check if version already exists
             Version? existingVersion = null;
             try
@@ -109,6 +113,7 @@ public class UploadService : IUploadService
                 {
                     Remote_ID = remote.Remote_ID,
                     Value = version,
+                    Url = await CalculateAndUpdateRemotePath(remote, version),
                     Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                     Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
                 };
@@ -260,9 +265,42 @@ public class UploadService : IUploadService
         }
     }
 
-    private async Task<string> CalculateAndUpdateRemotePath(Remote remote)
+    public async Task<string> CalculateAndUpdateRemotePath(Remote remote, string version)
     {
-        return string.Empty;
-    }
+        try
+        {
+            var dbType = await _configurationDbContext.Configurations
+                .Where(c => c.Key == "database:type")
+                .Select(c => c.Value)
+                .FirstOrDefaultAsync();
 
+            var baseUrl = await _configurationDbContext.Configurations
+                .Where(c => c.Key == "api:base_url")
+                .Select(c => c.Value)
+                .FirstOrDefaultAsync();
+
+            if (string.IsNullOrEmpty(baseUrl))
+            {
+                _logger.LogWarning("Base URL not configured. Using empty base URL.");
+                baseUrl = string.Empty;
+            }
+
+            baseUrl = baseUrl.TrimEnd('/');
+
+            if (string.Equals(dbType, "sqlite", StringComparison.OrdinalIgnoreCase))
+            {
+                var storagePath = await GetStoragePathAsync();
+                var remotePath = Path.Combine(storagePath, remote.Name, version, "remote.js");
+                return $"{baseUrl}/remotes/{remote.Name}/{version}/remote.js";
+            }
+
+            _logger.LogWarning("Unknown database type: {DbType}. Using default path pattern.", dbType);
+            return $"{baseUrl}/remotes/{remote.Name}/{version}/remote.js";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to calculate remote path");
+            throw new HandledException(ExceptionType.Service, "Failed to calculate remote path");
+        }
+    }
 }

@@ -156,8 +156,21 @@ public class RemoteService
         var remote = await _dbContext.Remotes.FindAsync(id);
         if (remote == null) return false;
 
+        // Delete audit records first
+        var auditRemotes = await _dbContext.AuditRemotes
+            .Where(ar => ar.Remote_ID == id)
+            .ToListAsync();
+        _dbContext.AuditRemotes.RemoveRange(auditRemotes);
+
+        var auditReadsRemotes = await _dbContext.AuditReads_Remotes
+            .Where(ar => ar.Remote_ID == id)
+            .ToListAsync();
+        _dbContext.AuditReads_Remotes.RemoveRange(auditReadsRemotes);
+
+        // Then delete the remote
         _dbContext.Remotes.Remove(remote);
         await _dbContext.SaveChangesAsync();
+        
         _ = _analyticsService.LogRemoteReadAsync(id, "Delete", 1);
         return true;
     }

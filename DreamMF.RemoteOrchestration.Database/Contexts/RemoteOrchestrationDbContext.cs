@@ -20,6 +20,7 @@ public interface IRemoteOrchestrationDbContext
     DbSet<RemoteModule> RemoteModules { get; set; }
     DbSet<AuditReads_Host> AuditReads_Hosts { get; set; }
     DbSet<AuditReads_Remote> AuditReads_Remotes { get; set; }
+    DbSet<AuditRemote> AuditRemotes { get; set; }
     DbSet<EntityAnalytics> EntityAnalytics { get; set; }
     DbSet<DailyEntityAnalytics> DailyEntityAnalytics { get; set; }
     DbSet<RecentRemoteAnalytics> RecentRemoteAnalytics { get; set; }
@@ -39,6 +40,7 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
     public DbSet<RemoteModule> RemoteModules { get; set; } = null!;
     public DbSet<AuditReads_Host> AuditReads_Hosts { get; set; } = null!;
     public DbSet<AuditReads_Remote> AuditReads_Remotes { get; set; } = null!;
+    public DbSet<AuditRemote> AuditRemotes { get; set; } = null!;
     public DbSet<EntityAnalytics> EntityAnalytics { get; set; } = null!;
     public DbSet<DailyEntityAnalytics> DailyEntityAnalytics { get; set; } = null!;
     public DbSet<RecentRemoteAnalytics> RecentRemoteAnalytics { get; set; } = null!;
@@ -185,6 +187,18 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
             entity.Property(e => e.AuditRead_ID).ValueGeneratedOnAdd();
             entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.ToTable("AuditReads_Remote");
+        });
+
+        modelBuilder.Entity<AuditRemote>(entity =>
+        {
+            entity.HasKey(e => e.Audit_ID);
+            entity.Property(e => e.Audit_ID).ValueGeneratedOnAdd();
+            entity.Property(e => e.Change).IsRequired();
+            entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.HasOne(e => e.Remote)
+                .WithMany()
+                .HasForeignKey(e => e.Remote_ID);
+            entity.ToTable("Audit_Remote");
         });
         
         modelBuilder.Entity<EntityAnalytics>()

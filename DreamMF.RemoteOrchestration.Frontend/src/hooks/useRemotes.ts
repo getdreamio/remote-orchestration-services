@@ -146,6 +146,29 @@ export const useUpdateRemote = () => {
     });
 };
 
+export const useUpdateRemoteUrl = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ id, version }: { id: number; version: string }) => {
+            const response = await fetch(`${config.backendUrl}/api/remotes/${id}/url`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ version }),
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['remotes'] });
+        },
+    });
+};
+
 export const useDeleteRemote = () => {
     const queryClient = useQueryClient();
 

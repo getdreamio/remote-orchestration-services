@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Form, Input, Button, Card, message, Tabs, Table, Input as AntInput, Typography, Empty, InputRef } from 'antd';
-import { useUpdateRemote, useRemote, RemoteModule } from '@/hooks/useRemotes';
-import { PlusOutlined, DeleteOutlined, CodeOutlined } from '@ant-design/icons';
+import { useUpdateRemote, useRemote, RemoteModule, useRemoteVersions, useUpdateRemoteUrl, Version } from '@/hooks/useRemotes';
+import { PlusOutlined, DeleteOutlined, CodeOutlined, CopyOutlined, LinkOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { formatDate } from '@/lib/date-utils';
 import { TagInput, TagItem } from '@/components/tags/tag-input';
 import { useTags } from '@/hooks/useTags';
@@ -24,10 +24,11 @@ const EditRemotePage: React.FC = () => {
     const navigate = useNavigate();
     const [form] = Form.useForm();
     const updateRemote = useUpdateRemote();
+    const updateRemoteUrl = useUpdateRemoteUrl();
     const { data: remote, isLoading, error } = useRemote(Number(id));
+    const { data: versions = [], isLoading: versionsLoading } = useRemoteVersions(Number(id));
     const [activeTab, setActiveTab] = useState('general');
     const [modules, setModules] = useState<RemoteModule[]>([]);
-    const [versions] = useState<Version[]>([]); // This would be populated from your API
     const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
 
     useEffect(() => {
@@ -71,7 +72,6 @@ const EditRemotePage: React.FC = () => {
         }
     };
 
-
     const removeModule = (moduleToRemove: string) => {
         setModules(modules.filter(m => m.name !== moduleToRemove));
     };
@@ -86,12 +86,12 @@ const EditRemotePage: React.FC = () => {
     const columns = [
         {
             title: 'Version',
-            dataIndex: 'version',
+            dataIndex: 'value',
             key: 'version',
         },
         {
             title: 'Created At',
-            dataIndex: 'createdAt',
+            dataIndex: 'created_Date',
             key: 'createdAt',
             render: (date: string) => {
                 try {
@@ -102,13 +102,33 @@ const EditRemotePage: React.FC = () => {
             }
         },
         {
-            title: 'Status',
-            key: 'status',
-            render: (_: any, record: Version) => (
-                <span className={record.isActive ? 'text-green-500' : 'text-gray-500'}>
-                    {record.isActive ? 'Active' : 'Inactive'}
-                </span>
-            ),
+            title: 'Actions',
+            key: 'actions',
+            render: (_, record: Version) => {
+                const isCurrentVersion = remote?.url?.includes(`/${record.value}/`);
+                return isCurrentVersion ? (
+                    <span className="text-green-500 flex items-center gap-1">
+                        <CheckCircleOutlined /> Currently Active
+                    </span>
+                ) : (
+                    <Button
+                        type="primary"
+                        onClick={async () => {
+                            try {
+                                await updateRemoteUrl.mutateAsync({
+                                    id: Number(id),
+                                    version: record.value
+                                });
+                                message.success('Remote URL updated successfully');
+                            } catch (error) {
+                                message.error('Failed to update remote URL');
+                            }
+                        }}
+                    >
+                        Make Current
+                    </Button>
+                );
+            },
         },
     ];
 
@@ -139,147 +159,171 @@ const EditRemotePage: React.FC = () => {
             </div>
             <Card className="bg-gray-50 dark:bg-gray-800">
 
-            <Form
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                initialValues={{
-                    name: remote.name,
-                    key: remote.key,
-                    scope: remote.scope,
-                    repository: remote.repository,
-                    contactName: remote.contactName,
-                    contactEmail: remote.contactEmail,
-                    documentationUrl: remote.documentationUrl
-                }}
-                className="space-y-4"
-            >
+                <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={onFinish}
+                    initialValues={{
+                        name: remote.name,
+                        key: remote.key,
+                        scope: remote.scope,
+                        repository: remote.repository,
+                        contactName: remote.contactName,
+                        contactEmail: remote.contactEmail,
+                        documentationUrl: remote.documentationUrl
+                    }}
+                    className="space-y-4"
+                >
                     <Tabs activeKey={activeTab} onChange={setActiveTab}>
                         <TabPane tab="General" key="general">
-                                <Form.Item
-                                    label="Name"
-                                    name="name"
-                                    rules={[{ required: true, message: 'Please input the remote name!' }]}
-                                >
-                                    <Input />
-                                </Form.Item>
+                            <Form.Item
+                                label="Name"
+                                name="name"
+                                rules={[{ required: true, message: 'Please input the remote name!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
 
-                                <Form.Item
-                                    label="Key"
-                                    name="key"
-                                    rules={[{ required: true, message: 'Please input the remote key!' }]}
-                                >
-                                    <Input />
-                                </Form.Item>
+                            <Form.Item
+                                label="Key"
+                                name="key"
+                                rules={[{ required: true, message: 'Please input the remote key!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
 
-                                <Form.Item
-                                    label="Scope"
-                                    name="scope"
-                                    rules={[{ required: true, message: 'Please input the remote scope!' }]}
-                                >
-                                    <Input />
-                                </Form.Item>
+                            <Form.Item
+                                label="Scope"
+                                name="scope"
+                                rules={[{ required: true, message: 'Please input the remote scope!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
 
-                                <Form.Item
-                                    label="URL"
-                                >
-                                    <Input disabled placeholder="URL will be generated on the backend" />
-                                </Form.Item>
-
-                                <div className="space-y-2 max-w-[50%]">
-                                    <label className="block">Modules</label>
-                                    <div className="flex gap-2">
-                                        <AntInput
-                                            value={moduleInput}
-                                            onChange={(e) => setModuleInput(e.target.value)}
-                                            prefix={<CodeOutlined className="text-muted-foreground" />}
-                                            onKeyDown={handleModuleKeyPress}
-                                            placeholder="Add a module and press Enter"
-                                        />
-                                        <Button
-                                            type="primary"
-                                            onClick={() => addModule(moduleInput)}
-                                            icon={<PlusOutlined />}
-                                        >
-                                            Add
-                                        </Button>
-                                    </div>
-                                    <div className="space-y-2">
-                                        {modules.map((module, i) => (
-                                            <div key={i} className="flex justify-between items-center p-2 bg-card rounded">
-                                                <div className="flex items-center gap-2">
-                                                    <CodeOutlined className="text-muted-foreground" />
-                                                    <span>{module.name}</span>
-                                                </div>
-                                                <Button
-                                                    type="text"
-                                                    danger
-                                                    icon={<DeleteOutlined />}
-                                                    onClick={() => removeModule(module.name)}
-                                                >
-                                                    Remove
-                                                </Button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <Form.Item label="Tags">
-                                    <TagInput
-                                        entityType="remote"
-                                        entityId={Number(id)}
+                            <Form.Item
+                                label="URL"
+                            >
+                                <div className="flex gap-2">
+                                    <Button
+                                        icon={<CopyOutlined />}
+                                        onClick={() => {
+                                            if (remote?.url) {
+                                                navigator.clipboard.writeText(remote.url);
+                                                message.success('URL copied to clipboard');
+                                            }
+                                        }}
+                                        title="Copy URL"
                                     />
-                                </Form.Item>
+                                    <Button
+                                        icon={<LinkOutlined />}
+                                        onClick={() => {
+                                            if (remote?.url) {
+                                                window.open(remote.url, '_blank');
+                                            }
+                                        }}
+                                        title="Open URL"
+                                    />
+                                    <Input 
+                                        value={remote?.url || ''} 
+                                        readOnly 
+                                        className="flex-1"
+                                    />
+                                </div>
+                            </Form.Item>
+
+                            <div className="space-y-2 max-w-[50%]">
+                                <label className="block">Modules</label>
+                                <div className="flex gap-2">
+                                    <AntInput
+                                        value={moduleInput}
+                                        onChange={(e) => setModuleInput(e.target.value)}
+                                        prefix={<CodeOutlined className="text-muted-foreground" />}
+                                        onKeyDown={handleModuleKeyPress}
+                                        placeholder="Add a module and press Enter"
+                                    />
+                                    <Button
+                                        type="primary"
+                                        onClick={() => addModule(moduleInput)}
+                                        icon={<PlusOutlined />}
+                                    >
+                                        Add
+                                    </Button>
+                                </div>
+                                <div className="space-y-2">
+                                    {modules.map((module, i) => (
+                                        <div key={i} className="flex justify-between items-center p-2 bg-card rounded">
+                                            <div className="flex items-center gap-2">
+                                                <CodeOutlined className="text-muted-foreground" />
+                                                <span>{module.name}</span>
+                                            </div>
+                                            <Button
+                                                type="text"
+                                                danger
+                                                icon={<DeleteOutlined />}
+                                                onClick={() => removeModule(module.name)}
+                                            >
+                                                Remove
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <Form.Item label="Tags">
+                                <TagInput
+                                    entityType="remote"
+                                    entityId={Number(id)}
+                                />
+                            </Form.Item>
 
                         </TabPane>
                         <TabPane tab="Information" key="information">
-                                <Form.Item
-                                    label="Repository"
-                                    name="repository"
-                                    rules={[
-                                        { type: 'url', message: 'Please enter a valid repository URL!' }
-                                    ]}
-                                >
-                                    <Input placeholder="e.g., https://github.com/organization/repo" />
-                                </Form.Item>
+                            <Form.Item
+                                label="Repository"
+                                name="repository"
+                                rules={[
+                                    { type: 'url', message: 'Please enter a valid repository URL!' }
+                                ]}
+                            >
+                                <Input placeholder="e.g., https://github.com/organization/repo" />
+                            </Form.Item>
 
-                                <Form.Item
-                                    label="Contact Name"
-                                    name="contactName"
-                                >
-                                    <Input placeholder="e.g., John Smith" />
-                                </Form.Item>
+                            <Form.Item
+                                label="Contact Name"
+                                name="contactName"
+                            >
+                                <Input placeholder="e.g., John Smith" />
+                            </Form.Item>
 
-                                <Form.Item
-                                    label="Contact Email"
-                                    name="contactEmail"
-                                    rules={[
-                                        { type: 'email', message: 'Please enter a valid email address!' }
-                                    ]}
-                                >
-                                    <Input placeholder="e.g., john.smith@company.com" />
-                                </Form.Item>
+                            <Form.Item
+                                label="Contact Email"
+                                name="contactEmail"
+                                rules={[
+                                    { type: 'email', message: 'Please enter a valid email address!' }
+                                ]}
+                            >
+                                <Input placeholder="e.g., john.smith@company.com" />
+                            </Form.Item>
 
-                                <Form.Item
-                                    label="Documentation URL"
-                                    name="documentationUrl"
-                                    rules={[
-                                        { type: 'url', message: 'Please enter a valid URL!' }
-                                    ]}
-                                >
-                                    <Input placeholder="e.g., https://docs.example.com" />
-                                </Form.Item>
+                            <Form.Item
+                                label="Documentation URL"
+                                name="documentationUrl"
+                                rules={[
+                                    { type: 'url', message: 'Please enter a valid URL!' }
+                                ]}
+                            >
+                                <Input placeholder="e.g., https://docs.example.com" />
+                            </Form.Item>
                         </TabPane>
                         <TabPane tab="Sub-Remotes" key="remotes">
                             Coming soon....
                         </TabPane>
                         <TabPane tab="Versions" key="versions">
                             <Table
-                                rowSelection={rowSelection}
-                                columns={columns}
                                 dataSource={versions}
-                                rowKey="id"
-                                pagination={false}
+                                columns={columns}
+                                rowKey="version_ID"
+                                loading={versionsLoading}
                             />
                         </TabPane>
                     </Tabs>
@@ -300,7 +344,6 @@ const EditRemotePage: React.FC = () => {
 };
 
 export default EditRemotePage;
-
 
 export const EditRemoteSkeleton: React.FC = () => {
     return (
