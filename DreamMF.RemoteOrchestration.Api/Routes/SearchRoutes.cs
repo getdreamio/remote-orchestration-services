@@ -46,18 +46,7 @@ public static class SearchRoutes
             throw new HandledException(ExceptionType.Validation, "Search text cannot be empty");
         }
 
-        try
-        {
-            var results = await searchService.SearchAsync(request.SearchText);
-            return Results.Ok(results);
-        }
-        catch (HandledException ex)
-        {
-            return Results.BadRequest(ex);
-        }
-        catch (Exception ex)
-        {
-            throw new HandledException(ExceptionType.Database, "An error occurred while searching", ex);
-        }
+        var results = await searchService.SearchAsync(request.SearchText);
+        return Results.Ok(results);
     }
 }

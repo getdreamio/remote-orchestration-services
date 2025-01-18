@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace DreamMF.RemoteOrchestration.Database.Entities;
 
@@ -20,6 +21,9 @@ public class Host
     public string? Documentation_Url { get; set; }
     public long Created_Date { get; set; }
     public long Updated_Date { get; set; }
+
+    public virtual ICollection<Tags_Host> Tags_Hosts { get; set; } = new List<Tags_Host>();
+    public virtual ICollection<Host_Remote> Host_Remotes { get; set; } = new List<Host_Remote>();
 
     public static string GenerateKey()
     {

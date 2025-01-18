@@ -11,6 +11,8 @@ DROP TABLE IF EXISTS Tag;
 DROP TABLE IF EXISTS Module;
 DROP TABLE IF EXISTS Remote_Module;
 DROP TABLE IF EXISTS Configuration;
+DROP TABLE IF EXISTS UserRoleMapping;
+DROP TABLE IF EXISTS UserRole;
 DROP TABLE IF EXISTS [User];
 DROP TABLE IF EXISTS Version;
 DROP TABLE IF EXISTS Host_Remote;
@@ -26,6 +28,106 @@ CREATE TABLE __EFMigrationsHistory (
     MigrationId VARCHAR(150) NOT NULL PRIMARY KEY,
     ProductVersion VARCHAR(32) NOT NULL
 );
+
+-- User Management Tables
+CREATE TABLE [User] (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Email VARCHAR(255) NOT NULL,
+    DisplayName VARCHAR(255) NOT NULL,
+    FirstName VARCHAR(255),
+    LastName VARCHAR(255),
+    ProfilePictureUrl VARCHAR(1000),
+    AuthProvider INTEGER NOT NULL,  -- Enum: 0=Local, 1=Google, 2=GitHub, 3=Microsoft, 4=Custom
+    AuthUserId VARCHAR(255) NOT NULL,
+    PasswordHash VARCHAR(255),
+    PasswordSalt VARCHAR(255),
+    IsEmailVerified BOOLEAN NOT NULL DEFAULT 0,
+    EmailVerificationToken VARCHAR(255),
+    EmailVerificationTokenExpiry INTEGER,  -- Unix timestamp
+    AccessToken VARCHAR(1000),
+    RefreshToken VARCHAR(1000),
+    TokenExpiry INTEGER,  -- Unix timestamp
+    ProviderMetadata TEXT,  -- JSON string
+    IsTwoFactorEnabled BOOLEAN NOT NULL DEFAULT 0,
+    TwoFactorSecret VARCHAR(255),
+    BackupCodes TEXT,  -- JSON array
+    Status INTEGER NOT NULL,  -- Enum: 0=Active, 1=Inactive, 2=Suspended, 3=PendingVerification
+    LastLoginDate INTEGER,  -- Unix timestamp
+    LastLoginIp VARCHAR(45),
+    FailedLoginAttempts INTEGER NOT NULL DEFAULT 0,
+    LockoutEnd INTEGER,  -- Unix timestamp
+    CreatedDate INTEGER NOT NULL,  -- Unix timestamp
+    UpdatedDate INTEGER NOT NULL  -- Unix timestamp
+);
+
+CREATE TABLE UserRole (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name VARCHAR(255) NOT NULL,
+    NormalizedName VARCHAR(255) NOT NULL,
+    Description VARCHAR(1000),
+    CreatedDate INTEGER NOT NULL,  -- Unix timestamp
+    UpdatedDate INTEGER NOT NULL  -- Unix timestamp
+);
+
+CREATE TABLE UserRoleMapping (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserId INTEGER NOT NULL,
+    RoleId INTEGER NOT NULL,
+    CreatedDate INTEGER NOT NULL,  -- Unix timestamp
+    FOREIGN KEY (UserId) REFERENCES [User](Id) ON DELETE CASCADE,
+    FOREIGN KEY (RoleId) REFERENCES UserRole(Id) ON DELETE CASCADE
+);
+
+-- Indexes for User Management
+CREATE UNIQUE INDEX idx_user_email ON [User](Email);
+CREATE INDEX idx_user_auth ON [User](AuthProvider, AuthUserId);
+CREATE INDEX idx_user_status ON [User](Status);
+CREATE INDEX idx_user_lastlogin ON [User](LastLoginDate);
+CREATE UNIQUE INDEX idx_userrole_normalizedname ON UserRole(NormalizedName);
+CREATE INDEX idx_userrolemapping_user ON UserRoleMapping(UserId);
+CREATE INDEX idx_userrolemapping_role ON UserRoleMapping(RoleId);
+
+-- Default Roles
+INSERT INTO UserRole (Name, NormalizedName, Description, CreatedDate, UpdatedDate)
+VALUES 
+    ('Admin', 'ADMIN', 'Full system access', strftime('%s','now'), strftime('%s','now')),
+    ('User', 'USER', 'Standard user access', strftime('%s','now'), strftime('%s','now')),
+    ('ReadOnly', 'READONLY', 'Read-only access', strftime('%s','now'), strftime('%s','now'));
+
+-- Root User (Password: Dr34m!12345)
+INSERT INTO [User] (
+    Email,
+    DisplayName,
+    FirstName,
+    LastName,
+    AuthProvider,
+    AuthUserId,
+    PasswordHash,
+    PasswordSalt,
+    IsEmailVerified,
+    Status,
+    CreatedDate,
+    UpdatedDate
+) VALUES (
+    'root@dreammf.com',
+    'Root Admin',
+    'Root',
+    'Admin',
+    0,  -- Local auth
+    'root',
+    'JDJhJDEyJDlLLkxGcTJXWGRVMVpuYnBWLmxZdy5vRzBJQzBJQXFlSVhVWnVmSk1PYmNCZUxKYkUuQ0Nh',  -- Secure hash for Dr34m!12345
+    'JDJhJDEyJDlLLkxGcTJXWGRVMVpuYnBWLmxZdy4=',  -- Salt
+    1,  -- Email verified
+    0,  -- Active
+    strftime('%s','now'),
+    strftime('%s','now')
+);
+
+-- Assign Admin role to root user
+INSERT INTO UserRoleMapping (UserId, RoleId, CreatedDate)
+SELECT u.Id, r.Id, strftime('%s','now')
+FROM [User] u, UserRole r
+WHERE u.Email = 'root@dreammf.com' AND r.NormalizedName = 'ADMIN';
 
 CREATE TABLE Version (
     Version_ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,16 +196,6 @@ CREATE TABLE Audit_Host (
     Change_User_ID INT,
     Created_Date INTEGER NOT NULL,
     FOREIGN KEY (Host_ID) REFERENCES Host(Host_ID)
-);
-
-CREATE TABLE [User] (
-    User_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    Auth_Provider VARCHAR(255) NOT NULL,
-    Auth_User_ID VARCHAR(255) NOT NULL,
-    Email VARCHAR(255) NOT NULL,
-    Name VARCHAR(255) NOT NULL,
-    Created_Date INTEGER NOT NULL,
-    Updated_Date INTEGER NOT NULL
 );
 
 CREATE TABLE Host (
@@ -226,7 +318,6 @@ VALUES
     ('app:environment', 'development', 1671645260, 1671645260),
     ('app:debug_mode', 'false', 1671645260, 1671645260);
 
-
 -- Seed scripts
 
 
@@ -298,3 +389,64 @@ FROM Remote r
 LEFT JOIN AuditReads_Remote ar ON r.Remote_ID = ar.Remote_ID
 GROUP BY date(ar.Created_Date, 'unixepoch'), r.Remote_ID, r.Name
 ORDER BY ReadDate DESC;
+
+-- Search Views
+DROP VIEW IF EXISTS v_SearchResults;
+CREATE VIEW v_SearchResults AS
+WITH HostResults AS (
+    -- Direct host matches
+    SELECT DISTINCT
+        h.Host_ID as EntityId,
+        h.Name as EntityName,
+        'Host' as EntityType,
+        h.Description as Description,
+		NULL as Scope,
+        h.Environment as Environment,
+        h.Key as EntityKey
+    FROM Host h
+    
+    UNION
+    
+    -- Host matches through tags
+    SELECT DISTINCT
+        h.Host_ID as EntityId,
+        h.Name as EntityName,
+        'Host' as EntityType,
+        h.Description as Description,
+		NULL as Scope,
+        h.Environment as Environment,
+        h.Key as EntityKey
+    FROM Host h
+    JOIN Tags_Host th ON h.Host_ID = th.Host_ID
+    JOIN Tag t ON th.Tag_ID = t.Tag_ID
+),
+RemoteResults AS (
+    -- Direct remote matches
+    SELECT DISTINCT
+        r.Remote_ID as EntityId,
+        r.Name as EntityName,
+        'Remote' as EntityType,
+        NULL as Description,
+        r.Scope as Scope,
+        NULL as Environment,
+        r.Key as EntityKey
+    FROM Remote r
+    
+    UNION
+    
+    -- Remote matches through tags
+    SELECT DISTINCT
+        r.Remote_ID as EntityId,
+        r.Name as EntityName,
+        'Remote' as EntityType,
+        NULL as Description,
+        r.Scope as Scope,
+        NULL as Environment,
+        r.Key as EntityKey
+    FROM Remote r
+    JOIN Tags_Remote tr ON r.Remote_ID = tr.Remote_ID
+    JOIN Tag t ON tr.Tag_ID = t.Tag_ID
+)
+SELECT * FROM HostResults
+UNION ALL
+SELECT * FROM RemoteResults;

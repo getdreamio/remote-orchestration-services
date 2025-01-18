@@ -4,6 +4,7 @@ using DreamMF.RemoteOrchestration.Database;
 using Microsoft.EntityFrameworkCore;
 using DreamMF.RemoteOrchestration.Core.Mappers;
 using DreamMF.RemoteOrchestration.Database.Entities;
+using Microsoft.Data.Sqlite;
 
 namespace DreamMF.RemoteOrchestration.Core.Services;
 
@@ -23,55 +24,46 @@ public class SearchService
             throw new HandledException(ExceptionType.Validation, "Search text cannot be empty");
         }
 
-        try
+        var searchLower = searchText.ToLowerInvariant();
+
+        // Get all search results using the view
+        var searchResults = await _dbContext.Set<SearchResult>()
+            .FromSqlRaw(@"
+                SELECT * FROM v_SearchResults 
+                WHERE LOWER(EntityName) LIKE @searchText 
+                    OR LOWER(Description) LIKE @searchText 
+                    OR LOWER(Scope) LIKE @searchText 
+                    OR LOWER(EntityKey) LIKE @searchText",
+                new SqliteParameter("@searchText", $"%{searchLower}%"))
+            .ToListAsync();
+
+        // Group results by type and fetch full entities
+        var hostIds = searchResults
+            .Where(r => r.EntityType == "Host")
+            .Select(r => r.EntityId)
+            .ToList();
+
+        var remoteIds = searchResults
+            .Where(r => r.EntityType == "Remote")
+            .Select(r => r.EntityId)
+            .ToList();
+
+        // Fetch complete host entities
+        var hosts = await _dbContext.Hosts
+            .Where(h => hostIds.Contains(h.Host_ID))
+            .ToListAsync();
+
+        // Fetch complete remote entities with modules
+        var remotes = await _dbContext.Remotes
+            .Include(r => r.RemoteModules)
+                .ThenInclude(rm => rm.Module)
+            .Where(r => remoteIds.Contains(r.Remote_ID))
+            .ToListAsync();
+
+        return new Models.SearchResponse
         {
-            var searchLower = searchText.ToLowerInvariant();
-
-            // Search in Hosts
-            var hosts = await _dbContext.Hosts
-                .Where(h => h.Name.ToLower().Contains(searchLower) ||
-                           h.Description.ToLower().Contains(searchLower))
-                .Union(_dbContext.Hosts
-                    .Join(_dbContext.Tags_Hosts,
-                        h => h.Host_ID,
-                        th => th.Host_ID,
-                        (h, th) => new { Host = h, TagHost = th })
-                    .Join(_dbContext.Tags,
-                        j => j.TagHost.Tag_ID,
-                        t => t.Tag_ID,
-                        (j, t) => new { j.Host, j.TagHost, Tag = t })
-                    .Where(j => j.Tag.Key.ToLower().Contains(searchLower) ||
-                               j.TagHost.Value.ToLower().Contains(searchLower))
-                    .Select(j => j.Host))
-                .ToListAsync();
-
-            // Search in Remotes
-            var remotes = await _dbContext.Remotes
-                .Where(r => r.Name.ToLower().Contains(searchLower) ||
-                           r.Key.ToLower().Contains(searchLower))
-                .Union(_dbContext.Remotes
-                    .Join(_dbContext.Tags_Remotes,
-                        r => r.Remote_ID,
-                        tr => tr.Remote_ID,
-                        (r, tr) => new { Remote = r, TagRemote = tr })
-                    .Join(_dbContext.Tags,
-                        j => j.TagRemote.Tag_ID,
-                        t => t.Tag_ID,
-                        (j, t) => new { j.Remote, j.TagRemote, Tag = t })
-                    .Where(j => j.Tag.Key.ToLower().Contains(searchLower) ||
-                               j.TagRemote.Value.ToLower().Contains(searchLower))
-                    .Select(j => j.Remote))
-                .ToListAsync();
-
-            return new Models.SearchResponse
-            {
-                Hosts = hosts.Select(HostMapper.ToResponse).ToList(),
-                Remotes = remotes.Select(RemoteMapper.ToResponse).ToList()
-            };
-        }
-        catch (Exception ex)
-        {
-            throw new HandledException(ExceptionType.Database, "Failed to perform search", ex);
-        }
+            Hosts = hosts.Select(HostMapper.ToResponse).ToList(),
+            Remotes = remotes.Select(RemoteMapper.ToResponse).ToList()
+        };
     }
 }

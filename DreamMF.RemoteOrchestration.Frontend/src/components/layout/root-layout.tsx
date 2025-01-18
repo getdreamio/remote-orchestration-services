@@ -66,7 +66,7 @@ const RootLayout = () => {
                                 <Database className="h-5 w-5 text-green-500 dark:text-green-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
                                     <span>Remotes</span>
-                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Your federated modules</span>
+                                    <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Remote module configuration</span>
                                 </div>
                             </Link>
                             <Link
@@ -138,15 +138,16 @@ const RootLayout = () => {
                                     <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">Usage and activity for hosts and remotes</span>
                                 </div>
                             </Link>
-                            <div
-                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                            <Link
+                                to="/users"
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
-                                <Users className="h-5 w-5 text-violet-500 dark:text-violet-400 flex-shrink-0" />
+                                <Users className="h-5 w-5 text-purple-500 dark:text-purple-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
                                     <span>User Management</span>
                                     <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">User access and permissions within ROS</span>
                                 </div>
-                            </div>
+                            </Link>
                             <Link
                                 to="/settings"
                                 className={`group flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}

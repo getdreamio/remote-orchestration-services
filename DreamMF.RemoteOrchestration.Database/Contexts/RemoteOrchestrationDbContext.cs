@@ -25,6 +25,10 @@ public interface IRemoteOrchestrationDbContext
     DbSet<DailyEntityAnalytics> DailyEntityAnalytics { get; set; }
     DbSet<RecentRemoteAnalytics> RecentRemoteAnalytics { get; set; }
     DbSet<Entities.Version> Versions { get; set; }
+    DbSet<User> Users { get; set; }
+    DbSet<UserRole> UserRoles { get; set; }
+    DbSet<UserRoleMapping> UserRoleMappings { get; set; }
+    DbSet<SearchResult> SearchResults { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 
@@ -45,6 +49,10 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
     public DbSet<DailyEntityAnalytics> DailyEntityAnalytics { get; set; } = null!;
     public DbSet<RecentRemoteAnalytics> RecentRemoteAnalytics { get; set; } = null!;
     public DbSet<Entities.Version> Versions { get; set; } = null!;
+    public DbSet<User> Users { get; set; } = null!;
+    public DbSet<UserRole> UserRoles { get; set; } = null!;
+    public DbSet<UserRoleMapping> UserRoleMappings { get; set; } = null!;
+    public DbSet<SearchResult> SearchResults { get; set; } = null!;
 
     public new DatabaseFacade Database => base.Database;
 
@@ -216,6 +224,83 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
         modelBuilder.Entity<RecentRemoteAnalytics>()
             .HasNoKey()
             .ToView("v_RecentRemoteAnalytics");
+
+        modelBuilder.Entity<SearchResult>()
+            .HasNoKey()
+            .ToView("v_SearchResults");
+
+        modelBuilder.Entity<Host>()
+            .HasMany(h => h.Tags_Hosts)
+            .WithOne(th => th.Host)
+            .HasForeignKey(th => th.Host_ID);
+
+        modelBuilder.Entity<Remote>()
+            .HasMany(r => r.Tags_Remotes)
+            .WithOne(tr => tr.Remote)
+            .HasForeignKey(tr => tr.Remote_ID);
+
+        modelBuilder.Entity<Tag>()
+            .HasMany(t => t.Tags_Hosts)
+            .WithOne(th => th.Tag)
+            .HasForeignKey(th => th.Tag_ID);
+
+        modelBuilder.Entity<Tag>()
+            .HasMany(t => t.Tags_Remotes)
+            .WithOne(tr => tr.Tag)
+            .HasForeignKey(tr => tr.Tag_ID);
+
+        modelBuilder.Entity<Host>()
+            .HasMany(h => h.Host_Remotes)
+            .WithOne(hr => hr.Host)
+            .HasForeignKey(hr => hr.Host_ID);
+
+        modelBuilder.Entity<Remote>()
+            .HasMany(r => r.Host_Remotes)
+            .WithOne(hr => hr.Remote)
+            .HasForeignKey(hr => hr.Remote_ID);
+
+        modelBuilder.Entity<Remote>()
+            .HasMany(r => r.RemoteModules)
+            .WithOne(rm => rm.Remote)
+            .HasForeignKey(rm => rm.Remote_ID);
+
+        modelBuilder.Entity<Module>()
+            .HasMany(m => m.RemoteModules)
+            .WithOne(rm => rm.Module)
+            .HasForeignKey(rm => rm.Module_ID);
+
+        modelBuilder.Entity<User>()
+            .HasMany(u => u.UserRoleMappings)
+            .WithOne(urm => urm.User)
+            .HasForeignKey(urm => urm.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<UserRole>()
+            .HasMany(r => r.UserRoleMappings)
+            .WithOne(urm => urm.Role)
+            .HasForeignKey(urm => urm.RoleId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => new { u.AuthProvider, u.AuthUserId });
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Status);
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.LastLoginDate);
+
+        modelBuilder.Entity<UserRole>()
+            .HasIndex(r => r.NormalizedName)
+            .IsUnique();
+
+        modelBuilder.Entity<User>().ToTable("User");
+        modelBuilder.Entity<UserRole>().ToTable("UserRole");
+        modelBuilder.Entity<UserRoleMapping>().ToTable("UserRoleMapping");
 
         base.OnModelCreating(modelBuilder);
     }

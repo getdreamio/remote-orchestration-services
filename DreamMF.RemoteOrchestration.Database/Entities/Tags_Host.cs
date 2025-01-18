@@ -10,15 +10,15 @@ public class Tags_Host
     public int Tag_Host_ID { get; set; }
     
     public int Tag_ID { get; set; }
-    public string Value { get; set; }
+    public string Value { get; set; } = string.Empty;
 
     [ForeignKey(nameof(Tag_ID))]
-    public Tag? Tag { get; set; }
+    public virtual Tag? Tag { get; set; }
 
     public int Host_ID { get; set; }
 
     [ForeignKey(nameof(Host_ID))]
-    public Host? Host { get; set; }
+    public virtual Host? Host { get; set; }
 
     public long Created_Date { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     public long Updated_Date { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();

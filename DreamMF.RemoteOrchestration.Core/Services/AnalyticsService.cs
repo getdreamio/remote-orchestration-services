@@ -296,8 +296,12 @@ public class AnalyticsService : IAnalyticsService
     public async Task<RelationshipsModel?> GetRelationships()
     {
         var relationships = new RelationshipsModel();
-        var hosts = await _dbContext.Hosts.ToListAsync();
-        var remotes = await _dbContext.Remotes.ToListAsync();
+        var hosts = await _dbContext.Hosts
+            .Select(h => new { h.Host_ID, h.Name, h.Environment })
+            .ToListAsync();
+        var remotes = await _dbContext.Remotes
+            .Select(r => new { r.Remote_ID, r.Name, r.Key })
+            .ToListAsync();
         var hostRemotes = await _dbContext.Set<Host_Remote>().ToListAsync();
 
         // Process hosts

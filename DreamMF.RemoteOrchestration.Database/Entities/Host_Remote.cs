@@ -11,8 +11,12 @@ public class Host_Remote
     public int Host_ID { get; set; }
     public int Remote_ID { get; set; }
 
+    [ForeignKey("Host_ID")]
+    public virtual Host? Host { get; set; }
+
     [ForeignKey("Remote_ID")]
-    public Remote? Remote { get; set; }
+    public virtual Remote? Remote { get; set; }
+
     public long Created_Date { get; set; }
     public long Updated_Date { get; set; }
 }

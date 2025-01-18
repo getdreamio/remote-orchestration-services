@@ -39,6 +39,14 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Remote Orchestration API", Version = "v1" });
 });
 
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    options.SerializerOptions.PropertyNameCaseInsensitive = true;
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    options.SerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+});
+
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
@@ -87,6 +95,7 @@ builder.Services.AddScoped<SearchService>();
 builder.Services.AddScoped<ConfigurationService>();
 builder.Services.AddScoped<IDreamService, DreamService>();
 builder.Services.AddScoped<IUploadService, UploadService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddAntiforgery();
 
@@ -121,6 +130,7 @@ app.MapSearchRoutes();
 app.MapAnalyticsRoutes();
 app.MapDreamRoutes();
 app.MapUploadRoutes();
+app.MapUserRoutes();
 
 var provider = new FileExtensionContentTypeProvider();
 provider.Mappings[".js"] = "application/javascript";

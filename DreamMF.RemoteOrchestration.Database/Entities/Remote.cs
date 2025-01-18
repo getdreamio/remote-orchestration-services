@@ -20,5 +20,7 @@ public class Remote
     public long Created_Date { get; set; }
     public long Updated_Date { get; set; }
 
-    public ICollection<RemoteModule> RemoteModules { get; set; } = new List<RemoteModule>();
+    public virtual ICollection<Tags_Remote> Tags_Remotes { get; set; } = new List<Tags_Remote>();
+    public virtual ICollection<Host_Remote> Host_Remotes { get; set; } = new List<Host_Remote>();
+    public virtual ICollection<RemoteModule> RemoteModules { get; set; } = new List<RemoteModule>();
 }
