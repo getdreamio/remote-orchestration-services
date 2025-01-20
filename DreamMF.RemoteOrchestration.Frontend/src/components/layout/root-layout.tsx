@@ -17,7 +17,7 @@ const RootLayout = () => {
                 <div className="flex">
                     {/* Sidebar */}
                     <aside 
-                        className={`hidden lg:flex h-screen flex-col fixed left-0 top-0 border-r bg-card transition-all duration-300 ${isCollapsed ? 'w-[80px]' : 'w-[336px]'} overflow-hidden`}
+                        className={`hidden lg:flex h-screen flex-col fixed left-0 top-0 border-r transition-all duration-300 ${isCollapsed ? 'w-[80px]' : 'w-[336px]'} overflow-hidden bg-[#fbfbfb] dark:bg-card`}
                     >
                         {/* Header - Fixed */}
                         <div className="flex-none p-6 border-b relative">
