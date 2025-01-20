@@ -8,6 +8,7 @@ using DreamMF.RemoteOrchestration.Core.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.StaticFiles;
+using DreamMF.RemoteOrchestration.Api.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +37,48 @@ builder.Services.AddScoped<IRemoteOrchestrationDbContext>(provider =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Remote Orchestration API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { 
+        Title = "Remote Orchestration API", 
+        Version = "v1",
+        Description = @"### Authentication
+To use protected endpoints:
+1. Expand the /api/auth/login endpoint
+2. Click 'Try it out'
+3. Enter your credentials and execute
+4. Copy the token from the response
+5. Click 'Authorize' at the top
+6. Enter the token as: Bearer your-token-here"
+    });
+    
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme.\r\n\r\n" +
+                     "Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\n" +
+                     "Example: \"Bearer 12345abcdef\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+
+    // Add operation filter to mark endpoints as requiring authentication
+    c.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
 builder.Services.ConfigureHttpJsonOptions(options =>
@@ -50,9 +92,17 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
-        options.Authority = "https://youridentityserver";
-        options.RequireHttpsMetadata = false;
-        options.Audience = "api1";
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+                System.Text.Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
     });
 
 builder.Services.AddAuthorization();

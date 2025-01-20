@@ -3,33 +3,25 @@ import { config } from '@/config/env';
 import { Host } from './useHosts';
 import { Remote } from './useRemotes';
 import { message } from 'antd';
+import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 export interface SearchResponse {
     hosts: Host[];
     remotes: Remote[];
 }
 
+const fetchSearchResults = async (searchText: string) => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/search`, {
+        method: 'POST',
+        body: JSON.stringify({ searchText })
+    });
+    return response.json();
+};
+
 export const useSearch = (searchText: string) => {
     return useQuery({
         queryKey: ['search', searchText],
-        queryFn: async () => {
-            if (!searchText) return { hosts: [], remotes: [] };
-
-            const response = await fetch(`${config.backendUrl}/api/search`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ searchText }),
-            });
-
-            if (!response.ok) {
-                message.error('Failed to perform search');
-                throw new Error('Failed to perform search');
-            }
-
-            return response.json();
-        },
+        queryFn: () => fetchSearchResults(searchText),
         enabled: !!searchText,
     });
 };

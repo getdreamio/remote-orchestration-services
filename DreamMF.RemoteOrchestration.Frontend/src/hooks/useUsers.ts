@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { config } from '@/config/env';
+import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 export type AuthProvider = 'Local' | 'Google' | 'GitHub' | 'Microsoft' | 'Custom';
 export type UserStatus = 'Active' | 'Inactive' | 'Suspended' | 'PendingVerification';
@@ -44,29 +45,95 @@ export interface UpdateUserRequest {
     status?: UserStatus;
 }
 
+const fetchUsers = async () => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/users`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+};
+
+const fetchUser = async (id: number) => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/users/${id}`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+};
+
+const createUser = async (user: CreateUserRequest) => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/users`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+    });
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+};
+
+const updateUser = async ({ id, user }: { id: number; user: UpdateUserRequest }) => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/users/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+    });
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+};
+
+const deleteUser = async (id: number) => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/users/${id}`, {
+        method: 'DELETE',
+    });
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+};
+
+const fetchUserRoles = async (userId: number) => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/users/${userId}/roles`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+};
+
+const addUserRole = async ({ userId, roleName }: { userId: number; roleName: string }) => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/users/${userId}/roles/${roleName}`, {
+        method: 'POST',
+    });
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+};
+
+const removeUserRole = async ({ userId, roleName }: { userId: number; roleName: string }) => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/users/${userId}/roles/${roleName}`, {
+        method: 'DELETE',
+    });
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+};
+
 export const useUsers = () => {
     return useQuery({
         queryKey: ['users'],
-        queryFn: async () => {
-            const response = await fetch(`${config.backendUrl}/api/users`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        }
+        queryFn: fetchUsers,
     });
 };
 
 export const useUser = (id: number) => {
     return useQuery({
         queryKey: ['user', id],
-        queryFn: async () => {
-            const response = await fetch(`${config.backendUrl}/api/users/${id}`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        },
+        queryFn: () => fetchUser(id),
         enabled: !!id
     });
 };
@@ -75,19 +142,7 @@ export const useCreateUser = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (user: CreateUserRequest) => {
-            const response = await fetch(`${config.backendUrl}/api/users`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(user),
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        },
+        mutationFn: createUser,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
@@ -98,18 +153,7 @@ export const useUpdateUser = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ id, user }: { id: number; user: UpdateUserRequest }) => {
-            const response = await fetch(`${config.backendUrl}/api/users/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(user),
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-        },
+        mutationFn: updateUser,
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
             queryClient.invalidateQueries({ queryKey: ['user', variables.id] });
@@ -121,14 +165,7 @@ export const useDeleteUser = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => {
-            const response = await fetch(`${config.backendUrl}/api/users/${id}`, {
-                method: 'DELETE',
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-        },
+        mutationFn: deleteUser,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
@@ -138,13 +175,7 @@ export const useDeleteUser = () => {
 export const useUserRoles = (userId: number) => {
     return useQuery({
         queryKey: ['user-roles', userId],
-        queryFn: async () => {
-            const response = await fetch(`${config.backendUrl}/api/users/${userId}/roles`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        },
+        queryFn: () => fetchUserRoles(userId),
         enabled: !!userId
     });
 };
@@ -153,14 +184,7 @@ export const useAddUserRole = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ userId, roleName }: { userId: number; roleName: string }) => {
-            const response = await fetch(`${config.backendUrl}/api/users/${userId}/roles/${roleName}`, {
-                method: 'POST',
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-        },
+        mutationFn: addUserRole,
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['user-roles', variables.userId] });
             queryClient.invalidateQueries({ queryKey: ['user', variables.userId] });
@@ -172,14 +196,7 @@ export const useRemoveUserRole = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ userId, roleName }: { userId: number; roleName: string }) => {
-            const response = await fetch(`${config.backendUrl}/api/users/${userId}/roles/${roleName}`, {
-                method: 'DELETE',
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-        },
+        mutationFn: removeUserRole,
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['user-roles', variables.userId] });
             queryClient.invalidateQueries({ queryKey: ['user', variables.userId] });

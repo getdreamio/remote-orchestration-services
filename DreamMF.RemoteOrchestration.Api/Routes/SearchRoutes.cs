@@ -28,6 +28,8 @@ public static class SearchRoutes
     /// <param name="group">The route group to configure</param>
     private static RouteGroupBuilder MapSearchApi(this RouteGroupBuilder group)
     {
+        group.RequireAuthorization();
+
         group.MapPost("", Search)
             .Produces<Core.Models.SearchResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)

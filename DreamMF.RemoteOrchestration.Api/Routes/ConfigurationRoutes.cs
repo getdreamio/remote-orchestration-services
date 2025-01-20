@@ -17,6 +17,8 @@ public static class ConfigurationRoutes
 
     private static RouteGroupBuilder MapConfigurationsApi(this RouteGroupBuilder group)
     {
+        group.RequireAuthorization();
+
         group.MapGet("", GetAllConfigurations)
             .Produces<List<ConfigurationResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)

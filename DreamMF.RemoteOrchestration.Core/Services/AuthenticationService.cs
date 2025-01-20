@@ -32,10 +32,6 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<AuthResult> LoginAsync(string email, string password)
     {
-        var salt = BCrypt.Net.BCrypt.GenerateSalt();
-        Console.WriteLine($"#PasswordSalt: {salt}");
-        Console.WriteLine($"#PasswordHash: {BCrypt.Net.BCrypt.HashPassword(password, salt)}");
-
         var user = await _userService.GetUserObjectByEmailAsync(email);
         if (user == null)
             return new AuthResult(false, null, "Invalid credentials");

@@ -361,33 +361,33 @@ GROUP BY h.Host_ID, h.Name;
 -- View for daily Host reads
 CREATE VIEW v_DailyHostReads AS
 SELECT 
-    date(ar.Created_Date, 'unixepoch') as ReadDate,
+    COALESCE(date(ar.Created_Date, 'unixepoch'), date('now', 'localtime')) as ReadDate,
     h.Host_ID,
     h.Name as HostName,
-    COUNT(*) as TotalReads,
+    COUNT(ar.AuditRead_ID) as TotalReads,
     COUNT(CASE WHEN ar.Action = 'Read' THEN 1 END) as ReadCount,
     COUNT(CASE WHEN ar.Action = 'Update' THEN 1 END) as UpdateCount,
     COUNT(CASE WHEN ar.Action = 'Create' THEN 1 END) as CreateCount,
     COUNT(CASE WHEN ar.Action = 'Delete' THEN 1 END) as DeleteCount
 FROM Host h
 LEFT JOIN AuditReads_Host ar ON h.Host_ID = ar.Host_ID
-GROUP BY date(ar.Created_Date, 'unixepoch'), h.Host_ID, h.Name
+GROUP BY COALESCE(date(ar.Created_Date, 'unixepoch'), date('now', 'localtime')), h.Host_ID, h.Name
 ORDER BY ReadDate DESC;
 
 -- View for daily Remote reads
 CREATE VIEW v_DailyRemoteReads AS
 SELECT 
-    date(ar.Created_Date, 'unixepoch') as ReadDate,
+    COALESCE(date(ar.Created_Date, 'unixepoch'), date('now', 'localtime')) as ReadDate,
     r.Remote_ID,
     r.Name as RemoteName,
-    COUNT(*) as TotalReads,
+    COUNT(ar.AuditRead_ID) as TotalReads,
     COUNT(CASE WHEN ar.Action = 'Read' THEN 1 END) as ReadCount,
     COUNT(CASE WHEN ar.Action = 'Update' THEN 1 END) as UpdateCount,
     COUNT(CASE WHEN ar.Action = 'Create' THEN 1 END) as CreateCount,
     COUNT(CASE WHEN ar.Action = 'Delete' THEN 1 END) as DeleteCount
 FROM Remote r
 LEFT JOIN AuditReads_Remote ar ON r.Remote_ID = ar.Remote_ID
-GROUP BY date(ar.Created_Date, 'unixepoch'), r.Remote_ID, r.Name
+GROUP BY COALESCE(date(ar.Created_Date, 'unixepoch'), date('now', 'localtime')), r.Remote_ID, r.Name
 ORDER BY ReadDate DESC;
 
 -- Search Views

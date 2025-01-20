@@ -28,6 +28,8 @@ public static class TagRoutes
     /// <param name="group">The route group to configure</param>
     private static RouteGroupBuilder MapTagsApi(this RouteGroupBuilder group)
     {
+        group.RequireAuthorization();
+
         group.MapGet("", GetAllTags)
             .Produces<List<TagResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)

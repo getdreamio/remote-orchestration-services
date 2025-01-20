@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useQuery } from '@tanstack/react-query';
 import { config } from '@/config/env';
+import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 // Mock data for analytics and logs (replace with real data later)
 const analyticsData = {
@@ -54,13 +55,14 @@ const DashboardPage: React.FC = () => {
     const { data: tags } = useTags();
     const { data: remotes } = useRemotes();
 
-    const { data: recentAnalytics, isLoading: isLoadingAnalytics } = useQuery<RecentRemoteAnalytics>({
+    const fetchRecentRemotes = async () => {
+        const response = await fetchWithAuth(`${config.backendUrl}/api/analytics/recent-remotes`);
+        return response.json();
+    };
+
+    const { data: recentAnalytics, isLoading: isLoadingAnalytics, error } = useQuery<RecentRemoteAnalytics>({
         queryKey: ['recentRemoteAnalytics'],
-        queryFn: async () => {
-            const response = await fetch(`${config.backendUrl}/api/analytics/recent-remotes`);
-            if (!response.ok) throw new Error('Failed to fetch recent analytics');
-            return response.json();
-        },
+        queryFn: fetchRecentRemotes,
     });
 
     const getLogIcon = (type: string) => {
@@ -176,6 +178,10 @@ const DashboardPage: React.FC = () => {
                             {isLoadingAnalytics ? (
                                 <div className="h-24 flex items-center justify-center">
                                     <Spin />
+                                </div>
+                            ) : error ? (
+                                <div className="h-24 flex items-center justify-center text-red-500">
+                                    Error loading data
                                 </div>
                             ) : (
                                 <div className="space-y-4">

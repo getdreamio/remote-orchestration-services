@@ -18,6 +18,8 @@ public static class AnalyticsRoutes
 
     private static RouteGroupBuilder MapAnalyticsApi(this RouteGroupBuilder group)
     {
+        group.RequireAuthorization();
+
         group.MapGet("summary", GetAnalyticsSummary)
             .Produces<AnalyticsSummary>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(500)

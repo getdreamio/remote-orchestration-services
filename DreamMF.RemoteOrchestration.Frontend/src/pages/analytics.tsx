@@ -18,6 +18,7 @@ import { config } from '@/config/env';
 import { Helmet } from 'react-helmet';
 import { ArrowUpIcon, ArrowDownIcon, BarChart3Icon, ClockIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 interface EntityAnalytics {
     entityId: number;
@@ -47,33 +48,39 @@ interface AnalyticsSummary {
     recentRemoteActivity: DailyEntityAnalytics[];
 }
 
+const fetchAnalyticsSummary = async () => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/analytics/summary`);
+    if (!response.ok) throw new Error('Failed to fetch analytics summary');
+    return response.json();
+};
+
+const fetchHostAnalytics = async () => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/analytics/hosts`);
+    if (!response.ok) throw new Error('Failed to fetch host analytics');
+    return response.json();
+};
+
+const fetchRemoteAnalytics = async () => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/analytics/remotes`);
+    if (!response.ok) throw new Error('Failed to fetch remote analytics');
+    return response.json();
+};
+
 const AnalyticsPage: React.FC = () => {
     // Fetch analytics data
     const { data: summary, isLoading: isLoadingSummary } = useQuery<AnalyticsSummary>({
         queryKey: ['analyticsSummary'],
-        queryFn: async () => {
-            const response = await fetch(`${config.backendUrl}/api/analytics/summary`);
-            if (!response.ok) throw new Error('Failed to fetch analytics summary');
-            return response.json();
-        },
+        queryFn: fetchAnalyticsSummary,
     });
 
     const { data: hostAnalytics = [], isLoading: isLoadingHosts } = useQuery<EntityAnalytics[]>({
         queryKey: ['hostAnalytics'],
-        queryFn: async () => {
-            const response = await fetch(`${config.backendUrl}/api/analytics/hosts`);
-            if (!response.ok) throw new Error('Failed to fetch host analytics');
-            return response.json();
-        },
+        queryFn: fetchHostAnalytics,
     });
 
     const { data: remoteAnalytics = [], isLoading: isLoadingRemotes } = useQuery<EntityAnalytics[]>({
         queryKey: ['remoteAnalytics'],
-        queryFn: async () => {
-            const response = await fetch(`${config.backendUrl}/api/analytics/remotes`);
-            if (!response.ok) throw new Error('Failed to fetch remote analytics');
-            return response.json();
-        },
+        queryFn: fetchRemoteAnalytics,
     });
 
     const navigate = useNavigate();

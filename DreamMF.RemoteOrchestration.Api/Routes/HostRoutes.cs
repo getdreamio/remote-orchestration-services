@@ -18,6 +18,8 @@ public static class HostRoutes
 
     private static RouteGroupBuilder MapHostsApi(this RouteGroupBuilder group)
     {
+        group.RequireAuthorization();
+
         group.MapGet("/", GetHosts)
             .WithTags(GroupName)
             .Produces<List<HostResponse>>(StatusCodes.Status200OK)

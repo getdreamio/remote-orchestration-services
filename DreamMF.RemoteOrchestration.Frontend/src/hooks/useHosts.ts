@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { config } from '@/config/env';
+import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 interface Host {
     id: number;
@@ -37,7 +38,7 @@ interface RemoteHostCount {
 export type HostRequest = Omit<Host, 'id' | 'createdAt' | 'updatedAt'>;
 
 const fetchHosts = async (): Promise<Host[]> => {
-    const response = await fetch(`${config.backendUrl}/api/hosts`);
+    const response = await fetchWithAuth(`${config.backendUrl}/api/hosts`);
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -45,7 +46,7 @@ const fetchHosts = async (): Promise<Host[]> => {
 };
 
 const fetchHost = async (id: number): Promise<Host> => {
-    const response = await fetch(`${config.backendUrl}/api/hosts/${id}`);
+    const response = await fetchWithAuth(`${config.backendUrl}/api/hosts/${id}`);
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -54,7 +55,7 @@ const fetchHost = async (id: number): Promise<Host> => {
 
 // Fetch remotes attached to a host
 const fetchHostRemotes = async (hostId: number): Promise<HostRemote[]> => {
-    const response = await fetch(`${config.backendUrl}/api/hosts/${hostId}/remotes`);
+    const response = await fetchWithAuth(`${config.backendUrl}/api/hosts/${hostId}/remotes`);
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -63,7 +64,7 @@ const fetchHostRemotes = async (hostId: number): Promise<HostRemote[]> => {
 
 // Attach a remote to a host
 const attachRemoteToHost = async ({ hostId, remoteId }: { hostId: number; remoteId: number }): Promise<void> => {
-    const response = await fetch(`${config.backendUrl}/api/hosts/${hostId}/attach`, {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/hosts/${hostId}/attach`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -77,7 +78,7 @@ const attachRemoteToHost = async ({ hostId, remoteId }: { hostId: number; remote
 
 // Detach a remote from a host
 const detachRemoteFromHost = async ({ hostId, remoteId }: { hostId: number; remoteId: number }): Promise<void> => {
-    const response = await fetch(`${config.backendUrl}/api/hosts/${hostId}/detach`, {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/hosts/${hostId}/detach`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -91,7 +92,7 @@ const detachRemoteFromHost = async ({ hostId, remoteId }: { hostId: number; remo
 
 // Fetch remote counts for all hosts
 const fetchHostRemoteCounts = async (): Promise<HostRemoteCount[]> => {
-    const response = await fetch(`${config.backendUrl}/api/hosts/remote-counts`);
+    const response = await fetchWithAuth(`${config.backendUrl}/api/hosts/remote-counts`);
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -100,7 +101,7 @@ const fetchHostRemoteCounts = async (): Promise<HostRemoteCount[]> => {
 
 // Fetch host counts for all remotes
 const fetchRemoteHostCounts = async (): Promise<RemoteHostCount[]> => {
-    const response = await fetch(`${config.backendUrl}/api/remotes/host-counts`);
+    const response = await fetchWithAuth(`${config.backendUrl}/api/remotes/host-counts`);
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -127,7 +128,7 @@ export const useCreateHost = () => {
 
     return useMutation({
         mutationFn: async (host: HostRequest) => {
-            const response = await fetch(`${config.backendUrl}/api/hosts`, {
+            const response = await fetchWithAuth(`${config.backendUrl}/api/hosts`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -150,7 +151,7 @@ export const useUpdateHost = () => {
 
     return useMutation({
         mutationFn: async ({ id, host }: { id: number; host: HostRequest }) => {
-            const response = await fetch(`${config.backendUrl}/api/hosts/${id}`, {
+            const response = await fetchWithAuth(`${config.backendUrl}/api/hosts/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -172,7 +173,7 @@ export const useDeleteHost = () => {
 
     return useMutation({
         mutationFn: async (id: number) => {
-            const response = await fetch(`${config.backendUrl}/api/hosts/${id}`, {
+            const response = await fetchWithAuth(`${config.backendUrl}/api/hosts/${id}`, {
                 method: 'DELETE',
             });
             if (!response.ok) {

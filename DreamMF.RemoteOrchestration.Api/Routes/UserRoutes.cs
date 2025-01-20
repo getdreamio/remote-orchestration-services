@@ -18,6 +18,8 @@ public static class UserRoutes
 
     private static RouteGroupBuilder MapUsersApi(this RouteGroupBuilder group)
     {
+        group.RequireAuthorization();
+
         group.MapGet("/", GetUsers)
             .WithTags(GroupName)
             .Produces<List<UserResponse>>(StatusCodes.Status200OK)

@@ -1,8 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { config } from '@/config/env';
+import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 export interface Configuration {
     id: number;
+    key: string;
+    value: string;
+}
+
+export interface ConfigurationRequest {
     key: string;
     value: string;
 }
@@ -11,20 +17,17 @@ export type StorageType = 'LocalStorage' | 'AzureBlobStorage' | 'AwsS3Bucket';
 export type DatabaseType = 'sqlite' | 'sqlserver' | 'postgres';
 
 const fetchConfigurations = async (): Promise<Configuration[]> => {
-    const response = await fetch(`${config.backendUrl}/api/configurations`);
+    const response = await fetchWithAuth(`${config.backendUrl}/api/configurations`);
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
     return response.json();
 };
 
-const updateConfiguration = async ({ id, key, value }: { id: number; key: string; value: string }): Promise<Configuration> => {
-    const response = await fetch(`${config.backendUrl}/api/configurations/${id}`, {
+const updateConfiguration = async ({ id, data }: { id: number; data: ConfigurationRequest }): Promise<Configuration> => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/configurations/${id}`, {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ key, value }),
+        body: JSON.stringify(data),
     });
     if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -32,13 +35,10 @@ const updateConfiguration = async ({ id, key, value }: { id: number; key: string
     return response.json();
 };
 
-const createConfiguration = async ({ key, value }: { key: string; value: string }): Promise<Configuration> => {
-    const response = await fetch(`${config.backendUrl}/api/configurations`, {
+const createConfiguration = async (data: ConfigurationRequest): Promise<Configuration> => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/configurations`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ key, value }),
+        body: JSON.stringify(data),
     });
     if (!response.ok) {
         throw new Error('Network response was not ok');

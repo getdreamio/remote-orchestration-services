@@ -1,11 +1,13 @@
 import { LogOut, User } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 export function UserMenu() {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -25,7 +27,7 @@ export function UserMenu() {
                 className="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-100 dark:hover:bg-accent"
             >
                 <User className="h-5 w-5" />
-                <span>John Doe</span>
+                <span>{user?.name || 'Guest'}</span>
             </button>
 
             {isOpen && (

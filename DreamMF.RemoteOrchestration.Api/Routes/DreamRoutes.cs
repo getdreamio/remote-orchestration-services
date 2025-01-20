@@ -21,6 +21,7 @@ public static class DreamRoutes
 
     private static RouteGroupBuilder MapExtenalApi(this RouteGroupBuilder group)
     {
+        group.RequireAuthorization();
 
         group.MapGet("/hosts/{accessKey}/", GetHostDetailsByAccessKey)
             .WithTags(GroupName)

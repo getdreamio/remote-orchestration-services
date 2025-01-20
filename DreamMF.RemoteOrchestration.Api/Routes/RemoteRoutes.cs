@@ -20,6 +20,8 @@ public static class RemoteRoutes
 
     private static RouteGroupBuilder MapRemotesApi(this RouteGroupBuilder group)
     {
+        group.RequireAuthorization();
+
         group.MapGet("/", GetAllRemotes)
             .WithTags(GroupName)
             .Produces<List<RemoteResponse>>(StatusCodes.Status200OK)
