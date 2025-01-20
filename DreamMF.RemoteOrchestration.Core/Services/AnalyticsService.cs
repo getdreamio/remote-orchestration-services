@@ -108,9 +108,10 @@ public class AnalyticsService : IAnalyticsService
                     TotalUpdates,
                     TotalCreates,
                     TotalDeletes,
-                    Last30DaysActions
+                    Last30DaysActions,
+                    Last24HoursActions
                 FROM v_HostReadAnalytics
-                ORDER BY Last30DaysActions DESC")
+                ORDER BY Last24HoursActions DESC")
             .ToListAsync();
     }
 
@@ -125,9 +126,10 @@ public class AnalyticsService : IAnalyticsService
                     TotalUpdates,
                     TotalCreates,
                     TotalDeletes,
-                    Last30DaysActions
+                    Last30DaysActions,
+                    Last24HoursActions
                 FROM v_RemoteReadAnalytics
-                ORDER BY Last30DaysActions DESC")
+                ORDER BY Last24HoursActions DESC")
             .ToListAsync();
     }
 

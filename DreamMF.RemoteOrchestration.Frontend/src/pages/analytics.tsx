@@ -28,6 +28,7 @@ interface EntityAnalytics {
     totalCreates: number;
     totalDeletes: number;
     last30DaysActions: number;
+    last24HoursActions: number;
 }
 
 interface DailyEntityAnalytics {
@@ -288,7 +289,7 @@ const AnalyticsPage: React.FC = () => {
                                     <div>
                                         <Statistic
                                             title={<span className="text-sm">Last 24 Hours</span>}
-                                            value={summary?.topRemotes[0]?.last30DaysActions ?? 0}
+                                            value={summary?.topRemotes[0]?.last24HoursActions ?? 0}
                                             suffix="actions"
                                             valueStyle={{ color: '#0284c7' }}
                                         />

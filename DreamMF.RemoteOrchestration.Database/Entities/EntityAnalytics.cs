@@ -10,7 +10,8 @@ public class EntityAnalytics
     public int TotalUpdates { get; set; }
     public int TotalCreates { get; set; }
     public int TotalDeletes { get; set; }
-    public int Last30DaysActions { get; set; }
+    public int? Last30DaysActions { get; set; }
+    public int? Last24HoursActions { get; set; }
 }
 
 public class DailyEntityAnalytics
