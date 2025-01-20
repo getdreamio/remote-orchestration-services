@@ -119,11 +119,8 @@ public class UserService : IUserService
         if (request.Status.HasValue)
             user.Status = request.Status.Value;
 
-        if (!string.IsNullOrEmpty(request.CurrentPassword) && !string.IsNullOrEmpty(request.NewPassword))
+        if (!string.IsNullOrEmpty(request.NewPassword))
         {
-            if (user.PasswordHash == null || !BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash))
-                throw new InvalidOperationException("Current password is incorrect");
-
             var salt = BCrypt.Net.BCrypt.GenerateSalt();
             user.PasswordSalt = salt;
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword, salt);
