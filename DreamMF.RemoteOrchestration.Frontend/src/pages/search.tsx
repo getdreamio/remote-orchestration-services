@@ -2,26 +2,32 @@ import { useState, useEffect } from 'react';
 import { Input, Card, List, Tag, Empty, Spin, Typography, Badge, Row, Col, Space, Divider } from 'antd';
 import { SearchOutlined, TagOutlined, LinkOutlined, EnvironmentOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { useSearch } from '@/hooks/useSearch';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import debounce from 'lodash/debounce';
 import { Helmet } from 'react-helmet';
 
 const { Title, Text } = Typography;
 
 const Search = () => {
-    const [searchText, setSearchText] = useState('');
-    const [debouncedSearchText, setDebouncedSearchText] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchText, setSearchText] = useState(searchParams.get('q') || '');
+    const [debouncedSearchText, setDebouncedSearchText] = useState(searchParams.get('q') || '');
     const { data: results, isLoading } = useSearch(debouncedSearchText);
 
-    // Debounce search input to reduce API calls
+    // Debounce search input to reduce API calls and update URL
     useEffect(() => {
         const handler = debounce(() => {
             setDebouncedSearchText(searchText);
+            if (searchText) {
+                setSearchParams({ q: searchText });
+            } else {
+                setSearchParams({});
+            }
         }, 300);
 
         handler();
         return () => handler.cancel();
-    }, [searchText]);
+    }, [searchText, setSearchParams]);
 
     const renderTags = (tags: any[]) => {
         if (!tags?.length) return null;
@@ -157,7 +163,7 @@ const Search = () => {
                                                             title={
                                                                 <div className="flex justify-between items-start gap-4">
                                                                     <div className="flex items-center gap-2">
-                                                                        <Link to={`/hosts/edit/${host.host_ID}`} className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 font-medium">
+                                                                        <Link to={`/hosts/${host.id}`} className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 font-medium">
                                                                             {host.name}
                                                                         </Link>
                                                                         {host.environment && (
@@ -223,7 +229,7 @@ const Search = () => {
                                                         <List.Item.Meta
                                                             title={
                                                                 <div className="flex justify-between items-start gap-4">
-                                                                    <Link to={`/remotes/edit/${remote.remote_ID}`} className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 font-medium">
+                                                                    <Link to={`/remotes/${remote.id}`} className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 font-medium">
                                                                         {remote.name}
                                                                     </Link>
                                                                     {renderTags(remote.tags)}
