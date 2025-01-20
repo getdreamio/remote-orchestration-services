@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   frontend:
+    image: dreammf/dream.mf-frontend:0.9.0
     build:
       context: .
       target: frontend
@@ -12,6 +13,7 @@ services:
       - AUTH_CLIENT_ID=DreamMF-Web-01202025
 
   backend:
+    image: dreammf/dream.mf-backend:0.9.0
     build:
       context: .
       target: final

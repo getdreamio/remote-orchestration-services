@@ -28,7 +28,7 @@ The service architecture is designed to support scalability and reliability. It 
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/remote-orchestration-services.git
+   git clone https://github.com/getdreamio/remote-orchestration-services.git
    ```
 2. Navigate to the project directory:
    ```bash
