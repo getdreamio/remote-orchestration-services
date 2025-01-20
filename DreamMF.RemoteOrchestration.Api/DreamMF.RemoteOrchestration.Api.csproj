@@ -29,6 +29,12 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="remote_orchestration.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <Target Name="EnsureRemotesFolderExists" BeforeTargets="Build">
     <MakeDir Directories="$(MSBuildProjectDirectory)\remotes" />
   </Target>
