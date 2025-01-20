@@ -26,7 +26,7 @@ export function AntThemeProvider({ children }: { children: React.ReactNode }) {
                         headerSplitColor: appTheme === 'dark' ? '#475569' : '#e2e8f0',
                     },
                     Card: {
-                        colorBgContainer: appTheme === 'dark' ? '#1e293b' : '#fbfbfb',
+                        colorBgContainer: appTheme === 'dark' ? '#1e293b' : '#ffffff',
                     },
                     Select: {
                         colorBgContainer: appTheme === 'dark' ? '#1e293b' : '#ffffff',

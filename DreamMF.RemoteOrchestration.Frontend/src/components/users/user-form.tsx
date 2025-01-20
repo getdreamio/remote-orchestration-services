@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, Select, Alert, InputNumber, Switch, message } from 'antd';
-import { useCreateUser, useUpdateUser, useUserRoles } from '@/hooks/useUsers';
+import { useCreateUser, useUpdateUser, useRoles } from '@/hooks/useUsers';
 import PasswordStrength from './password-strength';
 
 const { Option } = Select;
@@ -20,6 +20,12 @@ export enum UserStatus {
     PendingVerification = 'PendingVerification'
 }
 
+export enum UserRoles {
+    Admin = 'Administrator',
+    User = 'Normal User',
+    Readonly = 'Readonly',
+}
+
 interface UserFormProps {
     editingUser?: {
         id: number;
@@ -28,6 +34,7 @@ interface UserFormProps {
         firstName?: string;
         lastName?: string;
         status?: UserStatus;
+        roles?: UserRoles[];
         authProvider?: AuthProvider;
         authUserId?: string;
         isTwoFactorEnabled?: boolean;
@@ -54,13 +61,14 @@ const UserForm: React.FC<UserFormProps> = ({
     const [newPassword, setNewPassword] = useState('');
     const createUser = useCreateUser();
     const updateUser = useUpdateUser();
-    const { data: roles = [] } = useUserRoles();
+    const { data: roles = [] } = useRoles();
 
     const isEditing = editingUser && editingUser.id > 0;
 
     React.useEffect(() => {
         if (editingUser) {
             form.setFieldsValue(editingUser);
+            console.log('###', editingUser);
         }
     }, [editingUser, form]);
 
@@ -75,7 +83,8 @@ const UserForm: React.FC<UserFormProps> = ({
                         lastName: values.lastName,
                         status: values.status,
                         newPassword: values.newPassword,
-                        isTwoFactorEnabled: values.isTwoFactorEnabled
+                        isTwoFactorEnabled: values.isTwoFactorEnable,
+                        roles: values.roles
                     }
                 };
                 await updateUser.mutateAsync(updateData);
@@ -181,6 +190,17 @@ const UserForm: React.FC<UserFormProps> = ({
                 <Select>
                     {Object.values(UserStatus).map(status => (
                         <Option key={status} value={status}>{status}</Option>
+                    ))}
+                </Select>
+            </Form.Item>
+            <Form.Item
+                name="roles"
+                label="Roles"
+                rules={[{ required: true, message: 'Please select at least one role.', type: 'array' }]}
+            >
+                <Select mode="multiple" placeholder="Select roles">
+                    {roles.map((role: string, i: number) => (
+                        <Option key={i} value={role}>{role}</Option>
                     ))}
                 </Select>
             </Form.Item>

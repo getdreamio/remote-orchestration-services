@@ -15,7 +15,7 @@ const EditUserPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState('general');
 
     const handleSuccess = () => {
-        navigate('/users');
+        //navigate('/users');
     };
 
     if (isLoading) {
@@ -79,7 +79,8 @@ const EditUserPage: React.FC = () => {
                                 accessToken: user.accessToken,
                                 refreshToken: user.refreshToken,
                                 createdDate: user.createdDate,
-                                updatedDate: user.updatedDate
+                                updatedDate: user.updatedDate,
+                                roles: user.roles
                             }}
                         />
                     </TabPane>

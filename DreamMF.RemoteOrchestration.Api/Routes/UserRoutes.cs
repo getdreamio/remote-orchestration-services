@@ -98,6 +98,15 @@ public static class UserRoutes
             .WithSummary("Remove Role from User")
             .WithDescription("Removes a role from a specific user");
 
+        group.MapGet("/roles", GetAvailableRoles)
+            .WithTags(GroupName)
+            .Produces<List<string>>(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("Get available roles"))
+            .WithSummary("Get Available Roles")
+            .WithDescription("Retrieves a list of all available roles in the system");
+
         return group;
     }
 
@@ -158,5 +167,11 @@ public static class UserRoutes
         if (!success)
             return Results.NotFound();
         return Results.NoContent();
+    }
+
+    private static async Task<IResult> GetAvailableRoles(IUserService userService)
+    {
+        var roles = await userService.GetAvailableRolesAsync();
+        return Results.Ok(roles);
     }
 }

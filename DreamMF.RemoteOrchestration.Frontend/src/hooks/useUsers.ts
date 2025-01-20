@@ -105,6 +105,14 @@ const fetchUserRoles = async (userId: number) => {
     return response.json();
 };
 
+const fetchAllRoles = async () => {
+    const response = await fetchWithAuth(`${config.backendUrl}/api/users/roles`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+};
+
 const addUserRole = async ({ userId, roleName }: { userId: number; roleName: string }) => {
     const response = await fetchWithAuth(`${config.backendUrl}/api/users/${userId}/roles/${roleName}`, {
         method: 'POST',
@@ -177,6 +185,13 @@ export const useUserRoles = (userId: number) => {
         queryKey: ['user-roles', userId],
         queryFn: () => fetchUserRoles(userId),
         enabled: !!userId
+    });
+};
+
+export const useRoles = () => {
+    return useQuery({
+        queryKey: ['roles'],
+        queryFn: () => fetchAllRoles()
     });
 };
 

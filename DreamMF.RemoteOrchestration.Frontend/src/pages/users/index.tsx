@@ -93,7 +93,7 @@ const UsersPage: React.FC = () => {
             title: 'Roles',
             dataIndex: 'roles',
             key: 'roles',
-            render: (roles: string[]) => roles.join(', '),
+            render: (roles: string[]) => roles.length,
         },
         {
             title: 'Auth Provider',

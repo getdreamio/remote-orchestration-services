@@ -90,9 +90,10 @@ CREATE INDEX idx_userrolemapping_role ON UserRoleMapping(RoleId);
 -- Default Roles
 INSERT INTO UserRole (Name, NormalizedName, Description, CreatedDate, UpdatedDate)
 VALUES 
-    ('Admin', 'ADMIN', 'Full system access', strftime('%s','now'), strftime('%s','now')),
-    ('User', 'USER', 'Standard user access', strftime('%s','now'), strftime('%s','now')),
-    ('ReadOnly', 'READONLY', 'Read-only access', strftime('%s','now'), strftime('%s','now'));
+    ('Administrator', 'ADMIN', 'Full system access', strftime('%s','now'), strftime('%s','now')),
+    ('CanCreateEditHosts', 'CANCREATEEDITHOSTS', 'Can create/edit hosts', strftime('%s','now'), strftime('%s','now')),
+    ('CanCreateEditRemotes', 'CANCREATEEDITREMOTES', 'Can create/edit remotes', strftime('%s','now'), strftime('%s','now')),
+    ('CanCreateEditTags', 'CANCREATEEDITTAGS', 'Can create/edit tags', strftime('%s','now'), strftime('%s','now'));
 
 -- Root User (Password: Dr34m!12345)
 INSERT INTO [User] (

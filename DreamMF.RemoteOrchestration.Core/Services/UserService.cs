@@ -19,6 +19,7 @@ public interface IUserService
     Task<IEnumerable<string>> GetUserRolesAsync(int userId);
     Task<bool> AddUserRoleAsync(int userId, int roleId);
     Task<bool> RemoveUserRoleAsync(int userId, int roleId);
+    Task<IEnumerable<string>> GetAvailableRolesAsync();
 }
 
 public class UserService : IUserService
@@ -119,6 +120,30 @@ public class UserService : IUserService
         if (request.Status.HasValue)
             user.Status = request.Status.Value;
 
+        // Update roles
+        var existingRoleMappings = await _dbContext.Set<UserRoleMapping>()
+            .Where(ur => ur.UserId == id)
+            .ToListAsync();
+        
+        // Remove all existing role mappings
+        _dbContext.Set<UserRoleMapping>().RemoveRange(existingRoleMappings);
+
+        // Add new role mappings
+        if (request.Roles?.Any() == true)
+        {
+            var roleEntities = await _dbContext.UserRoles
+                .Where(r => request.Roles.Contains(r.Name))
+                .ToListAsync();
+
+            var newRoleMappings = roleEntities.Select(r => new UserRoleMapping 
+            { 
+                UserId = id, 
+                RoleId = r.Id 
+            });
+            
+            await _dbContext.Set<UserRoleMapping>().AddRangeAsync(newRoleMappings);
+        }
+
         if (!string.IsNullOrEmpty(request.NewPassword))
         {
             var salt = BCrypt.Net.BCrypt.GenerateSalt();
@@ -185,5 +210,15 @@ public class UserService : IUserService
         _dbContext.Set<UserRoleMapping>().Remove(mapping);
         await _dbContext.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<IEnumerable<string>> GetAvailableRolesAsync()
+    {
+        var roles = await _dbContext.UserRoles
+            .OrderBy(r => r.Name)
+            .Select(r => r.Name)
+            .ToListAsync();
+        
+        return roles;
     }
 }
