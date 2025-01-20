@@ -59,10 +59,7 @@ const SettingsPage = () => {
             )}
 
             <Card className='mb-4 bg-gray-50 dark:bg-gray-800'>
-                <ApiSettingsForm
-                    configurations={configurations}
-                    onSave={handleSave}
-                />
+                <ApiSettingsForm />
             </Card>
             <Card className='mb-4 bg-gray-50 dark:bg-gray-800'>
                 <DatabaseSettingsForm 

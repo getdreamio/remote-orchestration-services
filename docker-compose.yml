@@ -1,19 +1,19 @@
 version: '3.8'
 services:
   frontend:
-    image: dreammf/ros-frontend:0.9.0
+    image: dreammf/ros-frontend:0.9.1
     build:
       context: .
-      target: frontend
+      target: frontend-server
+      args:
+        BACKEND_URL: https://localhost:5001
+        AUTH_AUTHORITY: http://localhost:5000
+        AUTH_CLIENT_ID: DreamMF-Web-01202025
     ports:
-      - "3000:3000"
-    environment:
-      - BACKEND_URL=https://localhost:5001
-      - AUTH_AUTHORITY=http://localhost:5000
-      - AUTH_CLIENT_ID=DreamMF-Web-01202025
+      - "3000:80"
 
   backend:
-    image: dreammf/ros-backend:0.9.0
+    image: dreammf/ros-backend:0.9.1
     build:
       context: .
       target: final

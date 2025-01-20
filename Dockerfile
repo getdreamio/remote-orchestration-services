@@ -5,8 +5,20 @@ COPY ["DreamMF.RemoteOrchestration.Frontend/package*.json", "./"]
 COPY ["DreamMF.RemoteOrchestration.Frontend/pnpm-lock.yaml", "./"]
 RUN npm install -g pnpm && pnpm install
 COPY ["DreamMF.RemoteOrchestration.Frontend", "./"]
-EXPOSE 8080
-CMD ["pnpm", "run", "dev"]
+RUN pnpm run build
+
+# Write environment variables to env-config.json
+ARG BACKEND_URL
+ARG AUTH_AUTHORITY
+ARG AUTH_CLIENT_ID
+RUN echo '{"BACKEND_URL":"'$BACKEND_URL'","AUTH_AUTHORITY":"'$AUTH_AUTHORITY'","AUTH_CLIENT_ID":"'$AUTH_CLIENT_ID'"}' > /src/frontend/dist/env-config.json
+
+# Serve Frontend
+FROM nginx:alpine AS frontend-server
+COPY --from=frontend /src/frontend/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
 
 # Build API
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
