@@ -68,7 +68,6 @@ const UserForm: React.FC<UserFormProps> = ({
     React.useEffect(() => {
         if (editingUser) {
             form.setFieldsValue(editingUser);
-            console.log('###', editingUser);
         }
     }, [editingUser, form]);
 

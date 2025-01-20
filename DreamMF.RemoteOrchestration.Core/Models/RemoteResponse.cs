@@ -14,6 +14,8 @@ public class RemoteResponse
     public List<ModuleResponse> Modules { get; set; } = new List<ModuleResponse>();
     public long Created_Date { get; set; }
     public long Updated_Date { get; set; }
+    public int HostCounts { get; set; } = 0;
+    public int SubRemoteCounts { get; set; } = 0;
 }
 
 public class RemoteSummaryResponse

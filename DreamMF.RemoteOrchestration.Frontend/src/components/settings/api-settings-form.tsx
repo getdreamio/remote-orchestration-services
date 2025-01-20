@@ -13,7 +13,6 @@ export const ApiSettingsForm: React.FC<ApiSettingsFormProps> = ({
     configurations,
     onSave,
 }) => {
-    console.log('#api-settings#', configurations);
     
     const getConfigValue = (key: string) => {
         return configurations?.find(c => c.key === key)?.value || '';

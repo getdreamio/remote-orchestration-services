@@ -25,16 +25,6 @@ interface HostRemote {
     createdAt: string;
 }
 
-interface HostRemoteCount {
-    hostId: number;
-    count: number;
-}
-
-interface RemoteHostCount {
-    remoteId: number;
-    count: number;
-}
-
 export type HostRequest = Omit<Host, 'id' | 'createdAt' | 'updatedAt'>;
 
 const fetchHosts = async (): Promise<Host[]> => {
@@ -88,24 +78,6 @@ const detachRemoteFromHost = async ({ hostId, remoteId }: { hostId: number; remo
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
-};
-
-// Fetch remote counts for all hosts
-const fetchHostRemoteCounts = async (): Promise<HostRemoteCount[]> => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/hosts/remote-counts`);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
-};
-
-// Fetch host counts for all remotes
-const fetchRemoteHostCounts = async (): Promise<RemoteHostCount[]> => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/remotes/host-counts`);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
 };
 
 export const useHosts = () => {
@@ -213,19 +185,5 @@ export const useDetachRemote = () => {
         onSuccess: (_, { hostId }) => {
             queryClient.invalidateQueries({ queryKey: ['hosts', hostId, 'remotes'] });
         },
-    });
-};
-
-export const useHostRemoteCounts = () => {
-    return useQuery({
-        queryKey: ['hosts', 'remote-counts'],
-        queryFn: fetchHostRemoteCounts,
-    });
-};
-
-export const useRemoteHostCounts = () => {
-    return useQuery({
-        queryKey: ['remotes', 'host-counts'],
-        queryFn: fetchRemoteHostCounts,
     });
 };

@@ -29,6 +29,7 @@ public static class HostMapper
             Url = entity.Url,
             Key = entity.Key,
             Environment = entity.Environment,
+            RemoteCount = entity.Host_Remotes.Count,
             Created_Date = entity.Created_Date,
             Updated_Date = entity.Updated_Date
         };

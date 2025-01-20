@@ -24,7 +24,7 @@ public class HostService
         {
             throw new HandledException(ExceptionType.Validation, "Database context cannot be null.");
         }
-        var hosts = await _dbContext.Hosts.ToListAsync();
+        var hosts = await _dbContext.Hosts.Include(h => h.Host_Remotes).ToListAsync();
         var hostResponses = hosts.Select(HostMapper.ToResponse).ToList();
         return hostResponses;
     }

@@ -49,15 +49,16 @@ const EditRemotePage: React.FC = () => {
 
     const onFinish = async (values: any) => {
         try {
-            await updateRemote.mutateAsync({
+            const result = await updateRemote.mutateAsync({
                 id: Number(id),
                 remote: {
                     ...values,
                     modules,
                 }
             });
-            message.success('Remote updated successfully');
-            navigate('/remotes');
+            if (result >= 200 && result < 400) {
+                message.success('Remote updated successfully');
+            }
         } catch (error) {
             message.error('Failed to update remote');
         }

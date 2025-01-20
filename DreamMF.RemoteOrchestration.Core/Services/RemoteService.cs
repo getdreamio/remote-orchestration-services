@@ -20,6 +20,7 @@ public class RemoteService
     public async Task<List<RemoteResponse>> GetAllRemotesAsync()
     {
         var remotes = await _dbContext.Remotes
+            .Include(r => r.Host_Remotes)
             .Include(r => r.RemoteModules)
                 .ThenInclude(rm => rm.Module)
             .ToListAsync();

@@ -17,9 +17,6 @@ const SettingsPage = () => {
     const { mutate: updateSetting, isPending: isUpdating } = useUpdateConfiguration();
     const { mutate: createSetting, isPending: isCreating } = useCreateConfiguration();
 
-
-    console.log('###', configurations);
-
     const getSettingValue = (key: string) => {
         return configurations?.find(s => s.key === key)?.value || '';
     };

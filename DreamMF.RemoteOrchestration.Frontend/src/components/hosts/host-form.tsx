@@ -68,8 +68,6 @@ const HostForm: React.FC<HostFormProps> = ({ onSuccess, editingHost, renderFoote
         message.success('Key copied to clipboard');
     };
 
-    console.log(form.getFieldsValue());
-
     return (
         <Form
             form={form}

@@ -9,16 +9,15 @@ import {
     AppstoreOutlined,
     BranchesOutlined 
 } from '@ant-design/icons';
-import { useRemotes, useDeleteRemote, useRemoteModuleCounts, useRemoteSubRemoteCounts } from '@/hooks/useRemotes';
-import { useRemoteHostCounts } from '@/hooks/useHosts';
+import { useRemotes, useDeleteRemote } from '@/hooks/useRemotes';
 import { formatDate } from '@/lib/date-utils';
 import { Helmet } from 'react-helmet';
-
-const { Title } = Typography;
 
 interface Remote {
     id: number;
     name: string;
+    scope: string;
+    modules: string[];
     storageType: string;
     created_Date: string;
     updated_Date: string;
@@ -27,9 +26,6 @@ interface Remote {
 const RemotesPage: React.FC = () => {
     const navigate = useNavigate();
     const { data: remotes, isLoading } = useRemotes();
-    const { data: hostCounts } = useRemoteHostCounts();
-    const { data: moduleCounts } = useRemoteModuleCounts();
-    const { data: subRemoteCounts } = useRemoteSubRemoteCounts();
     const deleteRemote = useDeleteRemote();
 
     const handleDelete = async (id: number) => {
@@ -63,62 +59,44 @@ const RemotesPage: React.FC = () => {
         {
             title: 'Modules',
             key: 'modules',
-            render: (_: any, record: Remote) => {
-                const count = moduleCounts?.find(mc => mc.remoteId === record.id)?.count || 0;
+            render: (_: any, record: any) => {
                 return (
-                    <Tooltip title={`${count} module${count === 1 ? '' : 's'}`}>
+                    <Tooltip title={`${record.modules.length} module${record.modules.length === 1 ? '' : 's'}`}>
                         <div className="flex items-center gap-1">
                             <AppstoreOutlined />
-                            <span>{count}</span>
+                            <span>{record.modules.length}</span>
                         </div>
                     </Tooltip>
                 );
-            },
-            sorter: (a: Remote, b: Remote) => {
-                const countA = moduleCounts?.find(mc => mc.remoteId === a.id)?.count || 0;
-                const countB = moduleCounts?.find(mc => mc.remoteId === b.id)?.count || 0;
-                return countA - countB;
-            },
+            }
         },
         {
             title: 'Sub-Remotes',
             key: 'subRemotes',
-            render: (_: any, record: Remote) => {
-                const count = subRemoteCounts?.find(src => src.remoteId === record.id)?.count || 0;
+            render: (_: any, record: any) => {
                 return (
-                    <Tooltip title={`${count} sub-remote${count === 1 ? '' : 's'}`}>
+                    <Tooltip title={`${record.subRemoteCounts} sub-remote${record.subRemoteCounts === 1 ? '' : 's'}`}>
                         <div className="flex items-center gap-1">
                             <BranchesOutlined />
-                            <span>{count}</span>
+                            <span>{record.subRemoteCounts}</span>
                         </div>
                     </Tooltip>
                 );
-            },
-            sorter: (a: Remote, b: Remote) => {
-                const countA = subRemoteCounts?.find(src => src.remoteId === a.id)?.count || 0;
-                const countB = subRemoteCounts?.find(src => src.remoteId === b.id)?.count || 0;
-                return countA - countB;
-            },
+            }
         },
         {
             title: 'Hosts',
             key: 'hosts',
-            render: (_: any, record: Remote) => {
-                const count = hostCounts?.find(hc => hc.remoteId === record.id)?.count || 0;
+            render: (_: any, record: any) => {
                 return (
-                    <Tooltip title={`${count} host${count === 1 ? '' : 's'}`}>
+                    <Tooltip title={`${record.hostCounts} host${record.hostCounts === 1 ? '' : 's'}`}>
                         <div className="flex items-center gap-1">
                             <DesktopOutlined />
-                            <span>{count}</span>
+                            <span>{record.hostCounts}</span>
                         </div>
                     </Tooltip>
                 );
-            },
-            sorter: (a: Remote, b: Remote) => {
-                const countA = hostCounts?.find(hc => hc.remoteId === a.id)?.count || 0;
-                const countB = hostCounts?.find(hc => hc.remoteId === b.id)?.count || 0;
-                return countA - countB;
-            },
+            }
         },
         {
             title: 'Last Updated',

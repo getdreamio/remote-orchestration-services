@@ -89,7 +89,7 @@ const updateRemote = async ({ id, remote }: { id: number; remote: RemoteRequest 
         method: 'PUT',
         body: JSON.stringify(remote),
     });
-    return response.json();
+    return response.status;
 };
 
 const deleteRemote = async (id: number) => {
@@ -103,7 +103,7 @@ const updateRemoteUrl = async ({ id, version }: { id: number; version: string })
         method: 'PUT',
         body: JSON.stringify({ version }),
     });
-    return response.json();
+    return response.status;
 };
 
 const fetchRemoteVersions = async (remoteId: number) => {

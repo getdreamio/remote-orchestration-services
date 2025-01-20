@@ -68,7 +68,9 @@ public static class RemoteMapper
                     Created_Date = rm.Module.Created_Date,
                     Updated_Date = rm.Module.Updated_Date
                 })
-                .ToList()
+                .ToList(),
+            HostCounts = entity.Host_Remotes.Count,
+            SubRemoteCounts = 0, // TODO: Add Sub Remotes
         };
     }
 }

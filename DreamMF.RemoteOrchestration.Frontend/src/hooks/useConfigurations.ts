@@ -32,7 +32,7 @@ const updateConfiguration = async ({ id, data }: { id: number; data: Configurati
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
-    return response.json();
+    return response.status;
 };
 
 const createConfiguration = async (data: ConfigurationRequest): Promise<Configuration> => {

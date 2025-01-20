@@ -12,6 +12,7 @@ public class HostResponse
     public string ContactName { get; set; } = string.Empty;
     public string ContactEmail { get; set; } = string.Empty;
     public string DocumentationUrl { get; set; } = string.Empty;
+    public int RemoteCount { get; set; } = 0;
     public long Created_Date { get; set; }
     public long Updated_Date { get; set; }
 }

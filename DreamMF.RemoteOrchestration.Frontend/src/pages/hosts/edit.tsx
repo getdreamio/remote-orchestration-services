@@ -45,7 +45,6 @@ const EditHostPage: React.FC = () => {
 
     const handleDetachRemote = async (remoteId: number) => {
         try {
-            console.log(`Detaching remote ${remoteId} from host ${id}`);
             await detachRemote.mutateAsync({ hostId: Number(id), remoteId });
             message.success('Remote detached successfully');
         } catch (error) {

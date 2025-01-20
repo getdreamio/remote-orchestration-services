@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Table, message, Tag, Typography, Tooltip, Popconfirm } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined, ApiOutlined } from '@ant-design/icons';
-import { useHosts, useDeleteHost, useHostRemoteCounts } from '@/hooks/useHosts';
+import { useHosts, useDeleteHost } from '@/hooks/useHosts';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 
@@ -10,7 +10,6 @@ const { Text } = Typography;
 const HostsPage: React.FC = () => {
     const navigate = useNavigate();
     const { data: hosts, isLoading } = useHosts();
-    const { data: remoteCounts } = useHostRemoteCounts();
     const deleteHost = useDeleteHost();
 
     const handleDelete = async (id: number) => {
@@ -110,12 +109,11 @@ const HostsPage: React.FC = () => {
             title: 'Remotes',
             key: 'remotes',
             render: (_: any, record: any) => {
-                const count = remoteCounts?.find(rc => rc.hostId === record.id)?.count || 0;
                 return (
-                    <Tooltip title={`${count} remote${count === 1 ? '' : 's'} connected`}>
+                    <Tooltip title={`${record.remoteCount} remote${record.remoteCount === 1 ? '' : 's'} attached`}>
                         <div className="flex items-center gap-1">
                             <ApiOutlined />
-                            <span>{count}</span>
+                            <span>{record.remoteCount}</span>
                         </div>
                     </Tooltip>
                 );
