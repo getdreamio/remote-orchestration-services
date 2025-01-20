@@ -207,6 +207,13 @@ const AnalyticsPage: React.FC = () => {
             sorter: (a: EntityAnalytics, b: EntityAnalytics) => a.last30DaysActions - b.last30DaysActions,
             render: (value: number) => value.toLocaleString(),
         },
+        {
+            title: 'Last 24 Hours',
+            dataIndex: 'last24HoursActions',
+            key: 'last24HoursActions',
+            sorter: (a: EntityAnalytics, b: EntityAnalytics) => a.last24HoursActions - b.last24HoursActions,
+            render: (value: number) => value.toLocaleString(),
+        },
     ];
 
     const hostColumns = [
@@ -254,6 +261,13 @@ const AnalyticsPage: React.FC = () => {
             dataIndex: 'last30DaysActions',
             key: 'last30DaysActions',
             sorter: (a: EntityAnalytics, b: EntityAnalytics) => a.last30DaysActions - b.last30DaysActions,
+            render: (value: number) => value.toLocaleString(),
+        },
+        {
+            title: 'Last 24 Hours',
+            dataIndex: 'last24HoursActions',
+            key: 'last24HoursActions',
+            sorter: (a: EntityAnalytics, b: EntityAnalytics) => a.last24HoursActions - b.last24HoursActions,
             render: (value: number) => value.toLocaleString(),
         },
     ];
@@ -380,16 +394,13 @@ const AnalyticsPage: React.FC = () => {
                                                         {remote.entityName}
                                                     </div>
                                                     <div className="text-sm text-muted-foreground">
-                                                        Last used: {new Date(summary?.recentRemoteActivity[0]?.readDate).toLocaleString()}
+                                                        <i>Recent: {remote.last24HoursActions.toLocaleString()} actions in the last 24 hours</i>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <div className="font-semibold text-blue-600 dark:text-blue-400">
+                                                <div className="font-semibold text-blue-600 dark:text-blue-400 text-lg">
                                                     {remote.last30DaysActions.toLocaleString()}
-                                                </div>
-                                                <div className="text-sm text-muted-foreground">
-                                                    actions
                                                 </div>
                                             </div>
                                         </div>

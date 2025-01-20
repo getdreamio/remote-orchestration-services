@@ -325,7 +325,6 @@ VALUES
 
 -- Analytics Views
 
-
 -- View for Remote read/update analytics
 DROP VIEW IF EXISTS v_RemoteReadAnalytics;
 CREATE VIEW v_RemoteReadAnalytics AS
@@ -338,12 +337,12 @@ SELECT
     COUNT(CASE WHEN ar.Action = 'Create' THEN 1 END) as TotalCreates,
     COUNT(CASE WHEN ar.Action = 'Delete' THEN 1 END) as TotalDeletes,
     COUNT(CASE 
-        WHEN ar.Created_Date >= strftime('%s', 'now', '-30 days') 
+        WHEN ar.Created_Date >= (strftime('%s', CURRENT_TIMESTAMP, '-30 days') * 1000)
         THEN 1 
     END) as Last30DaysActions,
     COUNT(
         CASE
-            WHEN ar.Created_Date >= strftime('%s', 'now', '-24 hour')
+            WHEN ar.Created_Date >= (strftime('%s', CURRENT_TIMESTAMP, '-24 hour') * 1000)
             THEN 1
         END
     ) AS Last24HoursActions
@@ -363,12 +362,12 @@ SELECT
     COUNT(CASE WHEN ar.Action = 'Create' THEN 1 END) as TotalCreates,
     COUNT(CASE WHEN ar.Action = 'Delete' THEN 1 END) as TotalDeletes,
     COUNT(CASE 
-        WHEN ar.Created_Date >= strftime('%s', 'now', '-30 days') 
+        WHEN ar.Created_Date >= (strftime('%s', CURRENT_TIMESTAMP, '-30 days') * 1000)
         THEN 1 
     END) as Last30DaysActions,
     COUNT(
         CASE
-            WHEN ar.Created_Date >= strftime('%s', 'now', '-24 hour')
+            WHEN ar.Created_Date >= (strftime('%s', CURRENT_TIMESTAMP, '-24 hour') * 1000)
             THEN 1
         END
     ) AS Last24HoursActions
@@ -388,12 +387,12 @@ SELECT
     COUNT(CASE WHEN ar.Action = 'Create' THEN 1 END) as TotalCreates,
     COUNT(CASE WHEN ar.Action = 'Delete' THEN 1 END) as TotalDeletes,
     COUNT(CASE 
-        WHEN ar.Created_Date >= strftime('%s', 'now', '-30 days') 
+        WHEN ar.Created_Date >= (strftime('%s', CURRENT_TIMESTAMP, '-30 days') * 1000)
         THEN 1 
     END) as Last30DaysActions,
     COUNT(
         CASE
-            WHEN ar.Created_Date >= strftime('%s', 'now', '-24 hour')
+            WHEN ar.Created_Date >= (strftime('%s', CURRENT_TIMESTAMP, '-24 hour') * 1000)
             THEN 1
         END
     ) AS Last24HoursActions
@@ -413,12 +412,12 @@ SELECT
     COUNT(CASE WHEN ar.Action = 'Create' THEN 1 END) as TotalCreates,
     COUNT(CASE WHEN ar.Action = 'Delete' THEN 1 END) as TotalDeletes,
     COUNT(CASE 
-        WHEN ar.Created_Date >= strftime('%s', 'now', '-30 days') 
+        WHEN ar.Created_Date >= (strftime('%s', CURRENT_TIMESTAMP, '-30 days') * 1000)
         THEN 1 
     END) as Last30DaysActions,
     COUNT(
         CASE
-            WHEN ar.Created_Date >= strftime('%s', 'now', '-24 hour')
+            WHEN ar.Created_Date >= (strftime('%s', CURRENT_TIMESTAMP, '-24 hour') * 1000)
             THEN 1
         END
     ) AS Last24HoursActions

@@ -151,13 +151,13 @@ public class AnalyticsService : IAnalyticsService
         {
             sql += " WHERE Host_ID = @hostId";
             return await _dbContext.Set<DailyEntityAnalytics>()
-                .FromSqlRaw(sql + " ORDER BY ReadDate DESC", 
+                .FromSqlRaw(sql + " ORDER BY ReadCount DESC", 
                     new Microsoft.Data.Sqlite.SqliteParameter("@hostId", hostId.Value))
                 .ToListAsync();
         }
 
         return await _dbContext.Set<DailyEntityAnalytics>()
-            .FromSqlRaw(sql + " ORDER BY ReadDate DESC")
+            .FromSqlRaw(sql + " ORDER BY ReadCount DESC")
             .ToListAsync();
     }
 
@@ -179,13 +179,13 @@ public class AnalyticsService : IAnalyticsService
         {
             sql += " WHERE Remote_ID = @remoteId";
             return await _dbContext.Set<DailyEntityAnalytics>()
-                .FromSqlRaw(sql + " ORDER BY ReadDate DESC", 
+                .FromSqlRaw(sql + " ORDER BY ReadCount DESC", 
                     new Microsoft.Data.Sqlite.SqliteParameter("@remoteId", remoteId.Value))
                 .ToListAsync();
         }
 
         return await _dbContext.Set<DailyEntityAnalytics>()
-            .FromSqlRaw(sql + " ORDER BY ReadDate DESC")
+            .FromSqlRaw(sql + " ORDER BY ReadCount DESC")
             .ToListAsync();
     }
 
