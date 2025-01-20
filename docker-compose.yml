@@ -5,9 +5,11 @@ services:
       context: .
       target: frontend
     ports:
-      - "8080:8080"
+      - "3000:3000"
     environment:
-      - VITE_API_URL=http://localhost:5000
+      - BACKEND_URL=https://localhost:5001
+      - AUTH_AUTHORITY=http://localhost:5000
+      - AUTH_CLIENT_ID=DreamMF-Web-01202025
 
   backend:
     build:

@@ -6,7 +6,7 @@ COPY ["DreamMF.RemoteOrchestration.Frontend/pnpm-lock.yaml", "./"]
 RUN npm install -g pnpm && pnpm install
 COPY ["DreamMF.RemoteOrchestration.Frontend", "./"]
 EXPOSE 8080
-CMD ["pnpm", "run", "dev", "--port", "8080", "--host"]
+CMD ["pnpm", "run", "dev"]
 
 # Build API
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base

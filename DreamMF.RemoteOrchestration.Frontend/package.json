@@ -46,6 +46,7 @@
   },
   "scripts": {
     "start": "rsbuild dev",
+    "dev": "rsbuild dev",
     "build": "rsbuild build"
   },
   "eslintConfig": {

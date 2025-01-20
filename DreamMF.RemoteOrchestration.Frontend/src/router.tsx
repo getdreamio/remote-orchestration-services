@@ -17,8 +17,8 @@ import NotFoundPage from './pages/not-found';
 import LoginPage from './pages/auth/login';
 import LogoutPage from './pages/auth/logout';
 import RegisterPage from './pages/auth/register';
-import ForgotPasswordPage from './pages/auth/forgot-password';
-import ResetPasswordPage from './pages/auth/reset-password';
+// import ForgotPasswordPage from './pages/auth/forgot-password';
+// import ResetPasswordPage from './pages/auth/reset-password';
 import TagsPage from './pages/tags/index';
 import ErrorDisplay from './components/error/error-display';
 import EditTagPage from './pages/tags/edit';
@@ -60,68 +60,68 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: '/',
-                element: <DashboardPage />,
+                element: <ProtectedRoute><DashboardPage /></ProtectedRoute>,
                 errorElement: <ErrorDisplay message="Error loading dashboard" />,
             },
             {
                 path: 'remotes',
-                element: <RemotesPage />,
+                element: <ProtectedRoute><RemotesPage /></ProtectedRoute>,
             },
             {
                 path: 'remotes/new',
-                element: <NewRemotePage />,
+                element: <ProtectedRoute><NewRemotePage /></ProtectedRoute>,
             },
             {
                 path: 'remotes/:id',
-                element: <EditRemotePage />,
+                element: <ProtectedRoute><EditRemotePage /></ProtectedRoute>,
             },
             {
                 path: 'hosts',
-                element: <HostsPage />,
+                element: <ProtectedRoute><HostsPage /></ProtectedRoute>,
             },
             {
                 path: 'hosts/new',
-                element: <NewHostPage />,
+                element: <ProtectedRoute><NewHostPage /></ProtectedRoute>,
             },
             {
                 path: 'hosts/:id',
-                element: <EditHostPage />,
+                element: <ProtectedRoute><EditHostPage /></ProtectedRoute>,
             },
             {
                 path: 'tags',
-                element: <TagsPage />,
+                element: <ProtectedRoute><TagsPage /></ProtectedRoute>,
                 errorElement: <ErrorDisplay message="Error loading tags" />,
             },
             {
                 path: 'tags/new',
-                element: <NewTagPage />,
+                element: <ProtectedRoute><NewTagPage /></ProtectedRoute>,
             },
             {
                 path: 'tags/:id',
-                element: <EditTagPage />,
+                element: <ProtectedRoute><EditTagPage /></ProtectedRoute>,
             },
             {
                 path: 'users',
-                element: <UsersPage />,
+                element: <ProtectedRoute><UsersPage /></ProtectedRoute>,
                 errorElement: <ErrorDisplay message="Error loading users" />,
             },
             {
                 path: 'users/new',
-                element: <NewUserPage />,
+                element: <ProtectedRoute><NewUserPage /></ProtectedRoute>,
                 errorElement: <ErrorDisplay message="Error creating user" />,
             },
             {
                 path: 'users/:id/edit',
-                element: <EditUserPage />,
+                element: <ProtectedRoute><EditUserPage /></ProtectedRoute>,
                 errorElement: <ErrorDisplay message="Error editing user" />,
             },
             {
                 path: 'settings',
-                element: <SettingsPage />,
+                element: <ProtectedRoute><SettingsPage /></ProtectedRoute>,
             },
             {
                 path: 'analytics',
-                element: <AnalyticsPage />,
+                element: <ProtectedRoute><AnalyticsPage /></ProtectedRoute>,
             },
             {
                 path: 'search',
