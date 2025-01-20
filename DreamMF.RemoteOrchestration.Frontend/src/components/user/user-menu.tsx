@@ -27,7 +27,12 @@ export function UserMenu() {
                 className="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-100 dark:hover:bg-accent"
             >
                 <User className="h-5 w-5" />
-                <span>{user?.name || 'Guest'}</span>
+                <div className="flex flex-col items-start">
+                    <span className="text-xs uppercase font-medium">{user?.name || 'Guest'}</span>
+                    {user?.email && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400">{user.email}</span>
+                    )}
+                </div>
             </button>
 
             {isOpen && (

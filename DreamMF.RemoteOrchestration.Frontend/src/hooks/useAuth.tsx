@@ -2,9 +2,17 @@ import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthUser, RegisterRequest } from "../types/auth";
 import { config } from '@/config/env';
+import { jwtDecode } from "jwt-decode";
 
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'auth_user';
+
+interface JwtPayload {
+  unique_name?: string;
+  email?: string;
+  nameid?: string;
+  role?: string | string[];
+}
 
 export const useAuth = () => {
   const navigate = useNavigate();
@@ -12,14 +20,34 @@ export const useAuth = () => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
+  const parseJwtToken = (token: string): AuthUser => {
+    const decoded = jwtDecode<JwtPayload>(token);
+    return {
+      id: decoded.nameid || '',
+      email: decoded.email || '',
+      given_name: decoded.email || '',
+      family_name: decoded.email || '',
+      name: decoded.unique_name || decoded.email || '',
+      roles: Array.isArray(decoded.role) ? decoded.role : decoded.role ? [decoded.role] : []
+    };
+  };
+
   useEffect(() => {
     // Load saved auth state
     const savedToken = localStorage.getItem(TOKEN_KEY);
     const savedUser = localStorage.getItem(USER_KEY);
     
-    if (savedToken && savedUser) {
+    if (savedToken) {
       setToken(savedToken);
-      setUser(JSON.parse(savedUser));
+      try {
+        const userData = parseJwtToken(savedToken);
+        setUser(userData);
+        // Update stored user data with latest from token
+        localStorage.setItem(USER_KEY, JSON.stringify(userData));
+      } catch (error) {
+        console.error('Error parsing JWT token:', error);
+        clearAuthState();
+      }
     }
     
     setIsLoading(false);
@@ -27,9 +55,10 @@ export const useAuth = () => {
 
   const saveAuthState = (token: string, user: AuthUser) => {
     localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    const userData = parseJwtToken(token);
+    localStorage.setItem(USER_KEY, JSON.stringify(userData));
     setToken(token);
-    setUser(user);
+    setUser(userData);
   };
 
   const clearAuthState = () => {
@@ -58,14 +87,7 @@ export const useAuth = () => {
       }
 
       const data = await response.json();
-      const userData: AuthUser = {
-        id: data.userId,
-        email: email,
-        name: data.displayName || email,
-        roles: data.roles || []
-      };
-
-      saveAuthState(data.token, userData);
+      saveAuthState(data.token, parseJwtToken(data.token));
       navigate("/");
     } catch (error) {
       throw error;
