@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { config } from '@/config/env';
+import { getApiUrl } from '../utils/api';
 import { Host } from './useHosts';
 import { Remote } from './useRemotes';
 import { message } from 'antd';
@@ -11,10 +11,10 @@ export interface SearchResponse {
 }
 
 const fetchSearchResults = async (searchText: string) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/search`, {
-        method: 'POST',
-        body: JSON.stringify({ searchText })
-    });
+    const response = await fetchWithAuth(getApiUrl(`/api/search?q=${encodeURIComponent(searchText)}`));
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
     return response.json();
 };
 

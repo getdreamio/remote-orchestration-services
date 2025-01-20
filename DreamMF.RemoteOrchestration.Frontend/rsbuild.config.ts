@@ -8,9 +8,9 @@ export default defineConfig({
             index: './src/index.tsx'
         },
         define: {
-            // Automatically inject all process.env.* variables
             'process.env': JSON.stringify(process.env)
-        }
+        },
+        include: ['public/env-config.json']
     },
     output: {
         distPath: {
@@ -19,7 +19,10 @@ export default defineConfig({
             css: 'static/css',
             assets: 'static/assets'
         },
-        cleanDistPath: true
+        cleanDistPath: true,
+        copy: [
+            { from: './public/env-config.json', to: 'env-config.json' }
+        ]
     },
     server: {
         port: 3000

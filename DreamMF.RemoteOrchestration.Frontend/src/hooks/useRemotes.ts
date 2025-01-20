@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { config } from '@/config/env';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { getApiUrl } from '../utils/api';
 
 interface Remote {
     id: number;
@@ -67,17 +68,23 @@ const fetchRemoteSubRemoteCounts = async (): Promise<RemoteSubRemoteCount[]> => 
 };
 
 const fetchRemotes = async () => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/remotes`);
+    const response = await fetchWithAuth(getApiUrl('/api/remotes'));
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
     return response.json();
 };
 
 const fetchRemote = async (id: number) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/remotes/${id}`);
+    const response = await fetchWithAuth(getApiUrl(`/api/remotes/${id}`));
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
     return response.json();
 };
 
 const createRemote = async (remote: RemoteRequest) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/remotes`, {
+    const response = await fetchWithAuth(getApiUrl('/api/remotes'), {
         method: 'POST',
         body: JSON.stringify(remote),
     });
@@ -85,7 +92,7 @@ const createRemote = async (remote: RemoteRequest) => {
 };
 
 const updateRemote = async ({ id, remote }: { id: number; remote: RemoteRequest }) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/remotes/${id}`, {
+    const response = await fetchWithAuth(getApiUrl(`/api/remotes/${id}`), {
         method: 'PUT',
         body: JSON.stringify(remote),
     });
@@ -93,13 +100,16 @@ const updateRemote = async ({ id, remote }: { id: number; remote: RemoteRequest 
 };
 
 const deleteRemote = async (id: number) => {
-    await fetchWithAuth(`${config.backendUrl}/api/remotes/${id}`, {
+    const response = await fetchWithAuth(getApiUrl(`/api/remotes/${id}`), {
         method: 'DELETE',
     });
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
 };
 
 const updateRemoteUrl = async ({ id, version }: { id: number; version: string }) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/remotes/${id}/url`, {
+    const response = await fetchWithAuth(getApiUrl(`/api/remotes/${id}/url`), {
         method: 'PUT',
         body: JSON.stringify({ version }),
     });
@@ -107,7 +117,7 @@ const updateRemoteUrl = async ({ id, version }: { id: number; version: string })
 };
 
 const fetchRemoteVersions = async (remoteId: number) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/remotes/${remoteId}/versions`);
+    const response = await fetchWithAuth(getApiUrl(`/api/remotes/${remoteId}/versions`));
     return response.json();
 };
 

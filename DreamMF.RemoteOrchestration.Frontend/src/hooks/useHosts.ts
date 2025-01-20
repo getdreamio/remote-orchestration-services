@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { config } from '@/config/env';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { getApiUrl } from '../utils/api';
 
 interface Host {
     id: number;
@@ -28,7 +29,7 @@ interface HostRemote {
 export type HostRequest = Omit<Host, 'id' | 'createdAt' | 'updatedAt'>;
 
 const fetchHosts = async (): Promise<Host[]> => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/hosts`);
+    const response = await fetchWithAuth(getApiUrl('/api/hosts'));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -36,7 +37,7 @@ const fetchHosts = async (): Promise<Host[]> => {
 };
 
 const fetchHost = async (id: number): Promise<Host> => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/hosts/${id}`);
+    const response = await fetchWithAuth(getApiUrl(`/api/hosts/${id}`));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -45,7 +46,7 @@ const fetchHost = async (id: number): Promise<Host> => {
 
 // Fetch remotes attached to a host
 const fetchHostRemotes = async (hostId: number): Promise<HostRemote[]> => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/hosts/${hostId}/remotes`);
+    const response = await fetchWithAuth(getApiUrl(`/api/hosts/${hostId}/remotes`));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -54,12 +55,8 @@ const fetchHostRemotes = async (hostId: number): Promise<HostRemote[]> => {
 
 // Attach a remote to a host
 const attachRemoteToHost = async ({ hostId, remoteId }: { hostId: number; remoteId: number }): Promise<void> => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/hosts/${hostId}/attach`, {
+    const response = await fetchWithAuth(getApiUrl(`/api/hosts/${hostId}/remotes/${remoteId}`), {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ remoteId }),
     });
     if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -68,12 +65,8 @@ const attachRemoteToHost = async ({ hostId, remoteId }: { hostId: number; remote
 
 // Detach a remote from a host
 const detachRemoteFromHost = async ({ hostId, remoteId }: { hostId: number; remoteId: number }): Promise<void> => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/hosts/${hostId}/detach`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ remoteId }),
+    const response = await fetchWithAuth(getApiUrl(`/api/hosts/${hostId}/remotes/${remoteId}`), {
+        method: 'DELETE',
     });
     if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -100,7 +93,7 @@ export const useCreateHost = () => {
 
     return useMutation({
         mutationFn: async (host: HostRequest) => {
-            const response = await fetchWithAuth(`${config.backendUrl}/api/hosts`, {
+            const response = await fetchWithAuth(getApiUrl('/api/hosts'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -123,7 +116,7 @@ export const useUpdateHost = () => {
 
     return useMutation({
         mutationFn: async ({ id, host }: { id: number; host: HostRequest }) => {
-            const response = await fetchWithAuth(`${config.backendUrl}/api/hosts/${id}`, {
+            const response = await fetchWithAuth(getApiUrl(`/api/hosts/${id}`), {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -145,7 +138,7 @@ export const useDeleteHost = () => {
 
     return useMutation({
         mutationFn: async (id: number) => {
-            const response = await fetchWithAuth(`${config.backendUrl}/api/hosts/${id}`, {
+            const response = await fetchWithAuth(getApiUrl(`/api/hosts/${id}`), {
                 method: 'DELETE',
             });
             if (!response.ok) {

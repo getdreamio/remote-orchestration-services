@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { config } from '@/config/env';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { getApiUrl } from '../utils/api';
 
 export type AuthProvider = 'Local' | 'Google' | 'GitHub' | 'Microsoft' | 'Custom';
 export type UserStatus = 'Active' | 'Inactive' | 'Suspended' | 'PendingVerification';
@@ -46,7 +47,7 @@ export interface UpdateUserRequest {
 }
 
 const fetchUsers = async () => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/users`);
+    const response = await fetchWithAuth(getApiUrl('/api/users'));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -54,7 +55,7 @@ const fetchUsers = async () => {
 };
 
 const fetchUser = async (id: number) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/users/${id}`);
+    const response = await fetchWithAuth(getApiUrl(`/api/users/${id}`));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -62,7 +63,7 @@ const fetchUser = async (id: number) => {
 };
 
 const createUser = async (user: CreateUserRequest) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/users`, {
+    const response = await fetchWithAuth(getApiUrl('/api/users'), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -76,7 +77,7 @@ const createUser = async (user: CreateUserRequest) => {
 };
 
 const updateUser = async ({ id, user }: { id: number; user: UpdateUserRequest }) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/users/${id}`, {
+    const response = await fetchWithAuth(getApiUrl(`/api/users/${id}`), {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -86,10 +87,11 @@ const updateUser = async ({ id, user }: { id: number; user: UpdateUserRequest })
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
+    return response.json();
 };
 
 const deleteUser = async (id: number) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/users/${id}`, {
+    const response = await fetchWithAuth(getApiUrl(`/api/users/${id}`), {
         method: 'DELETE',
     });
     if (!response.ok) {
@@ -98,7 +100,7 @@ const deleteUser = async (id: number) => {
 };
 
 const fetchUserRoles = async (userId: number) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/users/${userId}/roles`);
+    const response = await fetchWithAuth(getApiUrl(`/api/users/${userId}/roles`));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -106,7 +108,7 @@ const fetchUserRoles = async (userId: number) => {
 };
 
 const fetchAllRoles = async () => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/users/roles`);
+    const response = await fetchWithAuth(getApiUrl('/api/roles'));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -114,8 +116,12 @@ const fetchAllRoles = async () => {
 };
 
 const addUserRole = async ({ userId, roleName }: { userId: number; roleName: string }) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/users/${userId}/roles/${roleName}`, {
+    const response = await fetchWithAuth(getApiUrl(`/api/users/${userId}/roles`), {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ roleName }),
     });
     if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -123,7 +129,7 @@ const addUserRole = async ({ userId, roleName }: { userId: number; roleName: str
 };
 
 const removeUserRole = async ({ userId, roleName }: { userId: number; roleName: string }) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/users/${userId}/roles/${roleName}`, {
+    const response = await fetchWithAuth(getApiUrl(`/api/users/${userId}/roles/${roleName}`), {
         method: 'DELETE',
     });
     if (!response.ok) {

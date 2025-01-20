@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { config } from '@/config/env';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { getApiUrl } from '../utils/api';
 
 interface HostRelationship {
     hostId: string;
@@ -22,7 +23,7 @@ interface RelationshipsData {
 }
 
 const fetchRelationships = async (): Promise<RelationshipsData> => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/analytics/relationships`);
+    const response = await fetchWithAuth(getApiUrl('/api/analytics/relationships'));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }

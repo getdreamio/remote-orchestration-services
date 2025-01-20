@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { config } from '@/config/env';
 import { message } from 'antd';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { getApiUrl } from '../utils/api';
 
 export interface Tag {
     tag_ID: number;
@@ -30,7 +30,7 @@ export interface TagEntityResponse {
 }
 
 const fetchTags = async () => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/tags`);
+    const response = await fetchWithAuth(getApiUrl('/api/tags'));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -38,7 +38,7 @@ const fetchTags = async () => {
 };
 
 const fetchTag = async (id: number) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/tags/${id}`);
+    const response = await fetchWithAuth(getApiUrl(`/api/tags/${id}`));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -46,7 +46,7 @@ const fetchTag = async (id: number) => {
 };
 
 const fetchTagRemotes = async (id: number) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/tags/${id}/remotes`);
+    const response = await fetchWithAuth(getApiUrl(`/api/tags/${id}/remotes`));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -54,7 +54,7 @@ const fetchTagRemotes = async (id: number) => {
 };
 
 const fetchTagHosts = async (id: number) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/tags/${id}/hosts`);
+    const response = await fetchWithAuth(getApiUrl(`/api/tags/${id}/hosts`));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -66,7 +66,7 @@ const createTag = async (tag: TagRequest) => {
         key: tag.key,
         display_Name: tag.display_Name || tag.key
     };
-    const response = await fetchWithAuth(`${config.backendUrl}/api/tags`, {
+    const response = await fetchWithAuth(getApiUrl('/api/tags'), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ const createTag = async (tag: TagRequest) => {
 };
 
 const updateTag = async ({ id, tag }: { id: number; tag: Partial<Tag> }) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/tags/${id}`, {
+    const response = await fetchWithAuth(getApiUrl(`/api/tags/${id}`), {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ const updateTag = async ({ id, tag }: { id: number; tag: Partial<Tag> }) => {
 };
 
 const deleteTag = async (id: number) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/tags/${id}`, {
+    const response = await fetchWithAuth(getApiUrl(`/api/tags/${id}`), {
         method: 'DELETE',
     });
     if (!response.ok) {
@@ -103,8 +103,8 @@ const deleteTag = async (id: number) => {
 
 const removeTagAssociation = async ({ tagId, itemId, type }: { tagId: number; itemId: number; type: 'host' | 'remote' }) => {
     const endpoint = type === 'host'
-        ? `${config.backendUrl}/api/tags/host/${itemId}/remove/${tagId}`
-        : `${config.backendUrl}/api/tags/remote/${itemId}/remove/${tagId}`;
+        ? getApiUrl(`/api/tags/host/${itemId}/remove/${tagId}`)
+        : getApiUrl(`/api/tags/remote/${itemId}/remove/${tagId}`);
 
     const response = await fetchWithAuth(endpoint, {
         method: 'DELETE',
@@ -115,7 +115,7 @@ const removeTagAssociation = async ({ tagId, itemId, type }: { tagId: number; it
 };
 
 const fetchTagsByHost = async (hostId: number) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/tags/host/${hostId}`);
+    const response = await fetchWithAuth(getApiUrl(`/api/tags/host/${hostId}`));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -123,7 +123,7 @@ const fetchTagsByHost = async (hostId: number) => {
 };
 
 const fetchTagsByRemote = async (remoteId: number) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/tags/remote/${remoteId}`);
+    const response = await fetchWithAuth(getApiUrl(`/api/tags/remote/${remoteId}`));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -131,7 +131,7 @@ const fetchTagsByRemote = async (remoteId: number) => {
 };
 
 const addTagToEntity = async ({ entityType, entityId, tagId, value }: { entityType: 'host' | 'remote', entityId: number, tagId: number, value: string }) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/tags/add-to-entity`, {
+    const response = await fetchWithAuth(getApiUrl('/api/tags/add-to-entity'), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ const addTagToEntity = async ({ entityType, entityId, tagId, value }: { entityTy
 };
 
 const addTagToHost = async ({ hostId, tagId, value }: { hostId: number; tagId: number; value: string }) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/tags/host/${hostId}/add/${tagId}`, {
+    const response = await fetchWithAuth(getApiUrl(`/api/tags/host/${hostId}/add/${tagId}`), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ const addTagToHost = async ({ hostId, tagId, value }: { hostId: number; tagId: n
 };
 
 const removeTagFromHost = async ({ hostId, tagId }: { hostId: number; tagId: number }) => {
-    const response = await fetchWithAuth(`${config.backendUrl}/api/tags/host/${hostId}/remove/${tagId}`, {
+    const response = await fetchWithAuth(getApiUrl(`/api/tags/host/${hostId}/remove/${tagId}`), {
         method: 'DELETE',
     });
     if (!response.ok) {
