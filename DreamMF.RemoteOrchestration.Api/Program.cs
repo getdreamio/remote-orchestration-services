@@ -96,6 +96,7 @@ builder.Services.AddScoped<ConfigurationService>();
 builder.Services.AddScoped<IDreamService, DreamService>();
 builder.Services.AddScoped<IUploadService, UploadService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 builder.Services.AddAntiforgery();
 
@@ -131,6 +132,7 @@ app.MapAnalyticsRoutes();
 app.MapDreamRoutes();
 app.MapUploadRoutes();
 app.MapUserRoutes();
+app.MapAuthRoutes();
 
 var provider = new FileExtensionContentTypeProvider();
 provider.Mappings[".js"] = "application/javascript";

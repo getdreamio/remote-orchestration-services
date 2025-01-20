@@ -20,12 +20,21 @@ public class TagService
     {
         try
         {
-            var tags = await _dbContext.Tags.ToListAsync();
+            var tags = await _dbContext.Tags
+                .AsNoTracking()  // For better performance on read-only operations
+                .ToListAsync();
+            
+            if (tags == null || !tags.Any())
+            {
+                return new List<TagResponse>();  // Return empty list instead of null
+            }
+
             return tags.Select(TagMapper.ToResponse).ToList();
         }
         catch (Exception ex)
         {
-            throw new HandledException(ExceptionType.Database, "Failed to retrieve tags", ex);
+            throw new HandledException(ExceptionType.Database, 
+                "Failed to retrieve tags. Please ensure the database is accessible", ex);
         }
     }
 

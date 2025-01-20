@@ -1,8 +1,8 @@
-using BCrypt.Net;
 using DreamMF.RemoteOrchestration.Core.Mappers;
 using DreamMF.RemoteOrchestration.Core.Models;
 using DreamMF.RemoteOrchestration.Database;
 using DreamMF.RemoteOrchestration.Database.Entities;
+using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 
 namespace DreamMF.RemoteOrchestration.Core.Services;
@@ -12,14 +12,13 @@ public interface IUserService
     Task<List<UserResponse>> GetAllUsersAsync();
     Task<UserResponse?> GetUserByIdAsync(int id);
     Task<UserResponse?> GetUserByEmailAsync(string email);
-    Task<UserResponse> CreateUserAsync(CreateUserRequest request);
+    Task<User?> GetUserObjectByEmailAsync(string email);
+    Task<UserResponse?> CreateUserAsync(CreateUserRequest request);
     Task<UserResponse> UpdateUserAsync(int id, UpdateUserRequest request);
-    Task DeleteUserAsync(int id);
-    Task<bool> VerifyEmailAsync(string email, string token);
-    Task<bool> ResetPasswordAsync(string email, string token, string newPassword);
-    Task<List<string>> GetUserRolesAsync(int userId);
-    Task<bool> AddUserToRoleAsync(int userId, string roleName);
-    Task<bool> RemoveUserFromRoleAsync(int userId, string roleName);
+    Task<bool> DeleteUserAsync(int id);
+    Task<IEnumerable<string>> GetUserRolesAsync(int userId);
+    Task<bool> AddUserRoleAsync(int userId, int roleId);
+    Task<bool> RemoveUserRoleAsync(int userId, int roleId);
 }
 
 public class UserService : IUserService
@@ -61,7 +60,16 @@ public class UserService : IUserService
         return user != null ? UserMapper.ToResponse(user) : null;
     }
 
-    public async Task<UserResponse> CreateUserAsync(CreateUserRequest request)
+    public async Task<User?> GetUserObjectByEmailAsync(string email)
+    {
+        var user = await _dbContext.Users
+            .Include(u => u.UserRoleMappings)
+                .ThenInclude(ur => ur.Role)
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+        return user;
+    }
+
+    public async Task<UserResponse?> CreateUserAsync(CreateUserRequest request)
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var user = new User
@@ -76,6 +84,7 @@ public class UserService : IUserService
             CreatedDate = now,
             UpdatedDate = now
         };
+
 
         if (request.AuthProvider == AuthProvider.Local && !string.IsNullOrEmpty(request.Password))
         {
@@ -92,7 +101,6 @@ public class UserService : IUserService
 
         _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync();
-
         return UserMapper.ToResponse(user);
     }
 
@@ -110,8 +118,6 @@ public class UserService : IUserService
             user.LastName = request.LastName;
         if (request.Status.HasValue)
             user.Status = request.Status.Value;
-        if (request.IsTwoFactorEnabled.HasValue)
-            user.IsTwoFactorEnabled = request.IsTwoFactorEnabled.Value;
 
         if (!string.IsNullOrEmpty(request.CurrentPassword) && !string.IsNullOrEmpty(request.NewPassword))
         {
@@ -128,110 +134,58 @@ public class UserService : IUserService
         return UserMapper.ToResponse(user);
     }
 
-    public async Task DeleteUserAsync(int id)
+    public async Task<bool> DeleteUserAsync(int id)
     {
         var user = await _dbContext.Users.FindAsync(id);
         if (user == null)
-            throw new KeyNotFoundException("User not found");
+            return false;
 
         _dbContext.Users.Remove(user);
         await _dbContext.SaveChangesAsync();
-    }
-
-    public async Task<bool> VerifyEmailAsync(string email, string token)
-    {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => 
-            u.Email.ToLower() == email.ToLower() && 
-            u.EmailVerificationToken == token &&
-            u.EmailVerificationTokenExpiry > DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-
-        if (user == null)
-            return false;
-
-        user.IsEmailVerified = true;
-        user.Status = UserStatus.Active;
-        user.EmailVerificationToken = null;
-        user.EmailVerificationTokenExpiry = null;
-        user.UpdatedDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-        await _dbContext.SaveChangesAsync();
         return true;
     }
 
-    public async Task<bool> ResetPasswordAsync(string email, string token, string newPassword)
-    {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => 
-            u.Email.ToLower() == email.ToLower() && 
-            u.EmailVerificationToken == token &&
-            u.EmailVerificationTokenExpiry > DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-
-        if (user == null)
-            return false;
-
-        var salt = BCrypt.Net.BCrypt.GenerateSalt();
-        user.PasswordSalt = salt;
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword, salt);
-        user.EmailVerificationToken = null;
-        user.EmailVerificationTokenExpiry = null;
-        user.UpdatedDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-        await _dbContext.SaveChangesAsync();
-        return true;
-    }
-
-    public async Task<List<string>> GetUserRolesAsync(int userId)
+    public async Task<IEnumerable<string>> GetUserRolesAsync(int userId)
     {
         var user = await _dbContext.Users
             .Include(u => u.UserRoleMappings)
-                .ThenInclude(ur => ur.Role)
+            .ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(u => u.Id == userId);
 
-        if (user == null)
-            throw new KeyNotFoundException($"User with ID {userId} not found");
-
-        return user.UserRoleMappings.Select(ur => ur.Role.Name).ToList();
+        return user?.UserRoleMappings
+            .Select(ur => ur.Role.Name)
+            .ToList() ?? new List<string>();
     }
 
-    public async Task<bool> AddUserToRoleAsync(int userId, string roleName)
+    public async Task<bool> AddUserRoleAsync(int userId, int roleId)
     {
         var user = await _dbContext.Users.FindAsync(userId);
-        if (user == null)
-            throw new KeyNotFoundException($"User with ID {userId} not found");
+        var role = await _dbContext.Set<UserRole>().FindAsync(roleId);
 
-        var role = await _dbContext.UserRoles.FirstOrDefaultAsync(r => 
-            r.Name.ToUpper() == roleName.ToUpper());
-        if (role == null)
-            throw new KeyNotFoundException($"Role {roleName} not found");
-
-        var existingMapping = await _dbContext.UserRoleMappings
-            .FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == role.Id);
-        if (existingMapping != null)
+        if (user == null || role == null)
             return false;
 
         var mapping = new UserRoleMapping
         {
             UserId = userId,
-            RoleId = role.Id,
+            RoleId = roleId,
             CreatedDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
         };
 
-        _dbContext.UserRoleMappings.Add(mapping);
+        _dbContext.Set<UserRoleMapping>().Add(mapping);
         await _dbContext.SaveChangesAsync();
         return true;
     }
 
-    public async Task<bool> RemoveUserFromRoleAsync(int userId, string roleName)
+    public async Task<bool> RemoveUserRoleAsync(int userId, int roleId)
     {
-        var mapping = await _dbContext.UserRoleMappings
-            .Include(ur => ur.Role)
-            .FirstOrDefaultAsync(ur => 
-                ur.UserId == userId && 
-                ur.Role.Name.ToUpper() == roleName.ToUpper());
+        var mapping = await _dbContext.Set<UserRoleMapping>()
+            .FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == roleId);
 
         if (mapping == null)
             return false;
 
-        _dbContext.UserRoleMappings.Remove(mapping);
+        _dbContext.Set<UserRoleMapping>().Remove(mapping);
         await _dbContext.SaveChangesAsync();
         return true;
     }

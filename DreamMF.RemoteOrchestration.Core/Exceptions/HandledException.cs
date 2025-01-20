@@ -25,7 +25,7 @@ public class HandledException : Exception
     /// <param name="type">The type.</param>
     /// <param name="message">The message.</param>
     /// <param name="status">The status.</param>
-    public HandledException(ExceptionType type, string message, Exception ex, HttpStatusCode status = HttpStatusCode.BadRequest, string errorCode = DefaultErrorCode) : base(message)
+    public HandledException(ExceptionType type, string customMessage, Exception ex, HttpStatusCode status = HttpStatusCode.BadRequest, string errorCode = DefaultErrorCode) : base($"{customMessage} - {ex.Message}")
     {
         ErrorCode = errorCode;
         ExceptionType = type;
@@ -74,23 +74,5 @@ public class HandledException : Exception
         ExceptionType = type;
         StatusCode = status;
         InnerExceptions = exceptions;
-    }
-
-    /// <summary>
-    /// Gets the exception list in a readable form for restful consumption.
-    /// </summary>
-    /// <returns></returns>
-    public List<ExceptionListItem> GetExceptionList()
-    {
-        var collection = new List<ExceptionListItem>();
-        if (InnerExceptions != null && InnerExceptions.Any())
-        {
-            InnerExceptions.ForEach(ex => collection.Add(new ExceptionListItem() { Name = ex.Message, Type = ex.ExceptionType.ToString() }));
-        }
-        else
-        {
-            collection.Add(new ExceptionListItem() { Name = this.Message, Type = this.ExceptionType.ToString() });
-        }
-        return collection;
     }
 }

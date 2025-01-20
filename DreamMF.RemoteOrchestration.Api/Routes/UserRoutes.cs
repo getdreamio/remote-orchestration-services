@@ -76,7 +76,7 @@ public static class UserRoutes
             .WithSummary("Get User Roles")
             .WithDescription("Retrieves all roles assigned to a specific user");
 
-        group.MapPost("/{id}/roles/{roleName}", AddUserRole)
+        group.MapPost("/{id}/roles/{roleId}", AddUserRole)
             .WithTags(GroupName)
             .Produces(StatusCodes.Status204NoContent)
             .Produces<HandledResponseModel>(400)
@@ -86,7 +86,7 @@ public static class UserRoutes
             .WithSummary("Add Role to User")
             .WithDescription("Assigns a role to a specific user");
 
-        group.MapDelete("/{id}/roles/{roleName}", RemoveUserRole)
+        group.MapDelete("/{id}/roles/{roleId}", RemoveUserRole)
             .WithTags(GroupName)
             .Produces(StatusCodes.Status204NoContent)
             .Produces<HandledResponseModel>(400)
@@ -101,6 +101,7 @@ public static class UserRoutes
 
     private static async Task<IResult> GetUsers(IUserService userService)
     {
+        // Create the method in UserService and fill in the logic
         var users = await userService.GetAllUsersAsync();
         return Results.Ok(users);
     }
@@ -115,12 +116,14 @@ public static class UserRoutes
 
     private static async Task<IResult> CreateUser(CreateUserRequest request, IUserService userService)
     {
+        // Use a mapper here from requesdt to user
         var user = await userService.CreateUserAsync(request);
         return Results.Created($"/api/users/{user.Id}", user);
     }
 
     private static async Task<IResult> UpdateUser(int id, UpdateUserRequest request, IUserService userService)
     {
+        // Use a mapper here from requesdt to user
         var user = await userService.UpdateUserAsync(id, request);
         return Results.NoContent();
     }
@@ -137,17 +140,19 @@ public static class UserRoutes
         return Results.Ok(roles);
     }
 
-    private static async Task<IResult> AddUserRole(int id, string roleName, IUserService userService)
+    private static async Task<IResult> AddUserRole(int id, int roleId, IUserService userService)
     {
-        var success = await userService.AddUserToRoleAsync(id, roleName);
+        // Create the method in UserService and fill in the logic
+        var success = await userService.AddUserRoleAsync(id, roleId);
         if (!success)
             return Results.NotFound();
         return Results.NoContent();
     }
 
-    private static async Task<IResult> RemoveUserRole(int id, string roleName, IUserService userService)
+    private static async Task<IResult> RemoveUserRole(int id, int roleId, IUserService userService)
     {
-        var success = await userService.RemoveUserFromRoleAsync(id, roleName);
+        // Create the method in UserService and fill in the logic
+        var success = await userService.RemoveUserRoleAsync(id, roleId);
         if (!success)
             return Results.NotFound();
         return Results.NoContent();

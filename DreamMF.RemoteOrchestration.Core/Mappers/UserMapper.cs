@@ -5,7 +5,7 @@ namespace DreamMF.RemoteOrchestration.Core.Mappers;
 
 public static class UserMapper
 {
-    public static UserResponse ToResponse(User user, List<string>? roles = null)
+    public static UserResponse ToResponse(User user)
     {
         return new UserResponse
         {
@@ -14,14 +14,13 @@ public static class UserMapper
             DisplayName = user.DisplayName,
             FirstName = user.FirstName,
             LastName = user.LastName,
+            ProfilePictureUrl = null,
             AuthProvider = user.AuthProvider,
-            IsEmailVerified = user.IsEmailVerified,
-            IsTwoFactorEnabled = user.IsTwoFactorEnabled,
             Status = user.Status,
             LastLoginDate = user.LastLoginDate,
             CreatedDate = user.CreatedDate,
             UpdatedDate = user.UpdatedDate,
-            Roles = roles ?? user.UserRoleMappings.Select(ur => ur.Role.Name).ToList()
+            Roles = user.UserRoleMappings?.Select(ur => ur.Role.Name).ToList() ?? new List<string>()
         };
     }
 

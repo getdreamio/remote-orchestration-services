@@ -8,7 +8,8 @@ export default defineConfig({
             index: './src/index.tsx'
         },
         define: {
-            'process.env.BACKEND_URL': JSON.stringify(process.env.BACKEND_URL)
+            // Automatically inject all process.env.* variables
+            'process.env': JSON.stringify(process.env)
         }
     },
     output: {

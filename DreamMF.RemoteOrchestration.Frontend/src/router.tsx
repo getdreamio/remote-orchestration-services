@@ -16,24 +16,43 @@ import AnalyticsPage from './pages/analytics';
 import NotFoundPage from './pages/not-found';
 import LoginPage from './pages/auth/login';
 import LogoutPage from './pages/auth/logout';
+import RegisterPage from './pages/auth/register';
+import ForgotPasswordPage from './pages/auth/forgot-password';
+import ResetPasswordPage from './pages/auth/reset-password';
 import TagsPage from './pages/tags/index';
 import ErrorDisplay from './components/error/error-display';
 import EditTagPage from './pages/tags/edit';
 import NewTagPage from './pages/tags/new';
 import SearchPage from './pages/search';
 import RelationshipsPage from './pages/relationships';
+import { ProtectedRoute } from './components/auth/protected-route';
 
 export const router = createBrowserRouter([
     {
-        path: '/login',
+        path: '/auth/login',
         element: <LoginPage />,
         errorElement: <ErrorDisplay message="Error loading login page" />,
     },
     {
-        path: '/logout',
+        path: '/auth/logout',
         element: <LogoutPage />,
         errorElement: <ErrorDisplay message="Error during logout" />,
     },
+    {
+        path: '/auth/register',
+        element: <RegisterPage />,
+        errorElement: <ErrorDisplay message="Error during registration" />,
+      },
+    //   {
+    //     path: '/auth/forgot-password',
+    //     element: <ForgotPasswordPage />,
+    //     errorElement: <ErrorDisplay message="Error during forgot password" />,
+    //   },
+    //   {
+    //     path: '/auth/reset-password',
+    //     element: <ResetPasswordPage />,
+    //     errorElement: <ErrorDisplay message="Error during reset password" />,
+    //   },
     {
         path: '/',
         element: <RootLayout />,
@@ -106,11 +125,19 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'search',
-                element: <SearchPage />,
+                element: (
+                    <ProtectedRoute>
+                        <SearchPage />
+                    </ProtectedRoute>
+                ),
             },
             {
                 path: 'relationships',
-                element: <RelationshipsPage />,
+                element: (
+                    <ProtectedRoute>
+                        <RelationshipsPage />
+                    </ProtectedRoute>
+                )
             },
             {
                 path: '*',

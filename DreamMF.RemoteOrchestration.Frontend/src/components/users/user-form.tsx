@@ -168,58 +168,27 @@ const UserForm: React.FC<UserFormProps> = ({
                     ))}
                 </Select>
             </Form.Item>
+            <Form.Item
+                name="newPassword"
+                label="New Password"
+                extra="Leave blank to keep current password"
+            >
+                <Input.Password autoComplete="new-password" />
+            </Form.Item>
         </>
     );
 
     const renderSecurityFields = () => (
         <>
-            <Form.Item
-                name="isTwoFactorEnabled"
-                label="Two-Factor Authentication"
-                valuePropName="checked"
-            >
-                <Switch />
+            <Form.Item name="failedLoginAttempts" label="Failed Login Attempts">
+                <InputNumber min={0} disabled />
             </Form.Item>
-            <Form.Item
-                name="isEmailVerified"
-                label="Email Verified"
-                valuePropName="checked"
-            >
-                <Switch disabled={!isEditing} />
+            <Form.Item name="lastLoginIp" label="Last Login IP">
+                <Input disabled />
             </Form.Item>
-            {isEditing && (
-                <>
-                    <Form.Item name="failedLoginAttempts" label="Failed Login Attempts">
-                        <InputNumber min={0} disabled />
-                    </Form.Item>
-                    <Form.Item name="lastLoginIp" label="Last Login IP">
-                        <Input disabled />
-                    </Form.Item>
-                    <Form.Item name="lastLoginDate" label="Last Login Date">
-                        <Input disabled />
-                    </Form.Item>
-                </>
-            )}
-            <Form.Item
-                name="status"
-                label="Account Status"
-                rules={[{ required: true, message: 'Please select status' }]}
-            >
-                <Select>
-                    {Object.values(UserStatus).map(status => (
-                        <Option key={status} value={status}>{status}</Option>
-                    ))}
-                </Select>
+            <Form.Item name="lastLoginDate" label="Last Login Date">
+                <Input disabled />
             </Form.Item>
-            {isEditing && form.getFieldValue('authProvider') === AuthProvider.Local && (
-                <Form.Item
-                    name="newPassword"
-                    label="New Password"
-                    extra="Leave blank to keep current password"
-                >
-                    <Input.Password />
-                </Form.Item>
-            )}
         </>
     );
 
@@ -228,7 +197,7 @@ const UserForm: React.FC<UserFormProps> = ({
             form={form}
             layout="vertical"
             onFinish={handleSubmit}
-            className="max-w-2xl"
+            className="space-y-4"
         >
             {mode === 'general' && renderGeneralFields()}
             {mode === 'security' && renderSecurityFields()}

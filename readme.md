@@ -47,6 +47,11 @@ The service architecture is designed to support scalability and reliability. It 
    ```
 3. Access the service via the provided endpoint.
 
+## Authentication 
+When you first run the service, you will have a default user registered with the following credentials:
+- Email address: `root@dreammf.com`
+- Password: `Dr34m!12345`
+
 ## Documentation
 For detailed information on the architecture and design, refer to the diagrams in the `.docs` folder.
 

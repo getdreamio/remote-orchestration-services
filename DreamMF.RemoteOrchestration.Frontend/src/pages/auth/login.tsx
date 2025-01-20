@@ -1,29 +1,31 @@
 import React from 'react';
-import { Card, Form, Input, Button, Divider, Typography } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { GithubOutlined, GoogleOutlined, WindowsOutlined } from '@ant-design/icons';
-import { useTheme } from '../../components/theme/theme-provider';
+import { Card, Form, Input, Button, Typography, Alert } from 'antd';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/components/theme/theme-provider';
 
 const { Title, Text } = Typography;
 
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [form] = Form.useForm();
     const { theme } = useTheme();
+    const { login } = useAuth();
+    const [error, setError] = React.useState<string | null>(null);
+    const [loading, setLoading] = React.useState(false);
 
-    const handleSubmit = async (values: any) => {
-        // TODO: Implement login logic
-        navigate('/');
-    };
-
-    const handleSocialLogin = (provider: string) => {
-        // TODO: Implement social login
-        console.log(`Logging in with ${provider}`);
-    };
-
-    const handleSSOLogin = () => {
-        // TODO: Implement SSO login
-        console.log('Logging in with SSO');
+    const onFinish = async (values: { email: string; password: string }) => {
+        setLoading(true);
+        setError(null);
+        try {
+            await login(values.email, values.password);
+            navigate('/');
+        } catch (err: any) {
+            setError(err.message || 'Failed to login');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -44,31 +46,75 @@ const LoginPage: React.FC = () => {
                 </div>
 
                 <Card className="mt-8 bg-gray-50 dark:bg-transparent">
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-2 gap-3">
-                            <button
-                                onClick={() => handleSocialLogin('github')}
-                                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
-                            >
-                                <GithubOutlined className="h-5 w-5" />
-                                <span className="ml-2">GitHub</span>
-                            </button>
-                            <button
-                                onClick={() => handleSocialLogin('google')}
-                                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
-                            >
-                                <GoogleOutlined className="h-5 w-5" />
-                                <span className="ml-2">Google</span>
-                            </button>
-                        </div>
+                    {location.state?.message && (
+                        <Alert
+                            message={location.state.message}
+                            type="success"
+                            showIcon
+                            style={{ marginBottom: 24 }}
+                            closable
+                        />
+                    )}
 
-                        <button
-                            onClick={handleSSOLogin}
-                            className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    {error && (
+                        <Alert
+                            message={error}
+                            type="error"
+                            showIcon
+                            style={{ marginBottom: 24 }}
+                        />
+                    )}
+
+                    <Form
+                        form={form}
+                        name="login"
+                        onFinish={onFinish}
+                        layout="vertical"
+                        requiredMark={false}
+                    >
+                        <Form.Item
+                            name="email"
+                            label="Email"
+                            rules={[
+                                { required: true, message: 'Please enter your email' },
+                                { type: 'email', message: 'Please enter a valid email' }
+                            ]}
                         >
-                            <WindowsOutlined className="h-5 w-5" />
-                            <span className="ml-2">Single Sign-on</span>
-                        </button>
+                            <Input size="large" placeholder="Enter your email" />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="password"
+                            label="Password"
+                            rules={[{ required: true, message: 'Please enter your password' }]}
+                        >
+                            <Input.Password size="large" placeholder="Enter your password" />
+                        </Form.Item>
+
+                        <Form.Item>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                size="large"
+                                loading={loading}
+                                block
+                            >
+                                Sign In
+                            </Button>
+                        </Form.Item>
+                    </Form>
+
+                    <div className="text-center mt-4">
+                        <Text className="text-gray-600 dark:text-gray-400">
+                            Don't have an account?{' '}
+                            <Button
+                                type="link"
+                                onClick={() => navigate('/auth/register')}
+                                className="p-0"
+                            >
+                                Register now
+                            </Button>
+                        </Text>
                     </div>
                 </Card>
             </div>

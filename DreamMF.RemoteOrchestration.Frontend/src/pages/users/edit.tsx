@@ -87,16 +87,6 @@ const EditUserPage: React.FC = () => {
                         <UserForm
                             onSuccess={handleSuccess}
                             mode="security"
-                            renderFooter={(isSubmitting) => (
-                                <div className="flex justify-end gap-2 mt-6">
-                                    <Button onClick={() => navigate('/users')}>
-                                        Cancel
-                                    </Button>
-                                    <Button type="primary" htmlType="submit" loading={isSubmitting}>
-                                        Update Security Settings
-                                    </Button>
-                                </div>
-                            )}
                             editingUser={{
                                 id: user.id,
                                 isTwoFactorEnabled: user.isTwoFactorEnabled,

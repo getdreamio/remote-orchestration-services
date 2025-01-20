@@ -40,7 +40,7 @@ CREATE TABLE [User] (
     AuthProvider INTEGER NOT NULL,  -- Enum: 0=Local, 1=Google, 2=GitHub, 3=Microsoft, 4=Custom
     AuthUserId VARCHAR(255) NOT NULL,
     PasswordHash VARCHAR(255),
-    PasswordSalt VARCHAR(255),
+    PasswordSalt VARCHAR(255) NULL,  -- Made nullable since salt is included in BCrypt hash
     IsEmailVerified BOOLEAN NOT NULL DEFAULT 0,
     EmailVerificationToken VARCHAR(255),
     EmailVerificationTokenExpiry INTEGER,  -- Unix timestamp
@@ -115,12 +115,12 @@ INSERT INTO [User] (
     'Admin',
     0,  -- Local auth
     'root',
-    'JDJhJDEyJDlLLkxGcTJXWGRVMVpuYnBWLmxZdy5vRzBJQzBJQXFlSVhVWnVmSk1PYmNCZUxKYkUuQ0Nh',  -- Secure hash for Dr34m!12345
-    'JDJhJDEyJDlLLkxGcTJXWGRVMVpuYnBWLmxZdy4=',  -- Salt
+    '$2a$11$YphTg003gvjvLjEb/94z8uPpPOfgU48up7uDpC8if1xFXd.stCuS.',  -- BCrypt hash for Dr34m!12345
+    '$2a$11$6z88zhP288F5Lh7y44/mte',  -- Salt is included in the hash
     1,  -- Email verified
     0,  -- Active
-    strftime('%s','now'),
-    strftime('%s','now')
+    strftime('%s','now'),  -- Current timestamp
+    strftime('%s','now')  -- Current timestamp
 );
 
 -- Assign Admin role to root user

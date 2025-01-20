@@ -46,20 +46,12 @@ public class User
     // Local Auth specific
     public string? PasswordHash { get; set; }
     public string? PasswordSalt { get; set; }
-    public bool IsEmailVerified { get; set; }
-    public string? EmailVerificationToken { get; set; }
-    public long? EmailVerificationTokenExpiry { get; set; }
 
     // OAuth/SSO specific
     public string? AccessToken { get; set; }
     public string? RefreshToken { get; set; }
     public long? TokenExpiry { get; set; }
     public string? ProviderMetadata { get; set; } // JSON string for additional provider-specific data
-
-    // 2FA
-    public bool IsTwoFactorEnabled { get; set; }
-    public string? TwoFactorSecret { get; set; }
-    public string? BackupCodes { get; set; } // JSON array of hashed backup codes
 
     // Status and Security
     [Required]
