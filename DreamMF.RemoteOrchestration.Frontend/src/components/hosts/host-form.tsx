@@ -115,7 +115,7 @@ const HostForm: React.FC<HostFormProps> = ({ onSuccess, editingHost, renderFoote
 
                     {editingHost && (
                         <Form.Item label="Access Key">
-                            <div className="flex items-center gap-2 border border-[--ant-color-border] bg-[--ant-color-bg-elevated] p-2 rounded w-full">
+                            <div className="flex items-center gap-2 ant-input !rounded-[8px] !pl-[10px] dark:!bg-[#351515] !bg-[#ffb8b8]">
                                 <Text className="font-mono flex-1" ellipsis>
                                     {editingHost.key}
                                 </Text>

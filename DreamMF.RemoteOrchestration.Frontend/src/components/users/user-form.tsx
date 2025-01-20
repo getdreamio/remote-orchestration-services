@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Input, Select, Alert, InputNumber, Switch, message } from 'antd';
 import { useCreateUser, useUpdateUser, useUserRoles } from '@/hooks/useUsers';
+import PasswordStrength from './password-strength';
 
 const { Option } = Select;
 
@@ -49,6 +50,8 @@ const UserForm: React.FC<UserFormProps> = ({
     renderFooter
 }) => {
     const [form] = Form.useForm();
+    const [password, setPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
     const createUser = useCreateUser();
     const updateUser = useUpdateUser();
     const { data: roles = [] } = useUserRoles();
@@ -64,10 +67,18 @@ const UserForm: React.FC<UserFormProps> = ({
     const handleSubmit = async (values: any) => {
         try {
             if (isEditing) {
-                await updateUser.mutateAsync({
-                    ...values,
-                    id: editingUser.id
-                });
+                const updateData = {
+                    id: editingUser.id,
+                    user: {
+                        displayName: values.displayName,
+                        firstName: values.firstName,
+                        lastName: values.lastName,
+                        status: values.status,
+                        newPassword: values.newPassword,
+                        isTwoFactorEnabled: values.isTwoFactorEnabled
+                    }
+                };
+                await updateUser.mutateAsync(updateData);
                 message.success('User updated successfully');
             } else {
                 await createUser.mutateAsync(values);
@@ -131,7 +142,12 @@ const UserForm: React.FC<UserFormProps> = ({
                                 label="Password"
                                 rules={[{ required: true, message: 'Please input password' }]}
                             >
-                                <Input.Password />
+                                <div>
+                                    <Input.Password 
+                                        onChange={(e) => setPassword(e.target.value)}
+                                    />
+                                    <PasswordStrength password={password} />
+                                </div>
                             </Form.Item>
                         );
                     }
@@ -173,7 +189,13 @@ const UserForm: React.FC<UserFormProps> = ({
                 label="New Password"
                 extra="Leave blank to keep current password"
             >
-                <Input.Password autoComplete="new-password" />
+                <div>
+                    <Input.Password 
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        autoComplete="new-password" 
+                    />
+                    <PasswordStrength password={newPassword} />
+                </div>
             </Form.Item>
         </>
     );

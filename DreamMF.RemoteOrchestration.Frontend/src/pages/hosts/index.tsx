@@ -68,14 +68,14 @@ const HostsPage: React.FC = () => {
             title: 'Access Key',
             dataIndex: 'key',
             key: 'key',
+            ellipsis: true,
             render: (key: string) => (
-                <div className="flex items-center gap-2">
-                    <Text className="font-mono text-sm" ellipsis>
-                        {key.substring(0, 8)}...{key.substring(key.length - 8)}
-                    </Text>
+                <div className="flex items-center gap-2 rounded-[8px] pl-[10px] pr-[10px] dark:!bg-[#351515] !bg-[#ffb8b8] py-1 h-[32px] min-w-0">
                     <Tooltip title="Copy full key">
                         <Button
                             type="text"
+                            size="small"
+                            className="!p-0 flex-shrink-0"
                             icon={<CopyOutlined />}
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -83,6 +83,9 @@ const HostsPage: React.FC = () => {
                             }}
                         />
                     </Tooltip>
+                    <Text className="font-mono text-sm flex items-center truncate" ellipsis>
+                        {key.substring(0, 8)}...{key.substring(key.length - 8)}
+                    </Text>
                 </div>
             ),
         },
