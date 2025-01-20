@@ -1,7 +1,18 @@
-# Use the official .NET image as a parent image
+# Build Frontend
+FROM node:20-alpine AS frontend
+WORKDIR /src/frontend
+COPY ["DreamMF.RemoteOrchestration.Frontend/package*.json", "./"]
+COPY ["DreamMF.RemoteOrchestration.Frontend/pnpm-lock.yaml", "./"]
+RUN npm install -g pnpm && pnpm install
+COPY ["DreamMF.RemoteOrchestration.Frontend", "./"]
+EXPOSE 8080
+CMD ["pnpm", "run", "dev", "--port", "8080", "--host"]
+
+# Build API
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 80
+EXPOSE 5000
+EXPOSE 5001
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
@@ -20,4 +31,5 @@ RUN dotnet publish "DreamMF.RemoteOrchestration.Api.csproj" -c Release -o /app/p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+ENV ASPNETCORE_URLS=http://+:5000;https://+:5001
 ENTRYPOINT ["dotnet", "DreamMF.RemoteOrchestration.Api.dll"]
