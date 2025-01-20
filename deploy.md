@@ -14,7 +14,7 @@ Before running the services, you need to set up an HTTPS development certificate
 
 1. Create a development certificate:
 ```bash
-dotnet dev-certs https -ep ${HOME}/.aspnet/https/aspnetapp.pfx -p YourSecurePassword
+dotnet dev-certs https -ep ${HOME}/.aspnet/https/aspnetapp.pfx -p Dr34m0120225
 dotnet dev-certs https --trust
 ```
 
