@@ -43,5 +43,8 @@ RUN dotnet publish "DreamMF.RemoteOrchestration.Api.csproj" -c Release -o /app/p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY dreammf-ros.pfx /https/aspnetapp.pfx
 ENV ASPNETCORE_URLS=http://+:5000;https://+:5001
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password=Dr34m0120225
 ENTRYPOINT ["dotnet", "DreamMF.RemoteOrchestration.Api.dll"]

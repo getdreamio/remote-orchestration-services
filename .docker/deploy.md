@@ -59,13 +59,19 @@ docker login
 
 You'll be prompted to enter your Docker Hub username and password.
 
-### Step 2: Tag the Docker Images
+### Step 2: Build and Tag the Docker Images
+
+Build your image with:
+
+```bash
+docker-compose build
+```
 
 Assuming your Docker Hub username is `dreammf`, tag your images like this:
 
 ```bash
-docker tag dreammf/ros-frontend:0.9.2 dreammf/ros-frontend:latest
-docker tag dreammf/ros-backend:0.9.2 dreammf/ros-backend:latest
+docker tag dreammf/ros-frontend:0.9.3 dreammf/ros-frontend:latest
+docker tag dreammf/ros-backend:0.9.3 dreammf/ros-backend:latest
 ```
 
 ### Step 3: Push the Images
@@ -73,8 +79,8 @@ docker tag dreammf/ros-backend:0.9.2 dreammf/ros-backend:latest
 Push the tagged images to Docker Hub:
 
 ```bash
-docker push dreammf/ros-frontend:0.9.2
-docker push dreammf/ros-backend:0.9.2
+docker push dreammf/ros-frontend:0.9.3
+docker push dreammf/ros-backend:0.9.3
 ```
 
 ## Health Check

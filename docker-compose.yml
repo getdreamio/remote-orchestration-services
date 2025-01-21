@@ -1,7 +1,8 @@
 version: '3.8'
 services:
+  
   frontend:
-    image: dreammf/ros-frontend:0.9.2
+    image: dreammf/ros-frontend:0.9.3
     build:
       context: .
       target: frontend-server
@@ -13,7 +14,7 @@ services:
       - "3000:80"
 
   backend:
-    image: dreammf/ros-backend:0.9.2
+    image: dreammf/ros-backend:0.9.3
     build:
       context: .
       target: final
@@ -22,8 +23,9 @@ services:
       - "5001:5001"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5000;https://+:5001
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=Dr34m0120225
+      # - ASPNETCORE_URLS=http://+:5000;https://+:5001
+      # - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      # - ASPNETCORE_Kestrel__Certificates__Default__Password=Dr34m0120225
+    
     volumes:
       - ~/.aspnet/https:/https:ro
