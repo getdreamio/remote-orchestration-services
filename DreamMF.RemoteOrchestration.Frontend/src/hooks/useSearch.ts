@@ -11,7 +11,10 @@ export interface SearchResponse {
 }
 
 const fetchSearchResults = async (searchText: string) => {
-    const response = await fetchWithAuth(getApiUrl(`/api/search?q=${encodeURIComponent(searchText)}`));
+    const response = await fetchWithAuth(getApiUrl(`/api/search?q=${encodeURIComponent(searchText)}`), {
+        method: 'POST',
+        body: JSON.stringify({ searchText })
+    });
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
