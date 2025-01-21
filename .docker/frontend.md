@@ -39,7 +39,7 @@ The ROS Frontend provides a powerful web-based dashboard for managing your micro
 
 ## Environment Variables
 - `BACKEND_URL`: URL for the backend API (default: https://localhost:5001)
-- `AUTH_AUTHORITY`: Authentication authority URL (default: http://localhost:5000)
+- `AUTH_AUTHORITY`: Authentication authority URL (default: https://localhost:5001)
 - `AUTH_CLIENT_ID`: Client ID for authentication (default: DreamMF-Web-01202025)
 
 ## Development Usage
@@ -51,6 +51,16 @@ docker-compose up frontend
 docker-compose build frontend
 ```
 
+Using either with ARGS...
+
+```bash
+# Start frontend container with BACKEND_URL argument
+docker run -e BACKEND_URL=https://your-backend-url -p 3000:80 dreammf/ros-frontend:0.9.2
+
+# Using docker-compose with BACKEND_URL argument
+docker-compose run -e BACKEND_URL=https://your-backend-url frontend
+```
+
 ## Production Considerations
 - Consider using a multi-stage build for production to minimize final image size
 - Implement proper NGINX configuration for serving static files
@@ -59,8 +69,13 @@ docker-compose build frontend
 - Consider using Docker health checks
 
 ## Ports
-- Development server runs on port 8080 internally
-- Mapped to port 3000 on host machine via docker-compose
+- `3000`: Frontend server
+- `5000`: HTTP backend server
+- `5001`: HTTPS backend server
 
 ## Volumes
 No persistent volumes required for frontend container.
+
+## Image Version
+- Frontend: `dreammf/ros-frontend:0.9.2`
+- Backend: `dreammf/ros-backend:0.9.2`
