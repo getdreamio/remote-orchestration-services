@@ -248,8 +248,8 @@ export const StorageSettingsForm: React.FC<StorageSettingsFormProps> = ({
                         onChange={(value) => setSelectedStorageType(value)}
                     >
                         <Select.Option value="LocalStorage">Local Storage</Select.Option>
-                        <Select.Option value="AzureBlobStorage">Azure Blob Storage</Select.Option>
-                        <Select.Option value="AwsS3Bucket">AWS S3 Bucket</Select.Option>
+                        <Select.Option value="AzureBlobStorage" disabled>Azure Blob Storage</Select.Option>
+                        <Select.Option value="AwsS3Bucket" disabled>AWS S3 Bucket</Select.Option>
                     </Select>
                 </Form.Item>
 

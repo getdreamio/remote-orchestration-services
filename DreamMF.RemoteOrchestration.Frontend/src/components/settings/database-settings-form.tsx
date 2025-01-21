@@ -78,6 +78,7 @@ export const DatabaseSettingsForm: React.FC<DatabaseSettingsFormProps> = ({
                         >
                             <Input
                                 style={{ maxWidth: 400 }}
+                                disabled
                                 placeholder={defaultSqlitePath}
                             />
                         </Form.Item>
