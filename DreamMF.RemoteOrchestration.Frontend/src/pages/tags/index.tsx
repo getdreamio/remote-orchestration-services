@@ -1,9 +1,10 @@
 import type React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Table, Popconfirm, message } from 'antd';
+import { Button, Table, Popconfirm, message, Tooltip } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTags, useDeleteTag, Tag } from '@/hooks/useTags';
 import { Helmet } from 'react-helmet';
+import { formatDateShort, formatDateFull } from '@/lib/date-utils';
 
 const TagsPage: React.FC = () => {
     const navigate = useNavigate();
@@ -24,41 +25,75 @@ const TagsPage: React.FC = () => {
             title: 'Key',
             dataIndex: 'key',
             key: 'key',
+            ellipsis: true,
+            render: (key: string) => (
+                <Tooltip title={key}>
+                    <div className="font-medium max-w-[250px]">{key}</div>
+                </Tooltip>
+            ),
         },
         {
             title: 'Display Name',
             dataIndex: 'display_Name',
-            key: 'key',
+            key: 'display_Name',
+            ellipsis: true,
+            render: (name: string) => (
+                <Tooltip title={name}>
+                    <div className="max-w-[300px]">{name}</div>
+                </Tooltip>
+            ),
         },
         {
-            title: 'Created Date',
+            title: 'Created',
             dataIndex: 'created_Date',
             key: 'created_Date',
-            render: (date: string) => new Date(date).toLocaleDateString(),
+            render: (date: string) => (
+                <Tooltip title={formatDateFull(date)}>
+                    <div className="max-w-[120px]">{formatDateShort(date)}</div>
+                </Tooltip>
+            ),
+            sorter: (a: Tag, b: Tag) => new Date(a.created_Date).getTime() - new Date(b.created_Date).getTime(),
+        },
+        {
+            title: 'Updated',
+            dataIndex: 'updated_Date',
+            key: 'updated_Date',
+            render: (date: string) => (
+                <Tooltip title={formatDateFull(date)}>
+                    <div className="max-w-[120px]">{formatDateShort(date)}</div>
+                </Tooltip>
+            ),
+            sorter: (a: Tag, b: Tag) => new Date(a.updated_Date).getTime() - new Date(b.updated_Date).getTime(),
         },
         {
             title: 'Actions',
             key: 'actions',
             render: (tag: Tag) => (
-                <span>
-                    <Button
-                        type="link"
-                        icon={<EditOutlined />}
-                        onClick={() => navigate(`/tags/${tag.tag_ID}`)}
-                    >
-                        Edit
-                    </Button>
+                <div className="flex gap-2 max-w-[120px]">
+                    <Tooltip title="Edit">
+                        <Button
+                            type="text"
+                            className="flex items-center justify-center w-8 h-8"
+                            icon={<EditOutlined className="text-lg" />}
+                            onClick={() => navigate(`/tags/${tag.tag_ID}`)}
+                        />
+                    </Tooltip>
                     <Popconfirm
                         title="Are you sure you want to delete this tag?"
                         onConfirm={() => handleDelete(tag.tag_ID)}
                         okText="Yes"
                         cancelText="No"
                     >
-                        <Button type="link" danger icon={<DeleteOutlined />}>
-                            Delete
-                        </Button>
+                        <Tooltip title="Delete">
+                            <Button 
+                                type="text" 
+                                danger 
+                                className="flex items-center justify-center w-8 h-8"
+                                icon={<DeleteOutlined className="text-lg" />} 
+                            />
+                        </Tooltip>
                     </Popconfirm>
-                </span>
+                </div>
             ),
         },
     ];
@@ -84,6 +119,8 @@ const TagsPage: React.FC = () => {
                 dataSource={tags}
                 loading={isLoading}
                 rowKey="tag_ID"
+                scroll={{ x: 'max-content' }}
+                className="overflow-auto"
             />
         </div>
     );

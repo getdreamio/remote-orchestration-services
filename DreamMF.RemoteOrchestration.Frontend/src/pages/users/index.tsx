@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Card, Avatar, Table, Button, Tag, message, Tooltip, Popconfirm, Modal, Form, Input, Select } from 'antd';
+import { Card, Avatar, Table, Button, Tag, message, Tooltip, Popconfirm, Modal, Form, Input, Select, Typography } from 'antd';
 import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined } from '@ant-design/icons';
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
 import { useUsers, useCreateUser, useDeleteUser, User, CreateUserRequest, AuthProvider } from '@/hooks/useUsers';
+import { formatDateShort, formatDateFull } from '@/lib/date-utils';
 
 const { Option } = Select;
 
@@ -46,8 +47,6 @@ const UsersPage: React.FC = () => {
         };
         return colors[status] || 'default';
     };
-
-    const formatDate = (date: string) => new Date(date).toLocaleDateString();
 
     const columns = [
         {
@@ -93,7 +92,15 @@ const UsersPage: React.FC = () => {
             title: 'Roles',
             dataIndex: 'roles',
             key: 'roles',
-            render: (roles: string[]) => roles.length,
+            render: (roles: string[]) => {
+                return (
+                    <Tooltip title={`${roles.length} module${roles.length === 1 ? '' : 's'} roles`}>
+                        <Tag color="blue">
+                            {roles.length || '0'}
+                        </Tag>
+                    </Tooltip>
+                );
+            }
         },
         {
             title: 'Auth Provider',
@@ -108,10 +115,15 @@ const UsersPage: React.FC = () => {
             onFilter: (value: string, record: User) => record.authProvider === value,
         },
         {
-            title: 'Last Updated',
+            title: 'Updated',
             dataIndex: 'updatedDate',
             key: 'updatedDate',
-            render: (date: string) => formatDate(date),
+            width: 120,
+            render: (date: string) => (
+                <Tooltip title={formatDateFull(date)}>
+                    <span>{formatDateShort(date)}</span>
+                </Tooltip>
+            ),
             sorter: (a: User, b: User) => {
                 if (!a.updatedDate || !b.updatedDate) return 0;
                 return new Date(a.updatedDate).getTime() - new Date(b.updatedDate).getTime();
@@ -121,30 +133,42 @@ const UsersPage: React.FC = () => {
             title: 'Created',
             dataIndex: 'createdDate',
             key: 'createdDate',
-            render: (date: string) => formatDate(date),
+            width: 120,
+            render: (date: string) => (
+                <Tooltip title={formatDateFull(date)}>
+                    <span>{formatDateShort(date)}</span>
+                </Tooltip>
+            ),
             sorter: (a: User, b: User) => new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime(),
         },
         {
             title: 'Actions',
             key: 'actions',
+            width: 120,
             render: (_: any, record: User) => (
                 <div className="flex gap-2">
-                    <Button
-                        type="text"
-                        icon={<EditOutlined />}
-                        onClick={() => navigate(`/users/${record.id}/edit`)}
-                    >
-                        Edit
-                    </Button>
+                    <Tooltip title="Edit">
+                        <Button
+                            type="text"
+                            className="flex items-center justify-center w-8 h-8"
+                            icon={<EditOutlined className="text-lg" />}
+                            onClick={() => navigate(`/users/${record.id}`)}
+                        />
+                    </Tooltip>
                     <Popconfirm
                         title="Are you sure you want to delete this user?"
                         onConfirm={() => handleDeleteUser(record)}
                         okText="Yes"
                         cancelText="No"
                     >
-                        <Button type="text" danger icon={<DeleteOutlined />}>
-                            Delete
-                        </Button>
+                        <Tooltip title="Delete">
+                            <Button 
+                                type="text" 
+                                danger 
+                                className="flex items-center justify-center w-8 h-8"
+                                icon={<DeleteOutlined className="text-lg" />} 
+                            />
+                        </Tooltip>
                     </Popconfirm>
                 </div>
             ),

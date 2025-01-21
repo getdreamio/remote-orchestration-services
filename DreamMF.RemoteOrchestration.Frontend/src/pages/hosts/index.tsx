@@ -4,6 +4,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined, ApiOutlined }
 import { useHosts, useDeleteHost } from '@/hooks/useHosts';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import { formatDateShort, formatDateFull } from '@/lib/date-utils';
 
 const { Text } = Typography;
 
@@ -39,24 +40,23 @@ const HostsPage: React.FC = () => {
         }
     };
 
-    const formatDate = (date: string) => new Date(date).toLocaleDateString();
-
     const columns = [
         {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
-            sorter: (a: any, b: any) => a.name.localeCompare(b.name),
             render: (name: string) => (
                 <div>
                     <div><b>{name}</b></div>
                 </div>
             ),
+            sorter: (a: any, b: any) => a.name.localeCompare(b.name),
         },
         {
             title: 'URL',
             dataIndex: 'url',
             key: 'url',
+            ellipsis: true,
             render: (url: string) => (
                 <a href={url} target="_blank" rel="noopener noreferrer">
                     {url}
@@ -108,22 +108,27 @@ const HostsPage: React.FC = () => {
         {
             title: 'Remotes',
             key: 'remotes',
+            width: 100,
             render: (_: any, record: any) => {
                 return (
                     <Tooltip title={`${record.remoteCount} remote${record.remoteCount === 1 ? '' : 's'} attached`}>
-                        <div className="flex items-center gap-1">
-                            <ApiOutlined />
-                            <span>{record.remoteCount}</span>
-                        </div>
+                        <Tag icon={<ApiOutlined />} color="purple">
+                            {record.remoteCount}
+                        </Tag>
                     </Tooltip>
                 );
-            },
+            }
         },
         {
-            title: 'Last Updated',
+            title: 'Updated',
             dataIndex: 'updated_Date',
             key: 'updated_Date',
-            render: (date: string) => formatDate(date),
+            width: 120,
+            render: (date: string) => (
+                <Tooltip title={formatDateFull(date)}>
+                    <span>{formatDateShort(date)}</span>
+                </Tooltip>
+            ),
             sorter: (a: any, b: any) => {
                 if (!a.updated_Date || !b.updated_Date) return 0;
                 return new Date(a.updated_Date).getTime() - new Date(b.updated_Date).getTime();
@@ -133,30 +138,42 @@ const HostsPage: React.FC = () => {
             title: 'Created',
             dataIndex: 'created_Date',
             key: 'created_Date',
-            render: (date: string) => formatDate(date),
+            width: 120,
+            render: (date: string) => (
+                <Tooltip title={formatDateFull(date)}>
+                    <span>{formatDateShort(date)}</span>
+                </Tooltip>
+            ),
             sorter: (a: any, b: any) => new Date(a.created_Date).getTime() - new Date(b.created_Date).getTime(),
         },
         {
             title: 'Actions',
             key: 'actions',
+            width: 120,
             render: (_: any, record: any) => (
                 <div className="flex gap-2">
-                    <Button
-                        type="text"
-                        icon={<EditOutlined />}
-                        onClick={() => navigate(`/hosts/${record.id}`)}
-                    >
-                        Edit
-                    </Button>
+                    <Tooltip title="Edit">
+                        <Button
+                            type="text"
+                            className="flex items-center justify-center w-8 h-8"
+                            icon={<EditOutlined className="text-lg" />}
+                            onClick={() => navigate(`/hosts/${record.id}`)}
+                        />
+                    </Tooltip>
                     <Popconfirm
                         title="Are you sure you want to delete this host?"
                         onConfirm={() => handleDelete(record.id)}
                         okText="Yes"
                         cancelText="No"
                     >
-                        <Button type="text" danger icon={<DeleteOutlined />}>
-                            Delete
-                        </Button>
+                        <Tooltip title="Delete">
+                            <Button 
+                                type="text" 
+                                danger 
+                                className="flex items-center justify-center w-8 h-8"
+                                icon={<DeleteOutlined className="text-lg" />} 
+                            />
+                        </Tooltip>
                     </Popconfirm>
                 </div>
             ),

@@ -111,7 +111,7 @@ export const router = createBrowserRouter([
                 errorElement: <ErrorDisplay message="Error creating user" />,
             },
             {
-                path: 'users/:id/edit',
+                path: 'users/:id',
                 element: <ProtectedRoute><EditUserPage /></ProtectedRoute>,
                 errorElement: <ErrorDisplay message="Error editing user" />,
             },

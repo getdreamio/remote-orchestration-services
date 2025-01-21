@@ -1,0 +1,58 @@
+# Build Frontend
+FROM node:20-alpine AS frontend-build
+WORKDIR /src/frontend
+COPY ["DreamMF.RemoteOrchestration.Frontend/package*.json", "./"]
+COPY ["DreamMF.RemoteOrchestration.Frontend/pnpm-lock.yaml", "./"]
+RUN npm install -g pnpm && pnpm install
+COPY ["DreamMF.RemoteOrchestration.Frontend", "./"]
+RUN pnpm run build
+
+# Build Backend
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS backend-build
+WORKDIR /src
+COPY ["DreamMF.RemoteOrchestration.Api/DreamMF.RemoteOrchestration.Api.csproj", "DreamMF.RemoteOrchestration.Api/"]
+COPY ["DreamMF.RemoteOrchestration.Core/DreamMF.RemoteOrchestration.Core.csproj", "DreamMF.RemoteOrchestration.Core/"]
+COPY ["DreamMF.RemoteOrchestration.Database/DreamMF.RemoteOrchestration.Database.csproj", "DreamMF.RemoteOrchestration.Database/"]
+RUN dotnet restore "DreamMF.RemoteOrchestration.Api/DreamMF.RemoteOrchestration.Api.csproj"
+COPY . .
+WORKDIR "/src/DreamMF.RemoteOrchestration.Api"
+RUN dotnet publish "DreamMF.RemoteOrchestration.Api.csproj" -c Release -o /app/publish
+
+# Final combined image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /app
+
+# Define build argument for BACKEND_URL
+ARG BACKEND_URL=https://localhost:5001
+
+# Install Node.js and supervisor
+RUN apt-get update && apt-get install -y \
+    curl \
+    supervisor \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g pnpm \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy frontend build
+COPY --from=frontend-build /src/frontend/dist /app/frontend
+COPY --from=frontend-build /src/frontend/scripts/generate-env.js /app/frontend/scripts/
+RUN cd /app/frontend && npm install -g pnpm && pnpm install --prod
+
+# Copy backend build
+COPY --from=backend-build /app/publish /app/backend
+
+# Setup supervisor configuration
+RUN mkdir -p /var/log/supervisor
+COPY .docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+EXPOSE 3000 5000 5001
+
+ENV ASPNETCORE_URLS=http://+:5000;https://+:5001
+ENV BACKEND_URL=https://localhost:5001
+ENV AUTH_AUTHORITY=http://localhost:5000
+ENV AUTH_CLIENT_ID=DreamMF-Web-01202025
+
+# Generate environment config and start services
+CMD ["/bin/bash", "-c", "cd /app/frontend && node scripts/generate-env.js dist/env-config.js && /usr/bin/supervisord"]

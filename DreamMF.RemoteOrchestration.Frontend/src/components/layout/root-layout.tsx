@@ -6,6 +6,7 @@ import { Breadcrumb } from '../navigation/breadcrumb';
 import { useTheme } from '../theme/theme-provider';
 import ErrorBoundary from '../error/error-boundary';
 import { useState } from 'react';
+import packageJson from '../../../package.json';
 
 const RootLayout = () => {
     const { theme } = useTheme();
@@ -17,7 +18,7 @@ const RootLayout = () => {
                 <div className="flex">
                     {/* Sidebar */}
                     <aside 
-                        className={`hidden lg:flex h-screen flex-col fixed left-0 top-0 border-r bg-card transition-all duration-300 ${isCollapsed ? 'w-[80px]' : 'w-[336px]'} overflow-hidden`}
+                        className={`hidden lg:flex h-screen flex-col fixed left-0 top-0 border-r bg-[#f9fafb] dark:bg-card transition-all duration-300 ${isCollapsed ? 'w-[80px]' : 'w-[336px]'} overflow-hidden`}
                     >
                         {/* Header - Fixed */}
                         <div className="flex-none p-6 border-b relative">
@@ -26,9 +27,17 @@ const RootLayout = () => {
                                     <img src="/favicon-32x32.png" alt="Dream.MF Logo" className="w-6 h-6" />
                                 </div>
                                 <div className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100'}`}>
-                                    <h2 className="text-lg leading-tight whitespace-nowrap">Dream.MF [ROS]</h2>
+                                    <div className="flex items-center gap-2">
+                                        <h2 className="text-lg leading-tight whitespace-nowrap">Dream.MF [ROS]</h2>
+                                        <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 rounded-md leading-none">ALPHA</span>
+                                    </div>
                                     <p className="text-xs text-muted-foreground whitespace-nowrap">Remote Orchestration Services</p>
                                 </div>
+                                {isCollapsed && (
+                                    <div className="absolute left-full ml-2 bg-popover px-2 py-1 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap">
+                                        <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 rounded-md leading-none">ALPHA</span>
+                                    </div>
+                                )}
                             </div>
                             <button 
                                 onClick={() => setIsCollapsed(!isCollapsed)}
@@ -41,7 +50,7 @@ const RootLayout = () => {
                         <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-2">
                             <Link
                                 to="/"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <LayoutDashboard className="h-5 w-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -51,7 +60,7 @@ const RootLayout = () => {
                             </Link>
                             <Link
                                 to="/hosts"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <Server className="h-5 w-5 text-blue-500 dark:text-blue-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -61,7 +70,7 @@ const RootLayout = () => {
                             </Link>
                             <Link
                                 to="/remotes"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <Database className="h-5 w-5 text-green-500 dark:text-green-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -71,7 +80,7 @@ const RootLayout = () => {
                             </Link>
                             <Link
                                 to="/tags"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <Tag className="h-5 w-5 text-purple-500 dark:text-purple-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -81,7 +90,7 @@ const RootLayout = () => {
                             </Link>
                             <Link
                                 to="/search"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <Search className="h-5 w-5 text-amber-500 dark:text-amber-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -91,7 +100,7 @@ const RootLayout = () => {
                             </Link>
                             <Link
                                 to="/relationships"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <Network className="h-5 w-5 text-orange-500 dark:text-orange-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -101,7 +110,7 @@ const RootLayout = () => {
                             </Link>
                             <hr className="my-2 border-border" />
                             <div
-                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <Shield className="h-5 w-5 text-red-500 dark:text-red-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -110,7 +119,7 @@ const RootLayout = () => {
                                 </div>
                             </div>
                             <div
-                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <ToggleLeft className="h-5 w-5 text-yellow-500 dark:text-yellow-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -119,7 +128,7 @@ const RootLayout = () => {
                                 </div>
                             </div>
                             <div
-                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <ScrollText className="h-5 w-5 text-indigo-500 dark:text-indigo-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -130,7 +139,7 @@ const RootLayout = () => {
                             <hr className="my-2 border-border" />
                             <Link
                                 to="/analytics"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <BarChart className="h-5 w-5 text-blue-500 dark:text-blue-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -140,7 +149,7 @@ const RootLayout = () => {
                             </Link>
                             <Link
                                 to="/users"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <Users className="h-5 w-5 text-purple-500 dark:text-purple-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -150,7 +159,7 @@ const RootLayout = () => {
                             </Link>
                             <Link
                                 to="/settings"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <Settings className="h-5 w-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -159,10 +168,12 @@ const RootLayout = () => {
                                 </div>
                             </Link>
                         </nav>
-                        {/* Footer - Fixed */}
-                        <div className={`flex-none p-4 text-xs text-muted-foreground border-t transition-all duration-300 ${isCollapsed ? 'hidden' : ''}`}>
-                            2025 Dream.MF - All rights reserved.
-                        </div>
+                        {/* Footer */}
+                        <footer className="flex-none p-6 border-t">
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground"> 2025 Dream.MF. All rights reserved. v{packageJson.version}</p>
+                            </div>
+                        </footer>
                     </aside>
 
                     {/* Main Content */}
