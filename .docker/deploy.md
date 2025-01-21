@@ -18,38 +18,7 @@ dotnet dev-certs https -ep ${HOME}/.aspnet/https/aspnetapp.pfx -p Dr34m0120225
 dotnet dev-certs https --trust
 ```
 
-2. Update the certificate password in `docker-compose.yml` if you used a different password.
-
-## Building and Running the Services
-
-1. Create a `docker-compose.yml` file in the root directory with the following content:
-```yaml
-version: '3.8'
-services:
-  frontend:
-    build:
-      context: .
-      target: frontend
-    ports:
-      - "8080:8080"
-    environment:
-      - VITE_API_URL=http://localhost:5000
-
-  backend:
-    build:
-      context: .
-      target: final
-    ports:
-      - "5000:5000"
-      - "5001:5001"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5000;https://+:5001
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=YourSecurePassword
-    volumes:
-      - ~/.aspnet/https:/https:ro
-```
+Update the certificate password in `docker-compose.yml` if you used a different password.
 
 2. Start the services:
 ```bash
@@ -57,15 +26,13 @@ docker-compose up -d
 ```
 
 The applications will be available at:
-- Frontend: http://localhost:8080
-- API Endpoints: 
-  - HTTP: http://localhost:5000
-  - HTTPS: https://localhost:5001
+- Frontend: http://localhost:3000
+- API Endpoint: https://localhost:5001
 
 ## Environment Variables
 
 ### Frontend Environment Variables
-- `VITE_API_URL`: URL of the backend API
+- `BACKEND_URL`: URL of the backend API
 
 ### Backend Environment Variables
 ```bash
@@ -78,11 +45,42 @@ Additional HTTPS-related environment variables:
 - `ASPNETCORE_Kestrel__Certificates__Default__Path`: Path to the SSL certificate
 - `ASPNETCORE_Kestrel__Certificates__Default__Password`: Certificate password
 
+## Deploying to Docker Hub
+
+To deploy your Docker containers to Docker Hub, follow these steps:
+
+### Step 1: Log in to Docker Hub
+
+Open your terminal and run the following command to log in:
+
+```bash
+docker login
+```
+
+You'll be prompted to enter your Docker Hub username and password.
+
+### Step 2: Tag the Docker Images
+
+Assuming your Docker Hub username is `dreammf`, tag your images like this:
+
+```bash
+docker tag dreammf/ros-frontend:0.9.2 dreammf/ros-frontend:latest
+docker tag dreammf/ros-backend:0.9.2 dreammf/ros-backend:latest
+```
+
+### Step 3: Push the Images
+
+Push the tagged images to Docker Hub:
+
+```bash
+docker push dreammf/ros-frontend:0.9.2
+docker push dreammf/ros-backend:0.9.2
+```
+
 ## Health Check
 
 You can verify the API is running by accessing either:
 ```
-http://localhost:5000/health
 https://localhost:5001/health
 ```
 
@@ -107,7 +105,7 @@ docker-compose exec backend /bin/bash
 ```
 
 3. Common Issues:
-   - If the frontend can't connect to the backend, ensure the `VITE_API_URL` is set correctly
+   - If the frontend can't connect to the backend, ensure the `BACKEND_URL` is set correctly
    - If ports are already in use, modify the port mappings in docker-compose.yml
    - If HTTPS is not working, verify that:
      - The development certificate exists in ~/.aspnet/https/
