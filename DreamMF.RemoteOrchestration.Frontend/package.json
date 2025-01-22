@@ -1,6 +1,6 @@
 {
   "name": "dream-mf-remote-orchestration-frontend",
-  "version": "0.9.3",
+  "version": "0.9.10",
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^5.5.2",

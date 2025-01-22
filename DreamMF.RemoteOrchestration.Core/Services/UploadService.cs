@@ -179,21 +179,39 @@ public class UploadService : IUploadService
                 memoryStream.Position = 0;
                 
                 using var archive = new ZipArchive(memoryStream, ZipArchiveMode.Read);
-                
-                // Validate zip contents before extraction
+
                 foreach (var entry in archive.Entries)
                 {
-                    var fullPath = Path.GetFullPath(Path.Combine(targetPath, entry.FullName));
-                    if (!fullPath.StartsWith(targetPath))
+                    // Skip entries related to macOS or dotfiles that should be ignored
+                    if (entry.FullName.StartsWith("__MACOSX/") || entry.Name.StartsWith("._") || entry.Name.Equals("") || entry.Name.Equals(".gitkeep"))
                     {
-                        _logger.LogError("Zip slip attempt detected. Entry: {Entry}", entry.FullName);
-                        throw new HandledException(ExceptionType.Security, 
-                            "Invalid zip file: Contains files that would extract outside the target directory");
+                        continue;
+                    }
+
+                    var adjustedFullName = AdjustPathIgnoringTopLevel(entry.FullName);
+                    try
+                    {
+                        // Compute the full path for the extracted file
+                        var fullPath = Path.GetFullPath(Path.Combine(targetPath, adjustedFullName));
+                        if (!fullPath.StartsWith(Path.GetFullPath(targetPath), StringComparison.Ordinal))
+                        {
+                            _logger.LogError("Zip slip attempt detected. Entry: {Entry}", entry.FullName);
+                            throw new UnauthorizedAccessException("Invalid zip file: Contains files that would extract outside the target directory.");
+                        }
+                        
+                        if (!string.IsNullOrEmpty(entry.Name))
+                        {
+                            Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+                            entry.ExtractToFile(fullPath, overwrite: true);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error extracting entry: {Entry}", entry.FullName);
+                        throw;
                     }
                 }
-                
-                // Extract files
-                archive.ExtractToDirectory(targetPath, true);
+
                 _logger.LogInformation("Successfully extracted files to: {Path}", targetPath);
 
                 // Update the remote's updated date
@@ -225,6 +243,18 @@ public class UploadService : IUploadService
             _logger.LogError(ex, "Unexpected error during file extraction");
             throw new HandledException(ExceptionType.Service, "An unexpected error occurred during file extraction");
         }
+    }
+    
+    private string AdjustPathIgnoringTopLevel(string fullName)
+    {
+        var parts = fullName.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length <= 1) // Root file or no folders
+        {
+            return fullName;
+        }
+
+        // Skip the top-level folder
+        return string.Join('/', parts, 1, parts.Length - 1);
     }
 
     private async Task<string> GetStoragePathAsync()
@@ -290,12 +320,12 @@ public class UploadService : IUploadService
             if (string.Equals(dbType, "sqlite", StringComparison.OrdinalIgnoreCase))
             {
                 var storagePath = await GetStoragePathAsync();
-                var remotePath = Path.Combine(storagePath, remote.Name, version, "remote.js");
-                return $"{baseUrl}/remotes/{remote.Name}/{version}/remote.js";
+                var remotePath = Path.Combine(storagePath, remote.Name, version, "remoteEntry.js");
+                return $"{baseUrl}/remotes/{remote.Name}/{version}/remoteEntry.js";
             }
 
             _logger.LogWarning("Unknown database type: {DbType}. Using default path pattern.", dbType);
-            return $"{baseUrl}/remotes/{remote.Name}/{version}/remote.js";
+            return $"{baseUrl}/remotes/{remote.Name}/{version}/remoteEntry.js";
         }
         catch (Exception ex)
         {
