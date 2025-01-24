@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Select, Card, Button } from 'antd';
 import {
     Configuration,
@@ -8,20 +8,17 @@ import {
 import {
     STORAGE_TYPE_KEY,
     STORAGE_PATH_KEY,
-    AZURE_STORAGE_ACCOUNT_KEY,
-    AZURE_STORAGE_KEY_KEY,
+    AZURE_STORAGE_CONNECTION_STRING_KEY,
     AZURE_CONTAINER_NAME_KEY,
-    AZURE_BLOB_NAME_KEY,
-    AWS_ACCESS_KEY_ID_KEY,
-    AWS_SECRET_ACCESS_KEY_KEY,
+    AWS_ACCESS_ACCESS_KEY,
+    AWS_SECRET_SECRET_ACCESS_KEY,
     AWS_REGION_KEY,
     AWS_BUCKET_NAME_KEY,
-    AWS_BUCKET_KEY_KEY,
 } from '@/constants/settings_constants';
 
 interface StorageSettingsFormProps {
     configurations: Configuration[] | undefined;
-    onSave: (key: string, value: string) => void;
+    onSave: (changes: { key: string, value: string }[]) => void;
 }
 
 export const StorageSettingsForm: React.FC<StorageSettingsFormProps> = ({
@@ -30,54 +27,65 @@ export const StorageSettingsForm: React.FC<StorageSettingsFormProps> = ({
 }) => {
     const [form] = Form.useForm();
     const [selectedStorageType, setSelectedStorageType] = useState<string>(
-        configurations?.find(c => c.key === STORAGE_TYPE_KEY)?.value || 'LocalStorage'
+        configurations?.find(c => c.key === STORAGE_TYPE_KEY)?.value || 'Unknown'
     );
 
     const getConfigValue = (key: string) => {
         return configurations?.find(c => c.key === key)?.value || '';
     };
 
-    const handleSubmit = (values: any) => {
-        // Storage Type
-        if (values.storageType) {
-            onSave(STORAGE_TYPE_KEY, values.storageType);
-        }
+    // Update form values when configurations change
+    useEffect(() => {
+        form.setFieldsValue({
+            storageType: getConfigValue(STORAGE_TYPE_KEY),
+            storagePath: getConfigValue(STORAGE_PATH_KEY),
+            azureStorageConnectionString: getConfigValue(AZURE_STORAGE_CONNECTION_STRING_KEY),
+            azureContainerName: getConfigValue(AZURE_CONTAINER_NAME_KEY),
+            awsAccessKeyId: getConfigValue(AWS_ACCESS_ACCESS_KEY),
+            awsSecretAccessKey: getConfigValue(AWS_SECRET_SECRET_ACCESS_KEY),
+            awsRegion: getConfigValue(AWS_REGION_KEY),
+            awsBucketName: getConfigValue(AWS_BUCKET_NAME_KEY)
+        });
+    }, [configurations]);
 
-        // Local Storage
-        if (values.storagePath) {
-            onSave(STORAGE_PATH_KEY, values.storagePath);
-        }
+    const handleSubmit = async (values: any) => {
+        console.log('Form values:', values); // Debug log
 
-        // Azure Storage
-        if (values.azureStorageAccount) {
-            onSave(AZURE_STORAGE_ACCOUNT_KEY, values.azureStorageAccount);
-        }
-        if (values.azureStorageKey) {
-            onSave(AZURE_STORAGE_KEY_KEY, values.azureStorageKey);
-        }
-        if (values.azureContainerName) {
-            onSave(AZURE_CONTAINER_NAME_KEY, values.azureContainerName);
-        }
-        if (values.azureBlobName) {
-            onSave(AZURE_BLOB_NAME_KEY, values.azureBlobName);
-        }
+        // Create a map of field names to their corresponding configuration keys
+        const fieldToConfigKey: { [key: string]: string } = {
+            storageType: STORAGE_TYPE_KEY,
+            storagePath: STORAGE_PATH_KEY,
+            azureStorageConnectionString: AZURE_STORAGE_CONNECTION_STRING_KEY,
+            azureContainerName: AZURE_CONTAINER_NAME_KEY,
+            
+            awsAccessKeyId: AWS_ACCESS_ACCESS_KEY,
+            awsSecretAccessKey: AWS_SECRET_SECRET_ACCESS_KEY,
+            awsRegion: AWS_REGION_KEY,
+            awsBucketName: AWS_BUCKET_NAME_KEY
+        };
 
-        // AWS Storage
-        if (values.awsAccessKeyId) {
-            onSave(AWS_ACCESS_KEY_ID_KEY, values.awsAccessKeyId);
+        // Find all changed values
+        const changes = Object.entries(values)
+            .filter(([field, value]) => {
+                const currentValue = getConfigValue(fieldToConfigKey[field]);
+                return value !== currentValue && value !== undefined && value !== '';
+            })
+            .map(([field, value]) => ({
+                key: fieldToConfigKey[field],
+                value: value as string
+            }));
+
+        console.log('###', 'Changes to submit:', changes); // Debug log
+
+        // Send all changes in a single batch
+        if (changes.length > 0) {
+            onSave(changes);
         }
-        if (values.awsSecretAccessKey) {
-            onSave(AWS_SECRET_ACCESS_KEY_KEY, values.awsSecretAccessKey);
-        }
-        if (values.awsRegion) {
-            onSave(AWS_REGION_KEY, values.awsRegion);
-        }
-        if (values.awsBucketName) {
-            onSave(AWS_BUCKET_NAME_KEY, values.awsBucketName);
-        }
-        if (values.awsBucketKey) {
-            onSave(AWS_BUCKET_KEY_KEY, values.awsBucketKey);
-        }
+    };
+
+    const handleStorageTypeChange = (value: string) => {
+        setSelectedStorageType(value);
+        form.setFieldValue('storageType', value);
     };
 
     const renderConnectionDetails = () => {
@@ -88,12 +96,11 @@ export const StorageSettingsForm: React.FC<StorageSettingsFormProps> = ({
                         <Form.Item
                             label="Storage Path"
                             name="storagePath"
-                            initialValue={getConfigValue(STORAGE_PATH_KEY)}
-                            required
                             tooltip="The local path where files will be stored"
                         >
                             <Input
                                 style={{ maxWidth: 400 }}
+                                disabled
                                 placeholder="/remotes"
                             />
                         </Form.Item>
@@ -104,54 +111,23 @@ export const StorageSettingsForm: React.FC<StorageSettingsFormProps> = ({
                 return (
                     <div className="space-y-4">
                         <Form.Item
-                            label="Storage Account Name"
-                            name="azureStorageAccount"
-                            initialValue={getConfigValue(AZURE_STORAGE_ACCOUNT_KEY)}
-                            required
-                            tooltip="The name of your Azure Storage Account"
-                        >
-                            <Input
-                                style={{ maxWidth: 400 }}
-                                placeholder="Enter storage account name"
-                            />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="Storage Account Key"
-                            name="azureStorageKey"
-                            initialValue={getConfigValue(AZURE_STORAGE_KEY_KEY)}
-                            required
-                            tooltip="The access key for your Azure Storage Account"
+                            label="Storage Connection String"
+                            name="azureStorageConnectionString"
+                            tooltip="Azure Storage Connection String"
                         >
                             <Input.Password
                                 style={{ maxWidth: 400 }}
-                                placeholder="Enter storage account key"
+                                placeholder="DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=..."
                             />
                         </Form.Item>
-
                         <Form.Item
                             label="Container Name"
                             name="azureContainerName"
-                            initialValue={getConfigValue(AZURE_CONTAINER_NAME_KEY)}
-                            required
-                            tooltip="The name of your Azure Storage Container"
+                            tooltip="Azure Blob Storage Container Name"
                         >
                             <Input
                                 style={{ maxWidth: 400 }}
-                                placeholder="Enter container name"
-                            />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="Blob Name"
-                            name="azureBlobName"
-                            initialValue={getConfigValue(AZURE_BLOB_NAME_KEY)}
-                            required
-                            tooltip="The name of your Azure Storage Blob"
-                        >
-                            <Input
-                                style={{ maxWidth: 400 }}
-                                placeholder="Enter blob name"
+                                placeholder="my-container"
                             />
                         </Form.Item>
                     </div>
@@ -161,67 +137,43 @@ export const StorageSettingsForm: React.FC<StorageSettingsFormProps> = ({
                 return (
                     <div className="space-y-4">
                         <Form.Item
-                            label="AWS Access Key ID"
+                            label="Access Key ID"
                             name="awsAccessKeyId"
-                            initialValue={getConfigValue(AWS_ACCESS_KEY_ID_KEY)}
-                            required
-                            tooltip="Your AWS Access Key ID"
+                            tooltip="AWS Access Key ID"
                         >
                             <Input
                                 style={{ maxWidth: 400 }}
-                                placeholder="Enter AWS Access Key ID"
+                                placeholder="AKIAXXXXXXXXXXXXXXXX"
                             />
                         </Form.Item>
-
                         <Form.Item
-                            label="AWS Secret Access Key"
+                            label="Secret Access Key"
                             name="awsSecretAccessKey"
-                            initialValue={getConfigValue(AWS_SECRET_ACCESS_KEY_KEY)}
-                            required
-                            tooltip="Your AWS Secret Access Key"
+                            tooltip="AWS Secret Access Key"
                         >
                             <Input.Password
                                 style={{ maxWidth: 400 }}
-                                placeholder="Enter AWS Secret Access Key"
+                                placeholder="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                             />
                         </Form.Item>
-
                         <Form.Item
-                            label="AWS Region"
+                            label="Region"
                             name="awsRegion"
-                            initialValue={getConfigValue(AWS_REGION_KEY)}
-                            required
-                            tooltip="The AWS Region for your S3 Bucket"
+                            tooltip="AWS Region"
                         >
                             <Input
                                 style={{ maxWidth: 400 }}
-                                placeholder="Enter AWS Region"
+                                placeholder="us-west-2"
                             />
                         </Form.Item>
-
                         <Form.Item
-                            label="S3 Bucket Name"
+                            label="Bucket Name"
                             name="awsBucketName"
-                            initialValue={getConfigValue(AWS_BUCKET_NAME_KEY)}
-                            required
-                            tooltip="The name of your S3 Bucket"
+                            tooltip="AWS S3 Bucket Name"
                         >
                             <Input
                                 style={{ maxWidth: 400 }}
-                                placeholder="Enter S3 Bucket name"
-                            />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="S3 Bucket Key"
-                            name="awsBucketKey"
-                            initialValue={getConfigValue(AWS_BUCKET_KEY_KEY)}
-                            required
-                            tooltip="The key (path) within your S3 Bucket"
-                        >
-                            <Input
-                                style={{ maxWidth: 400 }}
-                                placeholder="Enter S3 Bucket key"
+                                placeholder="my-bucket"
                             />
                         </Form.Item>
                     </div>
@@ -233,24 +185,37 @@ export const StorageSettingsForm: React.FC<StorageSettingsFormProps> = ({
     };
 
     return (
-        <Form form={form} onFinish={handleSubmit} layout="vertical">
+        <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSubmit}
+            initialValues={{
+                storageType: selectedStorageType,
+                storagePath: getConfigValue(STORAGE_PATH_KEY),
+                azureStorageConnectionString: getConfigValue(AZURE_STORAGE_CONNECTION_STRING_KEY),
+                azureContainerName: getConfigValue(AZURE_CONTAINER_NAME_KEY),
+                awsAccessKeyId: getConfigValue(AWS_ACCESS_ACCESS_KEY),
+                awsSecretAccessKey: getConfigValue(AWS_SECRET_SECRET_ACCESS_KEY),
+                awsRegion: getConfigValue(AWS_REGION_KEY),
+                awsBucketName: getConfigValue(AWS_BUCKET_NAME_KEY)
+            }}
+        >
             <h2 className="text-lg font-semibold mb-4">Storage Settings</h2>
             <div className="space-y-4">
                 <Form.Item
                     label="Storage Type"
                     name="storageType"
-                    initialValue={selectedStorageType}
-                    required
-                    tooltip="Choose your preferred storage type"
+                    tooltip="Select the type of storage to use"
                 >
-                    <Select 
-                        style={{ maxWidth: 400 }} 
-                        onChange={(value) => setSelectedStorageType(value)}
-                    >
-                        <Select.Option value="LocalStorage">Local Storage</Select.Option>
-                        <Select.Option value="AzureBlobStorage" disabled>Azure Blob Storage</Select.Option>
-                        <Select.Option value="AwsS3Bucket" disabled>AWS S3 Bucket</Select.Option>
-                    </Select>
+                    <Select
+                        style={{ maxWidth: 400 }}
+                        onChange={handleStorageTypeChange}
+                        options={[
+                            { value: 'LocalStorage', label: 'Local Storage' },
+                            { value: 'AzureBlobStorage', label: 'Azure Blob Storage' },
+                            { value: 'AwsS3Bucket', label: 'AWS S3 Bucket' },
+                        ]}
+                    />
                 </Form.Item>
 
                 {renderConnectionDetails()}

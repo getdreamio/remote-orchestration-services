@@ -294,11 +294,14 @@ VALUES
 INSERT INTO Configuration ([Key], [Value], Created_Date, Updated_Date)
 VALUES 
     -- Storage Settings
-    ('storage:type', 'local', 1671645260, 1671645260),
+    ('storage:type', 'LocalStorage', 1671645260, 1671645260),
+    ('storage:path', '/remotes', 1671645260, 1671645260),
     ('storage:azure:container_name', '', 1671645260, 1671645260),
-    ('storage:azure:blob_name', '', 1671645260, 1671645260),
+    ('storage:azure:connection_string', '', 1671645260, 1671645260),
     ('storage:aws:bucket_name', '', 1671645260, 1671645260),
+    ('storage:aws:bucket_region', '', 1671645260, 1671645260),
     ('storage:aws:bucket_key', '', 1671645260, 1671645260),
+    ('storage:aws:bucket_secret', '', 1671645260, 1671645260),
     
     -- Database Settings
     ('database:type', 'sqlite', 1671645260, 1671645260),
@@ -310,7 +313,7 @@ VALUES
     ('database:password', '', 1671645260, 1671645260),
     
     -- API Settings
-    ('api:base_url', 'http://localhost:5000', 1671645260, 1671645260),
+    ('api:base_url', 'https://localhost:5001', 1671645260, 1671645260),
     ('api:version', 'v1', 1671645260, 1671645260),
     ('api:timeout', '30000', 1671645260, 1671645260),
     

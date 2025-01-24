@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react';
 import { 
     useConfigurations,
-    useUpdateConfiguration,
-    useCreateConfiguration,
+    useUpdateConfigurationBatch,
 } from '../hooks/useConfigurations';
-// import * as SettingsConstants from '../constants/settings_constants';
-// import { SettingsCard } from '../components/settings/settings-card';
 import { StorageSettingsForm } from '../components/settings/storage-settings-form';
 import { DatabaseSettingsForm } from '../components/settings/database-settings-form';
 import { Card } from 'antd';
@@ -14,23 +11,12 @@ import { Helmet } from 'react-helmet';
 
 const SettingsPage = () => {
     const { data: configurations, isLoading } = useConfigurations();
-    const { mutate: updateSetting, isPending: isUpdating } = useUpdateConfiguration();
-    const { mutate: createSetting, isPending: isCreating } = useCreateConfiguration();
+    const { mutate: updateSettingBatch, isPending: isUpdating } = useUpdateConfigurationBatch();
 
-    const getSettingValue = (key: string) => {
-        return configurations?.find(s => s.key === key)?.value || '';
-    };
-
-    const getSettingId = (key: string) => {
-        return configurations?.find(s => s.key === key)?.id;
-    };
-
-    const handleSave = async (key: string, value: string) => {
-        const settingId = getSettingId(key);
-        if (settingId) {
-            updateSetting({ id: settingId, key, value });
-        } else {
-            createSetting({ key, value });
+    const handleSave = async (changes: { key: string, value: string }[]) => {
+        console.log('Saving changes:', changes); // Debug log
+        if (changes && changes.length > 0) {
+            updateSettingBatch(changes);
         }
     };
 
@@ -52,29 +38,31 @@ const SettingsPage = () => {
                 <p>Note: Changes to database settings will require a restart of the application to take effect. Make sure your database server is properly configured and accessible.</p>
             </div>
 
-            {(isUpdating || isCreating) && (
+            {(isUpdating) && (
                 <div className="fixed bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-md shadow-lg">
                     Saving changes...
                 </div>
             )}
 
-            <Card className='mb-4 bg-gray-50 dark:bg-gray-800'>
-                <ApiSettingsForm />
-            </Card>
-            <Card className='mb-4 bg-gray-50 dark:bg-gray-800'>
-                <DatabaseSettingsForm 
-                    configurations={configurations}
-                    onSave={handleSave}
-                />
-            </Card>
-            <Card className='bg-gray-50 dark:bg-gray-800'>
-                <StorageSettingsForm 
-                    configurations={configurations}
-                    onSave={handleSave}
-                />
-            </Card>
+            <div className="space-y-6">
+                <Card title="API Settings" className="shadow-sm mb-4 bg-gray-50 dark:bg-gray-800">
+                    <ApiSettingsForm />
+                </Card>
+                <Card title="Database Settings" className="shadow-sm mb-4 bg-gray-50 dark:bg-gray-800">
+                    <DatabaseSettingsForm 
+                        configurations={configurations}
+                        onSave={handleSave}
+                    />
+                </Card>
+                <Card title="Storage Settings" className="shadow-sm bg-gray-50 dark:bg-gray-800">
+                    <StorageSettingsForm 
+                        configurations={configurations}
+                        onSave={handleSave}
+                    />
+                </Card>
+            </div>
         </div>
     );
-}
+};
 
 export default SettingsPage;

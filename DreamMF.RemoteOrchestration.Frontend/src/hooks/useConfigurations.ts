@@ -53,6 +53,21 @@ const createConfiguration = async (data: ConfigurationRequest): Promise<Configur
     return response.json();
 };
 
+const updateConfigurationBatch = async (data: ConfigurationRequest[]): Promise<Configuration[]> => {
+    console.log('Hook Saves',data);
+    const response = await fetchWithAuth(getApiUrl('/api/configurations/batch'), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+};
+
 export function useConfigurations() {
     return useQuery<Configuration[]>({
         queryKey: ['configurations'],
@@ -81,3 +96,14 @@ export function useCreateConfiguration() {
         },
     });
 }
+
+export const useUpdateConfigurationBatch = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: updateConfigurationBatch,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['configurations'] });
+        },
+    });
+};

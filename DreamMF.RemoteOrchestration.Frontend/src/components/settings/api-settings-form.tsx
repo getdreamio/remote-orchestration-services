@@ -42,7 +42,7 @@ export const ApiSettingsForm: React.FC<ApiSettingsFormProps> = () => {
                     <Input style={{ maxWidth: 400 }} readOnly disabled placeholder={'Reading from env-config.json...'} />
                 </Form.Item>
 
-                <Form.Item label="Remotes CDN" >
+                <Form.Item label="Local Remote CDN" >
                     <div className="flex gap-2">
                         <Button
                             icon={<CopyOutlined />}

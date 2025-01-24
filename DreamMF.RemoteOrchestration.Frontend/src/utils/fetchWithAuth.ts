@@ -21,6 +21,7 @@ export const fetchWithAuth = async (url: string, options: FetchOptions = {}) => 
 
     const response = await fetch(url, {
         ...rest,
+        //body: rest.body ? JSON.stringify(rest.body) : undefined,
         headers: requestHeaders,
     });
 

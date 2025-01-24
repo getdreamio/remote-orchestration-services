@@ -4,7 +4,6 @@
  * @returns The complete API URL
  */
 export const getApiUrl = (path: string): string => {
-    console.log('###', window.DreamMF);
     const backendUrl = window.DreamMF?.config?.BACKEND_URL || 'https://localhost:5001';
     return `${backendUrl}${path}`;
 };
