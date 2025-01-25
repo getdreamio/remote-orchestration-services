@@ -17,6 +17,12 @@ public class HandledResponseModel
         Exceptions.Add(new HandledResponseError() { Message = message });
     }
 
+    public HandledResponseModel(List<HandledException> exceptions, HttpStatusCode status = HttpStatusCode.BadRequest)
+    {
+        StatusCode = (int)status;
+        Exceptions = exceptions.Select(x => new HandledResponseError() { Message = x.Message }).ToList();
+    }
+
     public int StatusCode { get; set; }
 
     public List<HandledResponseError> Exceptions { get; set; }

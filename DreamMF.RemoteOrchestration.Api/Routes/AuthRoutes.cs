@@ -1,6 +1,7 @@
 using DreamMF.RemoteOrchestration.Core.Exceptions;
 using DreamMF.RemoteOrchestration.Core.Models;
 using DreamMF.RemoteOrchestration.Core.Services;
+using DreamMF.RemoteOrchestration.Core.Utilities;
 using Microsoft.AspNetCore.Builder;
 
 namespace DreamMF.RemoteOrchestration.Api.Routes;
@@ -68,33 +69,65 @@ public static class AuthRoutes
 
     private static async Task<IResult> Login(LoginRequest request, IAuthenticationService authService)
     {
-        var result = await authService.LoginAsync(request.Email, request.Password);
-        if (!result.Success)
-            return Results.BadRequest(new HandledResponseModel(result.Message));
+        // Validate request
+        var validationErrors = new List<HandledException>();
+        
+        if (string.IsNullOrEmpty(request.Email))
+            validationErrors.Add(new HandledException(ExceptionType.Validation, "Email is required"));
 
-        var response = new AuthResponse
-        {
-            Token = result.Token,
-            ExpiresIn = 604800 // 7 days in seconds
-        };
-        return response != null ? Results.Ok(response) : Results.BadRequest("Unable to log you in.");
+        else if (!Validations.IsValidEmail(request.Email))
+            validationErrors.Add(new HandledException(ExceptionType.Validation, "Invalid email format"));
+            
+        if (string.IsNullOrEmpty(request.Password))
+            validationErrors.Add(new HandledException(ExceptionType.Validation, "Password is required"));
+        else if (request.Password.Length < 8)
+            validationErrors.Add(new HandledException(ExceptionType.Validation, "Password must be at least 8 characters"));
+        
+        if (validationErrors.Count > 0)
+            return Results.BadRequest(new HandledResponseModel(validationErrors));
+
+
+        var result = await authService.LoginAsync(request.Email, request.Password);
+        return result.Success
+            ? Results.Ok(new AuthResponse
+            {
+                Token = result.Token,
+                ExpiresIn = 604800 // 7 days in seconds
+            }) 
+            : Results.BadRequest("Unable to log you in.");
     }
 
     private static async Task<IResult> Register(RegisterRequest request, IAuthenticationService authService)
     {
+        // Validate request
+        var validationErrors = new List<HandledException>();
+        
+        if (string.IsNullOrEmpty(request.Email))
+            validationErrors.Add(new HandledException(ExceptionType.Validation, "Email is required"));
+
+        else if (!Validations.IsValidEmail(request.Email))
+            validationErrors.Add(new HandledException(ExceptionType.Validation, "Invalid email format"));
+            
+        if (string.IsNullOrEmpty(request.Password))
+            validationErrors.Add(new HandledException(ExceptionType.Validation, "Password is required"));
+        else if (request.Password.Length < 8)
+            validationErrors.Add(new HandledException(ExceptionType.Validation, "Password must be at least 8 characters"));
+            
         if (request.Password != request.ConfirmPassword)
-            return Results.BadRequest(new HandledResponseModel("Passwords do not match"));
+            validationErrors.Add(new HandledException(ExceptionType.Validation, "Passwords do not match"));
+
+        if (validationErrors.Count > 0)
+            return Results.BadRequest(new HandledResponseModel(validationErrors));
 
         var result = await authService.RegisterAsync(request.Email, request.Password);
-        if (!result.Success)
-            return Results.BadRequest(new HandledResponseModel(result.Message));
+        return result.Success
+            ? Results.Created("/api/auth/login", new AuthResponse
+            {
+                Token = result.Token,
+                ExpiresIn = 604800 // 7 days in seconds
+            }) 
+            : Results.BadRequest("Unable to register a new user.");
 
-        var response = new AuthResponse
-        {
-            Token = result.Token,
-            ExpiresIn = 604800 // 7 days in seconds
-        };
-        return response != null ? Results.Created("/api/auth/login", response) : Results.BadRequest("Unable to register a new user.");
     }
 
     private static async Task<IResult> Logout()
