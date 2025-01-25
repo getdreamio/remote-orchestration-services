@@ -34,4 +34,19 @@ public static class HostMapper
             Updated_Date = entity.Updated_Date
         };
     }
+
+    public static DreamHostResponse ToDreamResponse(this Host entity)
+    {
+        return new DreamHostResponse
+        {
+            Id = entity.Host_ID,
+            Name = entity.Name,
+            Description = entity.Description,
+            Url = entity.Url,
+            Key = entity.Key,
+            Environment = entity.Environment,
+            Created_Date = entity.Created_Date,
+            Updated_Date = entity.Updated_Date
+        };
+    }
 }

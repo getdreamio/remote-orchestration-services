@@ -73,4 +73,27 @@ public static class RemoteMapper
             SubRemoteCounts = 0, // TODO: Add Sub Remotes
         };
     }
+
+    public static DreamRemoteResponse ToDreamResponse(this Remote entity)
+    {
+        return new DreamRemoteResponse
+        {
+            Id = entity.Remote_ID,
+            Name = entity.Name,
+            Scope = entity.Scope,
+            Key = entity.Key,
+            Url = entity.Url,
+            Created_Date = entity.Created_Date,
+            Updated_Date = entity.Updated_Date,
+            Modules = entity.RemoteModules
+                .Select(rm => new ModuleResponse
+                {
+                    Id = rm.Module.Module_ID,
+                    Name = rm.Module.Name,
+                    Created_Date = rm.Module.Created_Date,
+                    Updated_Date = rm.Module.Updated_Date
+                })
+                .ToList()
+        };
+    }
 }

@@ -99,7 +99,7 @@ const DashboardPage: React.FC = () => {
             <Row gutter={[16, 16]}>
                 <Col xs={24} sm={8}>
                     <Card 
-                        className="border-l-4 border-l-blue-500 dark:border-l-blue-400 bg-gray-50 dark:bg-gray-800"
+                        className="border-l-4 border-l-blue-500 dark:border-l-blue-400 bg-gray-50 dark:bg-gray-800 cursor-pointer transition-all hover:shadow-lg"
                         onClick={() => navigate('/hosts')}
                     >
                         <Statistic
@@ -111,7 +111,7 @@ const DashboardPage: React.FC = () => {
                 </Col>
                 <Col xs={24} sm={8}>
                     <Card 
-                        className="border-l-4 border-l-purple-500 dark:border-l-purple-400 bg-gray-50 dark:bg-gray-800"
+                        className="border-l-4 border-l-purple-500 dark:border-l-purple-400 bg-gray-50 dark:bg-gray-800 cursor-pointer transition-all hover:shadow-lg"
                         onClick={() => navigate('/tags')}
                     >
                         <Statistic
@@ -123,7 +123,7 @@ const DashboardPage: React.FC = () => {
                 </Col>
                 <Col xs={24} sm={8}>
                     <Card 
-                        className="border-l-4 border-l-green-500 dark:border-l-green-400 bg-gray-50 dark:bg-gray-800"
+                        className="border-l-4 border-l-green-500 dark:border-l-green-400 bg-gray-50 dark:bg-gray-800 cursor-pointer transition-all hover:shadow-lg"
                         onClick={() => navigate('/remotes')}
                     >
                         <Statistic

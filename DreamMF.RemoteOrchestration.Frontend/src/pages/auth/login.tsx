@@ -34,7 +34,7 @@ const LoginPage: React.FC = () => {
                 <div className="text-center">
                     <div className="flex items-center justify-center gap-2 mb-6">
                         <div className={theme === 'dark' ? 'bg-white rounded-full p-1' : ''}>
-                            <img src="/logo.png" alt="Dream.MF Logo" />
+                            <img src="/logo_white.png" alt="Dream.MF Logo" />
                         </div>
                     </div>
                     <Title level={2} className="mt-6">

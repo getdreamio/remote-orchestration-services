@@ -9,8 +9,8 @@ namespace DreamMF.RemoteOrchestration.Core.Services;
 
 public interface IDreamService
 {
-    Task<HostResponse> GetHostDetailsByAccessKey(string accessKey);
-    Task<List<RemoteResponse>> GetAttachedRemotesByAccessKey(string accessKey);
+    Task<DreamHostResponse> GetHostDetailsByAccessKey(string accessKey);
+    Task<List<DreamRemoteResponse>> GetAttachedRemotesByAccessKey(string accessKey);
     Task<RemoteSummaryResponse> GetRemoteByAccessKeyAndName(string accessKey, string key);
 }
 
@@ -23,14 +23,14 @@ public class DreamService : IDreamService
         _dbContext = dbContext;
     }
 
-    public async Task<HostResponse> GetHostDetailsByAccessKey(string accessKey)
+    public async Task<DreamHostResponse> GetHostDetailsByAccessKey(string accessKey)
     {
         var host = await _dbContext.Hosts
             .FirstOrDefaultAsync(h => h.Key == accessKey);
-        return host != null ? HostMapper.ToResponse(host) : null;
+        return host != null ? HostMapper.ToDreamResponse(host) : null;
     }
 
-    public async Task<List<RemoteResponse>> GetAttachedRemotesByAccessKey(string accessKey)
+    public async Task<List<DreamRemoteResponse>> GetAttachedRemotesByAccessKey(string accessKey)
     {
         var host = await GetHostDetailsByAccessKey(accessKey);
         var remotes = await _dbContext.Host_Remotes
@@ -39,7 +39,7 @@ public class DreamService : IDreamService
             .ToListAsync();
         return await _dbContext.Remotes
             .Where(r => remotes.Contains(r.Remote_ID))
-            .Select(r => RemoteMapper.ToResponse(r))
+            .Select(r => RemoteMapper.ToDreamResponse(r))
             .ToListAsync();
     }
 

@@ -1,4 +1,4 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Settings, Users, Server, Database, Tag, BarChart, Shield, ToggleLeft, ScrollText, Network, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ThemeToggle } from '../theme/theme-toggle';
 import { UserMenu } from '../user/user-menu';
@@ -11,6 +11,14 @@ import packageJson from '../../../package.json';
 const RootLayout = () => {
     const { theme } = useTheme();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const location = useLocation();
+
+    const isActiveRoute = (path: string) => {
+        if (path === '/') {
+            return location.pathname === path;
+        }
+        return location.pathname.startsWith(path);
+    };
 
     return (
         <ErrorBoundary>
@@ -24,7 +32,7 @@ const RootLayout = () => {
                         <div className="flex-none p-6 border-b relative">
                             <div className={`flex items-center gap-2 ${isCollapsed ? 'justify-center' : ''}`}>
                                 <div className={`${theme === 'dark' ? 'bg-white rounded-full p-1' : ''} flex-shrink-0`}>
-                                    <img src="/favicon-32x32.png" alt="Dream.MF Logo" className="w-6 h-6" />
+                                    <img src="/logo_white.png" alt="Dream.MF Logo" className="w-6 h-6" />
                                 </div>
                                 <div className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100'}`}>
                                     <div className="flex items-center gap-2">
@@ -50,7 +58,7 @@ const RootLayout = () => {
                         <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-2">
                             <Link
                                 to="/"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''} ${isActiveRoute('/') ? 'bg-white shadow-md dark:bg-muted/50' : ''}`}
                             >
                                 <LayoutDashboard className="h-5 w-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -60,7 +68,7 @@ const RootLayout = () => {
                             </Link>
                             <Link
                                 to="/hosts"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''} ${isActiveRoute('/hosts') ? 'bg-white shadow-md dark:bg-muted/50' : ''}`}
                             >
                                 <Server className="h-5 w-5 text-blue-500 dark:text-blue-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -70,7 +78,7 @@ const RootLayout = () => {
                             </Link>
                             <Link
                                 to="/remotes"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''} ${isActiveRoute('/remotes') ? 'bg-white shadow-md dark:bg-muted/50' : ''}`}
                             >
                                 <Database className="h-5 w-5 text-green-500 dark:text-green-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -80,7 +88,7 @@ const RootLayout = () => {
                             </Link>
                             <Link
                                 to="/tags"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''} ${isActiveRoute('/tags') ? 'bg-white shadow-md dark:bg-muted/50' : ''}`}
                             >
                                 <Tag className="h-5 w-5 text-purple-500 dark:text-purple-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -90,7 +98,7 @@ const RootLayout = () => {
                             </Link>
                             <Link
                                 to="/search"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''} ${isActiveRoute('/search') ? 'bg-white shadow-md dark:bg-muted/50' : ''}`}
                             >
                                 <Search className="h-5 w-5 text-amber-500 dark:text-amber-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -100,7 +108,7 @@ const RootLayout = () => {
                             </Link>
                             <Link
                                 to="/relationships"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''} ${isActiveRoute('/relationships') ? 'bg-white shadow-md dark:bg-muted/50' : ''}`}
                             >
                                 <Network className="h-5 w-5 text-orange-500 dark:text-orange-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -110,7 +118,7 @@ const RootLayout = () => {
                             </Link>
                             <hr className="my-2 border-border" />
                             <div
-                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <Shield className="h-5 w-5 text-red-500 dark:text-red-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -119,7 +127,7 @@ const RootLayout = () => {
                                 </div>
                             </div>
                             <div
-                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <ToggleLeft className="h-5 w-5 text-yellow-500 dark:text-yellow-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -128,7 +136,7 @@ const RootLayout = () => {
                                 </div>
                             </div>
                             <div
-                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <ScrollText className="h-5 w-5 text-indigo-500 dark:text-indigo-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -139,7 +147,7 @@ const RootLayout = () => {
                             <hr className="my-2 border-border" />
                             <Link
                                 to="/analytics"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''} ${isActiveRoute('/analytics') ? 'bg-white shadow-md dark:bg-muted/50' : ''}`}
                             >
                                 <BarChart className="h-5 w-5 text-blue-500 dark:text-blue-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -149,7 +157,7 @@ const RootLayout = () => {
                             </Link>
                             <Link
                                 to="/users"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''} ${isActiveRoute('/users') ? 'bg-white shadow-md dark:bg-muted/50' : ''}`}
                             >
                                 <Users className="h-5 w-5 text-purple-500 dark:text-purple-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -159,7 +167,7 @@ const RootLayout = () => {
                             </Link>
                             <Link
                                 to="/settings"
-                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`group flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 relative ${isCollapsed ? 'justify-center' : ''} ${isActiveRoute('/settings') ? 'bg-white shadow-md dark:bg-muted/50' : ''}`}
                             >
                                 <Settings className="h-5 w-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
