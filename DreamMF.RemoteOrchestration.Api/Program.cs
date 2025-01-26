@@ -34,6 +34,7 @@ builder.Services.AddScoped<IRemoteOrchestrationDbContext>(provider =>
     return factory.CreateDbContext();
 });
 
+builder.Services.AddMemoryCache();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {

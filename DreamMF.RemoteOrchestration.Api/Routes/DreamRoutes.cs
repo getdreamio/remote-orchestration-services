@@ -6,6 +6,7 @@ using DreamMF.RemoteOrchestration.Database;
 using DreamMF.RemoteOrchestration.Database.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DreamMF.RemoteOrchestration.Api.Routes;
 
@@ -16,16 +17,20 @@ public static class DreamRoutes
     public static void MapDreamRoutes(this WebApplication app)
     {
         var group = app.MapGroup("/api/dreammf").WithTags(GroupName);
-        group.MapExtenalApi();
+        
+        // Get the memory cache service
+        var cache = app.Services.GetRequiredService<IMemoryCache>();
+        
+        group.MapExtenalApi(cache);
     }
 
-    private static RouteGroupBuilder MapExtenalApi(this RouteGroupBuilder group)
+    private static RouteGroupBuilder MapExtenalApi(this RouteGroupBuilder group, IMemoryCache cache)
     {
         group.RequireAuthorization();
 
         group.MapGet("/hosts/{accessKey}/", GetHostDetailsByAccessKey)
             .WithTags(GroupName)
-            .Produces<HostResponse>(StatusCodes.Status200OK)
+            .Produces<DreamHostResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
             .Produces<HandledResponseModel>(500)
@@ -35,7 +40,7 @@ public static class DreamRoutes
 
         group.MapGet("/hosts/{accessKey}/remotes", GetAttachedRemotesByAccessKey)
             .WithTags(GroupName)
-            .Produces<List<RemoteResponse>>(StatusCodes.Status200OK)
+            .Produces<List<DreamRemoteResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
             .Produces<HandledResponseModel>(500)
@@ -45,7 +50,7 @@ public static class DreamRoutes
 
         group.MapGet("/hosts/{accessKey}/remote/{key}", GetRemoteByAccessKeyAndName)
             .WithTags(GroupName)
-            .Produces<RemoteResponse>(StatusCodes.Status200OK)
+            .Produces<RemoteSummaryResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
             .Produces<HandledResponseModel>(500)
@@ -56,21 +61,51 @@ public static class DreamRoutes
         return group;
     }
 
-    private static async Task<IResult> GetHostDetailsByAccessKey(string accessKey, IDreamService service)
+    private static async Task<IResult> GetHostDetailsByAccessKey(string accessKey, IDreamService service, IMemoryCache cache)
     {
-        var result = await service.GetHostDetailsByAccessKey(accessKey);
-        return result != null ? Results.Ok(result) : Results.NotFound();
+        var cacheKey = $"host_{accessKey}";
+        if (!cache.TryGetValue(cacheKey, out DreamHostResponse? cachedResult))
+        {
+            cachedResult = await service.GetHostDetailsByAccessKey(accessKey);
+            if (cachedResult != null)
+            {
+                var cacheOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                cache.Set(cacheKey, cachedResult, cacheOptions);
+            }
+        }
+        return cachedResult != null ? Results.Ok(cachedResult) : Results.NotFound();
     }
 
-    private static async Task<IResult> GetAttachedRemotesByAccessKey(string accessKey, IDreamService service)
+    private static async Task<IResult> GetAttachedRemotesByAccessKey(string accessKey, IDreamService service, IMemoryCache cache)
     {
-        var result = await service.GetAttachedRemotesByAccessKey(accessKey);
-        return result != null ? Results.Ok(result) : Results.NotFound();
+        var cacheKey = $"remotes_{accessKey}";
+        if (!cache.TryGetValue(cacheKey, out List<DreamRemoteResponse>? cachedResult))
+        {
+            cachedResult = await service.GetAttachedRemotesByAccessKey(accessKey);
+            if (cachedResult != null)
+            {
+                var cacheOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                cache.Set(cacheKey, cachedResult, cacheOptions);
+            }
+        }
+        return cachedResult != null ? Results.Ok(cachedResult) : Results.NotFound();
     }
 
-    private static async Task<IResult> GetRemoteByAccessKeyAndName(string accessKey, string key, IDreamService service)
+    private static async Task<IResult> GetRemoteByAccessKeyAndName(string accessKey, string key, IDreamService service, IMemoryCache cache)
     {
-        var result = await service.GetRemoteByAccessKeyAndName(accessKey, key);
-        return result != null ? Results.Ok(result) : Results.NotFound();
+        var cacheKey = $"remote_{accessKey}_{key}";
+        if (!cache.TryGetValue(cacheKey, out RemoteSummaryResponse? cachedResult))
+        {
+            cachedResult = await service.GetRemoteByAccessKeyAndName(accessKey, key);
+            if (cachedResult != null)
+            {
+                var cacheOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                cache.Set(cacheKey, cachedResult, cacheOptions);
+            }
+        }
+        return cachedResult != null ? Results.Ok(cachedResult) : Results.NotFound();
     }
 }
