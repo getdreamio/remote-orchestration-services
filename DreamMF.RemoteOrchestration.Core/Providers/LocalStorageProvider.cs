@@ -135,6 +135,30 @@ public class LocalStorageProvider : IStorageProvider
             }
     }
 
+    public async Task DeleteRemoteVersionAsync(string name, string version)
+    {
+        string baseStoragePath = await GetStoragePathAsync();
+        var targetPath = Path.Combine(baseStoragePath, name, version);
+
+        if (Directory.Exists(targetPath))
+        {
+            Directory.Delete(targetPath, true);
+            _logger.LogInformation("Deleted directory: {Path}", targetPath);
+        }
+    }
+
+    public async Task DeleteRemoteAsync(string name)
+    {
+        string baseStoragePath = await GetStoragePathAsync();
+        var targetPath = Path.Combine(baseStoragePath, name);
+
+        if (Directory.Exists(targetPath))
+        {
+            Directory.Delete(targetPath, true);
+            _logger.LogInformation("Deleted directory: {Path}", targetPath);
+        }
+    }
+
     private async Task<string> GetStoragePathAsync()
     {
         try

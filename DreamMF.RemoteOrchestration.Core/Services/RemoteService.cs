@@ -29,6 +29,24 @@ public class RemoteService
         return remoteResponses;
     }
 
+    public async Task<List<ModuleResponse>> GetAllRemoteModulesAsync(int? maxResults = null, string? contains = null)
+    {
+        var query = _dbContext.Modules.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(contains))
+        {
+            query = query.Where(m => EF.Functions.Like(m.Name.ToLower(), $"%{contains.ToLower()}%"));
+        }
+
+        if (maxResults.HasValue)
+        {
+            query = query.Take(maxResults.Value);
+        }
+
+        var modules = await query.ToListAsync();
+        return modules.Select(ModuleMapper.ToResponse).ToList();
+    }   
+
     public async Task<RemoteResponse?> GetRemoteByIdAsync(int id)
     {
         var remote = await _dbContext.Remotes

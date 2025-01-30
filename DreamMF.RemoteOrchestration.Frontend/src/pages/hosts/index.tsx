@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Table, message, Tag, Typography, Tooltip, Popconfirm } from 'antd';
+import { Button, Table, message, Tag, Typography, Tooltip, Popconfirm, Modal } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined, ApiOutlined } from '@ant-design/icons';
 import { useHosts, useDeleteHost } from '@/hooks/useHosts';
 import { useNavigate } from 'react-router-dom';
@@ -13,13 +13,22 @@ const HostsPage: React.FC = () => {
     const { data: hosts, isLoading } = useHosts();
     const deleteHost = useDeleteHost();
 
-    const handleDelete = async (id: number) => {
-        try {
-            await deleteHost.mutateAsync(id);
-            message.success('Host deleted successfully');
-        } catch (error) {
-            message.error('Failed to delete host');
-        }
+    const handleDelete = (id: number) => {
+        Modal.confirm({
+            title: 'Are you sure you want to delete this host?',
+            content: 'This action cannot be undone. Please confirm you want to delete this host.',
+            okText: 'Yes, delete it',
+            okType: 'danger',
+            cancelText: 'Cancel',
+            onOk: async () => {
+                try {
+                    await deleteHost.mutateAsync(id);
+                    message.success('Host deleted successfully');
+                } catch (error) {
+                    message.error('Failed to delete host');
+                }
+            }
+        });
     };
 
     const copyToClipboard = (text: string) => {
@@ -160,21 +169,15 @@ const HostsPage: React.FC = () => {
                             onClick={() => navigate(`/hosts/${record.id}`)}
                         />
                     </Tooltip>
-                    <Popconfirm
-                        title="Are you sure you want to delete this host?"
-                        onConfirm={() => handleDelete(record.id)}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Tooltip title="Delete">
-                            <Button 
-                                type="text" 
-                                danger 
-                                className="flex items-center justify-center w-8 h-8"
-                                icon={<DeleteOutlined className="text-lg" />} 
-                            />
-                        </Tooltip>
-                    </Popconfirm>
+                    <Tooltip title="Delete">
+                        <Button 
+                            type="text" 
+                            danger 
+                            className="flex items-center justify-center w-8 h-8"
+                            icon={<DeleteOutlined className="text-lg" />} 
+                            onClick={() => handleDelete(record.id)}
+                        />
+                    </Tooltip>
                 </div>
             ),
         },

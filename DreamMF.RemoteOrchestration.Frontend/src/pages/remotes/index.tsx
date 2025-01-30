@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Typography, Table, Button, Tag, Tooltip, Popconfirm, message } from 'antd';
+import { Card, Typography, Table, Button, Tag, Tooltip, Modal, message } from 'antd';
 import { 
     PlusOutlined, 
     EditOutlined, 
@@ -31,13 +31,22 @@ const RemotesPage: React.FC = () => {
     const { data: remotes, isLoading } = useRemotes();
     const deleteRemote = useDeleteRemote();
 
-    const handleDelete = async (id: number) => {
-        try {
-            await deleteRemote.mutateAsync(id);
-            message.success('Remote deleted successfully');
-        } catch (error) {
-            message.error('Failed to delete remote');
-        }
+    const handleDelete = (id: number) => {
+        Modal.confirm({
+            title: 'Are you sure you want to delete this remote?',
+            content: 'This action cannot be undone. Please confirm you want to delete this remote.',
+            okText: 'Yes, delete it',
+            okType: 'danger',
+            cancelText: 'Cancel',
+            onOk: async () => {
+                try {
+                    await deleteRemote.mutateAsync(id);
+                    message.success('Remote deleted successfully');
+                } catch (error) {
+                    message.error('Failed to delete remote');
+                }
+            }
+        });
     };
 
     const columns = [
@@ -142,21 +151,13 @@ const RemotesPage: React.FC = () => {
                             onClick={() => navigate(`/remotes/${record.id}`)}
                         />
                     </Tooltip>
-                    <Popconfirm
-                        title="Are you sure you want to delete this remote?"
-                        onConfirm={() => handleDelete(record.id)}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Tooltip title="Delete">
-                            <Button 
-                                type="text" 
-                                danger 
-                                className="flex items-center justify-center w-8 h-8"
-                                icon={<DeleteOutlined className="text-lg" />} 
-                            />
-                        </Tooltip>
-                    </Popconfirm>
+                    <Button 
+                        type="text" 
+                        danger 
+                        className="flex items-center justify-center w-8 h-8"
+                        icon={<DeleteOutlined className="text-lg" />} 
+                        onClick={() => handleDelete(record.id)}
+                    />
                 </div>
             ),
         },

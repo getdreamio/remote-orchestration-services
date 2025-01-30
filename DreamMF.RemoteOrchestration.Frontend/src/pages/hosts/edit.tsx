@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, Typography, Spin, Tabs, Table, Button, Modal, message } from 'antd';
-import { LinkOutlined, DisconnectOutlined } from '@ant-design/icons';
+import { LinkOutlined, DisconnectOutlined, DeleteOutlined } from '@ant-design/icons';
 import HostForm from '@/components/hosts/host-form';
-import { useGetHost, useHostRemotes, useAttachRemote, useDetachRemote } from '@/hooks/useHosts';
+import { useGetHost, useHostRemotes, useAttachRemote, useDetachRemote, useDeleteHost } from '@/hooks/useHosts';
 import { useRemotes } from '@/hooks/useRemotes';
 import { formatDate } from '@/lib/date-utils';
 import { Helmet } from 'react-helmet';
@@ -19,6 +19,7 @@ const EditHostPage: React.FC = () => {
     const { data: allRemotes } = useRemotes();
     const attachRemote = useAttachRemote();
     const detachRemote = useDetachRemote();
+    const deleteHost = useDeleteHost();
     const [activeTab, setActiveTab] = useState('general');
     const [isAttachModalOpen, setIsAttachModalOpen] = useState(false);
 
@@ -50,6 +51,25 @@ const EditHostPage: React.FC = () => {
         } catch (error) {
             message.error('Failed to detach remote');
         }
+    };
+
+    const handleDeleteHost = () => {
+        Modal.confirm({
+            title: 'Are you sure you want to delete this host?',
+            content: 'This action cannot be undone. Please confirm you want to delete this host.',
+            okText: 'Yes, delete it',
+            okType: 'danger',
+            cancelText: 'Cancel',
+            onOk: async () => {
+                try {
+                    await deleteHost.mutateAsync(Number(id));
+                    message.success('Host deleted successfully');
+                    navigate('/hosts');
+                } catch (error) {
+                    message.error('Failed to delete host');
+                }
+            }
+        });
     };
 
     const columns = [
@@ -143,8 +163,17 @@ const EditHostPage: React.FC = () => {
 
     return (
         <div className="p-6">
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center justify-between mb-6">
                 <Title level={4} className="!mb-0">Edit Host: {host.name}</Title>
+                <Button
+                    type="primary"
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={handleDeleteHost}
+                    style={{ float: 'right' }}
+                >
+                    Delete
+                </Button>
             </div>
             <Helmet>
                 <title>[ROS] | Edit Host {host.name}</title>
@@ -158,8 +187,9 @@ const EditHostPage: React.FC = () => {
                             mode="general"
                             renderFooter={(isSubmitting) => (
                                 <div className="flex justify-end gap-2 mt-6">
+                                    <Button type="default" onClick={() => navigate('/hosts')}>Cancel</Button>
                                     <Button type="primary" htmlType="submit" loading={isSubmitting}>
-                                        Update Host
+                                        Save Changes
                                     </Button>
                                 </div>
                             )}
@@ -183,6 +213,7 @@ const EditHostPage: React.FC = () => {
                             mode="information"
                             renderFooter={(isSubmitting) => (
                                 <div className="flex justify-end gap-2 mt-6">
+                                    <Button type="default" onClick={() => navigate('/hosts')}>Cancel</Button>
                                     <Button type="primary" htmlType="submit" loading={isSubmitting}>
                                         Update Host
                                     </Button>

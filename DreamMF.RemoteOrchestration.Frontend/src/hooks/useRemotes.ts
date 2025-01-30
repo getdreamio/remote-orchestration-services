@@ -76,11 +76,22 @@ const fetchRemotes = async () => {
 };
 
 const fetchRemote = async (id: number) => {
-    const response = await fetchWithAuth(getApiUrl(`/api/remotes/${id}`));
-    if (!response.ok) {
+    const remoteResponse = await fetchWithAuth(getApiUrl(`/api/remotes/${id}`));
+    if (!remoteResponse.ok) {
         throw new Error('Network response was not ok');
     }
-    return response.json();
+    const remoteData = await remoteResponse.json();
+    return remoteData;
+};
+
+export const fetchModules = async (moduleInput: string) => {
+    const url = getApiUrl(`/api/remotes/modules?contains=${moduleInput}`);
+    const moduleResponse = await fetchWithAuth(url);
+    if (!moduleResponse.ok) {
+        throw new Error('Failed to fetch modules');
+    }
+    const moduleData = await moduleResponse.json();
+    return moduleData.map((module: RemoteModule) => ({ value: module.name }));
 };
 
 const createRemote = async (remote: RemoteRequest) => {

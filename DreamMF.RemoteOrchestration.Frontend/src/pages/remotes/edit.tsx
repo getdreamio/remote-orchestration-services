@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Form, Input, Button, Card, message, Tabs, Table, Input as AntInput, Typography, Empty, InputRef } from 'antd';
-import { useUpdateRemote, useRemote, RemoteModule, useRemoteVersions, useUpdateRemoteUrl, Version } from '@/hooks/useRemotes';
+import { Form, Input, Button, Card, message, Tabs, Table, Input as AntInput, Typography, Empty, InputRef, AutoComplete, Modal } from 'antd';
+import { useUpdateRemote, useRemote, RemoteModule, useRemoteVersions, useUpdateRemoteUrl, fetchModules, useDeleteRemote } from '@/hooks/useRemotes';
 import { PlusOutlined, DeleteOutlined, CodeOutlined, CopyOutlined, LinkOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { formatDate } from '@/lib/date-utils';
 import { TagInput, TagItem } from '@/components/tags/tag-input';
 import { useTags } from '@/hooks/useTags';
 import { Helmet } from 'react-helmet';
+import useDebounce from '@/hooks/useDebounce';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -20,16 +21,19 @@ interface Version {
 
 const EditRemotePage: React.FC = () => {
     const [moduleInput, setModuleInput] = useState('');
+    const [moduleOptions, setModuleOptions] = useState<{ value: string }[]>([]);
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [form] = Form.useForm();
     const updateRemote = useUpdateRemote();
     const updateRemoteUrl = useUpdateRemoteUrl();
+    const deleteRemote = useDeleteRemote();
     const { data: remote, isLoading, error } = useRemote(Number(id));
     const { data: versions = [], isLoading: versionsLoading } = useRemoteVersions(Number(id));
     const [activeTab, setActiveTab] = useState('general');
     const [modules, setModules] = useState<RemoteModule[]>([]);
     const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
+    const debouncedModuleInput = useDebounce(moduleInput, 300);
 
     useEffect(() => {
         if (remote) {
@@ -46,6 +50,16 @@ const EditRemotePage: React.FC = () => {
             setSelectedVersion(remote.activeVersion || null);
         }
     }, [remote, form]);
+
+    useEffect(() => {
+        if (debouncedModuleInput) {
+            fetchModules(debouncedModuleInput)
+                .then(data => setModuleOptions(data))
+                .catch(error => console.error('Failed to fetch modules:', error));
+        } else {
+            setModuleOptions([]);
+        }
+    }, [debouncedModuleInput]);
 
     const onFinish = async (values: any) => {
         try {
@@ -141,6 +155,26 @@ const EditRemotePage: React.FC = () => {
         },
     };
 
+    const handleDeleteRemote = () => {
+        Modal.confirm({
+            title: 'Are you sure you want to delete this remote?',
+            content: 'This action cannot be undone. Please confirm you want to delete this remote.',
+            okText: 'Yes, delete it',
+            okType: 'danger',
+            cancelText: 'Cancel',
+            className: 'theme-dialog',
+            onOk: async () => {
+                try {
+                    await deleteRemote.mutateAsync(Number(id));
+                    message.success('Remote deleted successfully');
+                    navigate('/remotes');
+                } catch (error) {
+                    message.error('Failed to delete remote');
+                }
+            }
+        });
+    };
+
     if (isLoading) {
         return <EditRemoteSkeleton />;
     }
@@ -150,16 +184,24 @@ const EditRemotePage: React.FC = () => {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
+                <Title level={4} className="!mb-0">Edit Remote: {remote?.name}</Title>
+                <Button
+                    type="primary"
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={handleDeleteRemote}
+                    style={{ float: 'right' }}
+                >
+                    Delete
+                </Button>
+            </div>
             <Helmet>
                 <title>[ROS] | Edit Remote {remote?.name}</title>
                 <meta name="description" content={`Dream.mf [ROS] | Edit Remote ${remote?.name}`} />
             </Helmet>
-            <div className="flex items-center gap-4 mb-6">
-                <Title level={4} className="!mb-0">Edit Remote: {remote?.name}</Title>
-            </div>
             <Card className="bg-gray-50 dark:bg-gray-800">
-
                 <Form
                     form={form}
                     layout="vertical"
@@ -235,22 +277,30 @@ const EditRemotePage: React.FC = () => {
 
                             <div className="space-y-2 max-w-[50%]">
                                 <label className="block">Modules</label>
-                                <div className="flex gap-2">
-                                    <AntInput
-                                        value={moduleInput}
-                                        onChange={(e) => setModuleInput(e.target.value)}
-                                        prefix={<CodeOutlined className="text-muted-foreground" />}
-                                        onKeyDown={handleModuleKeyPress}
-                                        placeholder="Add a module and press Enter"
-                                    />
-                                    <Button
-                                        type="primary"
-                                        onClick={() => addModule(moduleInput)}
-                                        icon={<PlusOutlined />}
-                                    >
-                                        Add
-                                    </Button>
-                                </div>
+                                <Form.Item label="Module" name="module">
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <AutoComplete
+                                            options={moduleOptions}
+                                            style={{ width: '100%' }}
+                                            onSelect={(value) => addModule(value)}
+                                            onSearch={(value) => setModuleInput(value)}
+                                            placeholder="Search for modules"
+                                            value={moduleInput}
+                                            onChange={(value) => setModuleInput(value)}
+                                        />
+                                        <Button
+                                            type="primary"
+                                            onClick={() => {
+                                                addModule(moduleInput);
+                                                setModuleInput('');
+                                            }}
+                                            icon={<PlusOutlined />}
+                                            style={{ marginLeft: '8px' }}
+                                        >
+                                            Add
+                                        </Button>
+                                    </div>
+                                </Form.Item>
                                 <div className="space-y-2">
                                     {modules.map((module, i) => (
                                         <div key={i} className="flex justify-between items-center p-2 bg-card rounded">
@@ -349,18 +399,18 @@ export default EditRemotePage;
 
 export const EditRemoteSkeleton: React.FC = () => {
     return (
-        <div className="space-y-6">
+        <div className="p-6">
             <div className="flex items-center gap-4 mb-6">
-                <div className="h-8 w-64 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                <div className="h-8 w-64 bg-gray-200 rounded animate-pulse" />
             </div>
             <Card>
                 {/* Tab Headers */}
-                <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
+                <div className="border-b border-gray-200 mb-6">
                     <div className="flex gap-4 px-2">
                         {['General', 'Sub-Remotes', 'Versions'].map((tab) => (
                             <div
                                 key={tab}
-                                className="h-4 w-24 bg-gray-200 rounded dark:bg-gray-700 animate-pulse mb-4"
+                                className="h-4 w-24 bg-gray-200 rounded animate-pulse mb-4"
                             />
                         ))}
                     </div>
@@ -370,48 +420,48 @@ export const EditRemoteSkeleton: React.FC = () => {
                 <div className="space-y-6 p-6">
                     {/* Name Field */}
                     <div className="space-y-2">
-                        <div className="h-4 w-16 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
-                        <div className="h-10 w-full bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                        <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+                        <div className="h-10 w-full bg-gray-200 rounded animate-pulse" />
                     </div>
 
                     {/* Scope Field */}
                     <div className="space-y-2">
-                        <div className="h-4 w-20 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
-                        <div className="h-10 w-full bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                        <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
+                        <div className="h-10 w-full bg-gray-200 rounded animate-pulse" />
                     </div>
 
                     {/* URL Field */}
                     <div className="space-y-2">
-                        <div className="h-4 w-12 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
-                        <div className="h-10 w-full bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                        <div className="h-4 w-12 bg-gray-200 rounded animate-pulse" />
+                        <div className="h-10 w-full bg-gray-200 rounded animate-pulse" />
                     </div>
 
                     {/* Modules Section */}
                     <div className="space-y-4">
-                        <div className="h-4 w-24 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                        <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
                         <div className="flex gap-2">
-                            <div className="h-10 flex-1 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
-                            <div className="h-10 w-24 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                            <div className="h-10 flex-1 bg-gray-200 rounded animate-pulse" />
+                            <div className="h-10 w-24 bg-gray-200 rounded animate-pulse" />
                         </div>
                         {/* Module Items */}
                         {[1, 2].map((i) => (
                             <div
                                 key={i}
-                                className="h-12 w-full bg-gray-200 rounded dark:bg-gray-700 animate-pulse"
+                                className="h-12 w-full bg-gray-200 rounded animate-pulse"
                             />
                         ))}
                     </div>
 
                     {/* Tags Section */}
                     <div className="space-y-2">
-                        <div className="h-4 w-16 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
-                        <div className="h-10 w-full bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                        <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+                        <div className="h-10 w-full bg-gray-200 rounded animate-pulse" />
                     </div>
 
                     {/* Action Buttons */}
                     <div className="flex justify-end space-x-2 pt-4">
-                        <div className="h-9 w-24 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
-                        <div className="h-9 w-32 bg-gray-200 rounded dark:bg-gray-700 animate-pulse" />
+                        <div className="h-9 w-24 bg-gray-200 rounded animate-pulse" />
+                        <div className="h-9 w-32 bg-gray-200 rounded animate-pulse" />
                     </div>
                 </div>
             </Card>
