@@ -2,7 +2,7 @@ version: '3.8'
 services:
   
   frontend:
-    image: dreammf/ros-frontend:0.9.12
+    image: dreammf/ros-frontend:0.9.13
     build:
       context: .
       target: frontend-server
@@ -11,10 +11,10 @@ services:
         AUTH_AUTHORITY: https://localhost:5001
         AUTH_CLIENT_ID: DreamMF-Web-01202025
     ports:
-      - "3000:80"
+      - "3000:3000"
 
   backend:
-    image: dreammf/ros-backend:0.9.12
+    image: dreammf/ros-backend:0.9.13
     build:
       context: .
       target: final
