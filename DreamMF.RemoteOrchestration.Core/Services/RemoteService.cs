@@ -47,26 +47,45 @@ public class RemoteService
     {
         var remote = RemoteMapper.ToEntity(request);
         
-        foreach (var module in request.Modules.Where(m => m.Id == 0))
+        // Save the remote first to get its ID
+        _dbContext.Remotes.Add(remote);
+        await _dbContext.SaveChangesAsync();
+
+        // Now handle the modules
+        foreach (var module in request.Modules)
         {
-            var newModule = new Module
+            Module moduleEntity;
+            if (module.Id == 0)
             {
-                Name = module.Name,
+                // Create new module
+                moduleEntity = new Module
+                {
+                    Name = module.Name,
+                    Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+                };
+                _dbContext.Modules.Add(moduleEntity);
+                await _dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                // Use existing module
+                moduleEntity = await _dbContext.Modules.FindAsync(module.Id);
+                if (moduleEntity == null) continue;
+            }
+
+            // Create the linking object
+            var remoteModule = new RemoteModule
+            {
+                Remote_ID = remote.Remote_ID,
+                Module_ID = moduleEntity.Module_ID,
                 Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
             };
-            _dbContext.Modules.Add(newModule);
-            await _dbContext.SaveChangesAsync();
-
-            remote.RemoteModules.Add(new RemoteModule
-            {
-                Module_ID = newModule.Module_ID,
-                Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-            });
+            
+            _dbContext.RemoteModules.Add(remoteModule);
         }
 
-        _dbContext.Remotes.Add(remote);
         await _dbContext.SaveChangesAsync();
         _ = _analyticsService.LogRemoteReadAsync(remote.Remote_ID, "Create", 1);
 
