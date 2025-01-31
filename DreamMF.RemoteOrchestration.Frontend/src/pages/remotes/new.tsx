@@ -41,8 +41,7 @@ const NewRemotePage: React.FC = () => {
         try {
             await createRemote.mutateAsync({
                 ...values,
-                modules,
-                tags
+                modules
             });
             message.success('Remote created successfully');
             navigate('/remotes');
