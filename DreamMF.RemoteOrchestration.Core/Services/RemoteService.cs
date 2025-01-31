@@ -29,6 +29,24 @@ public class RemoteService
         return remoteResponses;
     }
 
+    public async Task<List<ModuleResponse>> GetAllRemoteModulesAsync(int? maxResults = null, string? contains = null)
+    {
+        var query = _dbContext.Modules.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(contains))
+        {
+            query = query.Where(m => EF.Functions.Like(m.Name.ToLower(), $"%{contains.ToLower()}%"));
+        }
+
+        if (maxResults.HasValue)
+        {
+            query = query.Take(maxResults.Value);
+        }
+
+        var modules = await query.ToListAsync();
+        return modules.Select(ModuleMapper.ToResponse).ToList();
+    }   
+
     public async Task<RemoteResponse?> GetRemoteByIdAsync(int id)
     {
         var remote = await _dbContext.Remotes
@@ -176,22 +194,35 @@ public class RemoteService
         var remote = await _dbContext.Remotes.FindAsync(id);
         if (remote == null) return false;
 
-        // Delete audit records first
-        var auditRemotes = await _dbContext.AuditRemotes
-            .Where(ar => ar.Remote_ID == id)
-            .ToListAsync();
+        // Remove audit read records
+        var remoteAuditRecords = _dbContext.AuditReads_Remotes.Where(ar => ar.Remote_ID == id);
+        _dbContext.AuditReads_Remotes.RemoveRange(remoteAuditRecords);
+
+        // Remove audit records
+        var auditRemotes = _dbContext.AuditRemotes.Where(ar => ar.Remote_ID == id);
         _dbContext.AuditRemotes.RemoveRange(auditRemotes);
 
-        var auditReadsRemotes = await _dbContext.AuditReads_Remotes
-            .Where(ar => ar.Remote_ID == id)
-            .ToListAsync();
-        _dbContext.AuditReads_Remotes.RemoveRange(auditReadsRemotes);
+        // Remove related tags
+        var remoteTags = _dbContext.Tags_Remotes.Where(th => th.Remote_ID == id);
+        _dbContext.Tags_Remotes.RemoveRange(remoteTags);
+
+        // Remove attachments
+        var attachments = _dbContext.Host_Remotes.Where(th => th.Remote_ID == id);
+        _dbContext.Host_Remotes.RemoveRange(attachments);
+
+        // Remove related versions
+        var remoteVersions = _dbContext.Versions.Where(th => th.Remote_ID == id);
+        _dbContext.Versions.RemoveRange(remoteVersions);
+
+        // Remove related modules
+        var remoteModules = _dbContext.RemoteModules.Where(th => th.Remote_ID == id);
+        _dbContext.RemoteModules.RemoveRange(remoteModules);
+
+        // If we are deleting a remote, lets delete any uploaded remotes...
 
         // Then delete the remote
         _dbContext.Remotes.Remove(remote);
         await _dbContext.SaveChangesAsync();
-        
-        _ = _analyticsService.LogRemoteReadAsync(id, "Delete", 1);
         return true;
     }
 

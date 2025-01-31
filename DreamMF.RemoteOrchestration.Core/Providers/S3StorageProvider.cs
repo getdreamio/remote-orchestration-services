@@ -108,6 +108,43 @@ public class S3StorageProvider : IStorageProvider
         }
     }
 
+    public async Task DeleteRemoteVersionAsync(string name, string version)
+    {
+        var targetPath = $"{name}/{version}";
+        using var s3Client = new AmazonS3Client(_accessKeyId, _secretAccessKey, RegionEndpoint.GetBySystemName(_s3ClientRegion));
+
+        var listRequest = new ListObjectsV2Request
+        {
+            BucketName = _bucketName,
+            Prefix = targetPath
+        };
+
+        var listResponse = await s3Client.ListObjectsV2Async(listRequest);
+        foreach (var s3Object in listResponse.S3Objects)
+        {
+            await s3Client.DeleteObjectAsync(_bucketName, s3Object.Key);
+            _logger.LogInformation("Deleted S3 object: {Key}", s3Object.Key);
+        }
+    }
+
+    public async Task DeleteRemoteAsync(string name)
+    {
+        using var s3Client = new AmazonS3Client(_accessKeyId, _secretAccessKey, RegionEndpoint.GetBySystemName(_s3ClientRegion));
+
+        var listRequest = new ListObjectsV2Request
+        {
+            BucketName = _bucketName,
+            Prefix = name
+        };
+
+        var listResponse = await s3Client.ListObjectsV2Async(listRequest);
+        foreach (var s3Object in listResponse.S3Objects)
+        {
+            await s3Client.DeleteObjectAsync(_bucketName, s3Object.Key);
+            _logger.LogInformation("Deleted S3 object: {Key}", s3Object.Key);
+        }
+    }
+
     private string AdjustPathIgnoringTopLevel(string fullName)
     {
         var parts = fullName.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);

@@ -89,9 +89,21 @@ public class HostService
         var host = await _dbContext.Hosts.FindAsync(id);
         if (host == null) return false;
 
+        // Remove audit records
+        var hostAuditRecords = _dbContext.AuditReads_Hosts.Where(ar => ar.Host_ID == id);
+        _dbContext.AuditReads_Hosts.RemoveRange(hostAuditRecords);
+
+        // Remove related tags
+        var hostTags = _dbContext.Tags_Hosts.Where(th => th.Host_ID == id);
+        _dbContext.Tags_Hosts.RemoveRange(hostTags);
+
+        // Delete related child entities
+        var hostRemotes = _dbContext.Host_Remotes.Where(hr => hr.Host_ID == id);
+        _dbContext.Host_Remotes.RemoveRange(hostRemotes);
+
+        // Remove the host
         _dbContext.Hosts.Remove(host);
         await _dbContext.SaveChangesAsync();
-        _ = _analyticsService.LogHostReadAsync(id, "Delete", 1);
         return true;
     }
 

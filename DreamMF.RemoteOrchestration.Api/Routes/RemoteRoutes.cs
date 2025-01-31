@@ -31,6 +31,15 @@ public static class RemoteRoutes
             .WithSummary("Get All Remotes")
             .WithDescription("Retrieves a list of all registered remote instances");
 
+        group.MapGet("/modules", GetAllRemoteModules)
+            .WithTags(GroupName)
+            .Produces<List<ModuleResponse>>(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("List all modules that have previously been created"))
+            .WithSummary("Get All Remote Modules")
+            .WithDescription("Retrieves a list of all registered remote modules");
+
         group.MapGet("/{id}", GetRemoteById)
             .WithTags(GroupName)
             .Produces<RemoteResponse>(StatusCodes.Status200OK)
@@ -81,6 +90,12 @@ public static class RemoteRoutes
             .WithDescription("Deletes a specific remote instance by its unique identifier");
 
         return group;
+    }
+
+    private static async Task<IResult> GetAllRemoteModules(RemoteService remoteService, int? maxResults = null, string? contains = null)
+    {
+        var modules = await remoteService.GetAllRemoteModulesAsync(maxResults, contains);
+        return Results.Ok(modules);
     }
 
     private static async Task<IResult> GetAllRemotes(RemoteService remoteService)

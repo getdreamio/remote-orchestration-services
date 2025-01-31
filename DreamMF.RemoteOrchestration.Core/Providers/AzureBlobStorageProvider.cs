@@ -108,6 +108,33 @@ public class AzureBlobStorageProvider : IStorageProvider
         }
     }
 
+    public async Task DeleteRemoteVersionAsync(string name, string version)
+    {
+        var targetPath = $"{name}/{version}";
+        var blobServiceClient = new BlobServiceClient(_connectionString);
+        var containerClient = blobServiceClient.GetBlobContainerClient(_containerName);
+
+        await foreach (var blobItem in containerClient.GetBlobsAsync(prefix: targetPath))
+        {
+            var blobClient = containerClient.GetBlobClient(blobItem.Name);
+            await blobClient.DeleteIfExistsAsync();
+            _logger.LogInformation("Deleted blob: {BlobName}", blobItem.Name);
+        }
+    }
+
+    public async Task DeleteRemoteAsync(string name)
+    {
+        var blobServiceClient = new BlobServiceClient(_connectionString);
+        var containerClient = blobServiceClient.GetBlobContainerClient(_containerName);
+
+        await foreach (var blobItem in containerClient.GetBlobsAsync(prefix: name))
+        {
+            var blobClient = containerClient.GetBlobClient(blobItem.Name);
+            await blobClient.DeleteIfExistsAsync();
+            _logger.LogInformation("Deleted blob: {BlobName}", blobItem.Name);
+        }
+    }
+
     private string AdjustPathIgnoringTopLevel(string fullName)
     {
         var parts = fullName.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
