@@ -23,8 +23,8 @@ CMD ["nginx", "-g", "daemon off;"]
 # Build API
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 5000
-EXPOSE 5001
+EXPOSE 4000
+EXPOSE 4001
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
@@ -44,7 +44,7 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 COPY dreammf-ros.pfx /https/aspnetapp.pfx
-ENV ASPNETCORE_URLS=http://+:5000;https://+:5001
+ENV ASPNETCORE_URLS=http://+:4000;https://+:4001
 ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
 ENV ASPNETCORE_Kestrel__Certificates__Default__Password=Dr34m0120225
 ENTRYPOINT ["dotnet", "DreamMF.RemoteOrchestration.Api.dll"]

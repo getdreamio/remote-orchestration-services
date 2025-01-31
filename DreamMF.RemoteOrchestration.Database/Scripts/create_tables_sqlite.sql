@@ -313,7 +313,7 @@ VALUES
     ('database:password', '', 1671645260, 1671645260),
     
     -- API Settings
-    ('api:base_url', 'https://localhost:5001', 1671645260, 1671645260),
+    ('api:base_url', 'https://localhost:4001', 1671645260, 1671645260),
     ('api:version', 'v1', 1671645260, 1671645260),
     ('api:timeout', '30000', 1671645260, 1671645260),
     

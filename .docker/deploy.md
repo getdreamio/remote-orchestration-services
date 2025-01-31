@@ -27,7 +27,7 @@ docker-compose up -d
 
 The applications will be available at:
 - Frontend: http://localhost:3000
-- API Endpoint: https://localhost:5001
+- API Endpoint: https://localhost:4001
 
 ## Environment Variables
 
@@ -89,7 +89,7 @@ docker push dreammf/ros-backend:0.11.0
 
 You can verify the API is running by accessing either:
 ```
-https://localhost:5001/health
+https://localhost:4001/health
 ```
 
 ## Troubleshooting

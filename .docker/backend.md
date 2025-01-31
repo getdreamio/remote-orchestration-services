@@ -63,7 +63,7 @@ The ROS Backend provides the core infrastructure and APIs that power the microfr
 
 ## Environment Variables
 - `ASPNETCORE_ENVIRONMENT`: Runtime environment (default: Development)
-- `ASPNETCORE_URLS`: API endpoints (http://+:5000;https://+:5001)
+- `ASPNETCORE_URLS`: API endpoints (http://+:4000;https://+:4001)
 - `ASPNETCORE_Kestrel__Certificates__Default__Path`: SSL certificate path
 - `ASPNETCORE_Kestrel__Certificates__Default__Password`: SSL certificate password
 
@@ -85,8 +85,8 @@ docker-compose build backend
 - Implement proper backup strategies for any persistent data
 
 ## Ports
-- HTTP: 5000 (internal and host)
-- HTTPS: 5001 (internal and host)
+- HTTP: 4000 (internal and host)
+- HTTPS: 4001 (internal and host)
 
 ## Volumes
 - SSL Certificates: `~/.aspnet/https:/https:ro` (read-only)

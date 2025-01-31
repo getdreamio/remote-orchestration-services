@@ -23,7 +23,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 
 # Define build argument for BACKEND_URL
-ARG BACKEND_URL=https://localhost:5001
+ARG BACKEND_URL=https://localhost:4001
 
 # Install Node.js and supervisor
 RUN apt-get update && apt-get install -y \
@@ -47,11 +47,11 @@ COPY --from=backend-build /app/publish /app/backend
 RUN mkdir -p /var/log/supervisor
 COPY .docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-EXPOSE 3000 5000 5001
+EXPOSE 3000 4000 4001
 
-ENV ASPNETCORE_URLS=http://+:5000;https://+:5001
-ENV BACKEND_URL=https://localhost:5001
-ENV AUTH_AUTHORITY=http://localhost:5000
+ENV ASPNETCORE_URLS=http://+:4000;https://+:4001
+ENV BACKEND_URL=https://localhost:4001
+ENV AUTH_AUTHORITY=http://localhost:4000
 ENV AUTH_CLIENT_ID=DreamMF-Web-01202025
 
 # Generate environment config and start services

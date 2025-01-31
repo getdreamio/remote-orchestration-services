@@ -38,8 +38,8 @@ The ROS Frontend provides a powerful web-based dashboard for managing your micro
 5. Exposes port 8080 for development server
 
 ## Environment Variables
-- `BACKEND_URL`: URL for the backend API (default: https://localhost:5001)
-- `AUTH_AUTHORITY`: Authentication authority URL (default: https://localhost:5001)
+- `BACKEND_URL`: URL for the backend API (default: https://localhost:4001)
+- `AUTH_AUTHORITY`: Authentication authority URL (default: https://localhost:4001)
 - `AUTH_CLIENT_ID`: Client ID for authentication (default: DreamMF-Web-01202025)
 
 ## Development Usage
@@ -70,8 +70,8 @@ docker-compose run -e BACKEND_URL=https://your-backend-url frontend
 
 ## Ports
 - `3000`: Frontend server
-- `5000`: HTTP backend server
-- `5001`: HTTPS backend server
+- `4000`: HTTP backend server
+- `4001`: HTTPS backend server
 
 ## Volumes
 No persistent volumes required for frontend container.

@@ -4,7 +4,7 @@
  * @returns The complete API URL
  */
 export const getApiUrl = (path: string): string => {
-    const backendUrl = window.DreamMF?.config?.BACKEND_URL || 'https://localhost:5001';
+    const backendUrl = window.DreamMF?.config?.BACKEND_URL || 'https://localhost:4001';
     return `${backendUrl}${path}`;
 };
 
@@ -15,8 +15,8 @@ interface DreamConfig {
 }
 
 const DEFAULT_CONFIG: DreamConfig = {
-    BACKEND_URL: 'https://localhost:5001',
-    AUTH_AUTHORITY: 'http://localhost:5000',
+    BACKEND_URL: 'https://localhost:4001',
+    AUTH_AUTHORITY: 'http://localhost:4000',
     AUTH_CLIENT_ID: 'DreamMF.Web'
 };
 

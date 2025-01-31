@@ -50,18 +50,18 @@ The ROS Combined Service provides a single container solution that runs both the
    - Configures environment
 
 ## Environment Variables
-- `BACKEND_URL`: URL for the backend API (configurable via build arg, default: https://localhost:5001)
-- `AUTH_AUTHORITY`: Authentication authority URL (default: http://localhost:5000)
+- `BACKEND_URL`: URL for the backend API (configurable via build arg, default: https://localhost:4001)
+- `AUTH_AUTHORITY`: Authentication authority URL (default: http://localhost:4000)
 - `AUTH_CLIENT_ID`: Client ID for authentication (default: DreamMF-Web-01202025)
-- `ASPNETCORE_URLS`: Backend service URLs (default: http://+:5000;https://+:5001)
+- `ASPNETCORE_URLS`: Backend service URLs (default: http://+:4000;https://+:4001)
 
 ## Build Arguments
 - `BACKEND_URL`: Optional build argument to set the backend URL during image build
 
 ## Exposed Ports
 - 3000: Frontend application
-- 5000: Backend HTTP
-- 5001: Backend HTTPS
+- 4000: Backend HTTP
+- 4001: Backend HTTPS
 
 ## Development Usage
 ```bash
@@ -69,15 +69,15 @@ The ROS Combined Service provides a single container solution that runs both the
 docker build -t dreammf/ros-combined:0.9.0 -f Dockerfile.combined .
 
 # Build with custom backend URL
-docker build -t dreammf/ros-combined:0.9.0 -f Dockerfile.combined --build-arg BACKEND_URL=https://your-backend-url:5001 .
+docker build -t dreammf/ros-combined:0.9.0 -f Dockerfile.combined --build-arg BACKEND_URL=https://your-backend-url:4001 .
 
 # Run the container
-docker run -p 3000:3000 -p 5000:5000 -p 5001:5001 dreammf/ros-combined:0.9.0
+docker run -p 3000:3000 -p 4000:4000 -p 4001:4001 dreammf/ros-combined:0.9.0
 ```
 
 ## Process Management
 The combined service uses Supervisor to manage both frontend and backend processes:
 - Frontend runs on port 3000 using pnpm preview
-- Backend runs on ports 5000/5001 using dotnet
+- Backend runs on ports 4000/4001 using dotnet
 - Automatic process restart on failure
 - Consolidated logging for both services
