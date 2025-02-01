@@ -252,8 +252,8 @@ const DashboardPage: React.FC = () => {
                                 </div>
                             </Card>
                             {/* Coming Soon Overlay */}
-                            <div className="absolute inset-0 bg-black/80 flex items-center justify-center rounded-lg pointer-events-none">
-                                <span className="text-white font-bold text-2xl">COMING SOON</span>
+                            <div className="absolute inset-0 bg-white/80 dark:bg-black/80 flex items-center justify-center rounded-lg pointer-events-none">
+                                <span className="text-gray-900 dark:text-white opacity-80 font-bold text-2xl">COMING SOON</span>
                             </div>
                         </div>
                     </Col>
@@ -289,8 +289,8 @@ const DashboardPage: React.FC = () => {
                                 )}
                             </Card>
                             {/* Coming Soon Overlay */}
-                            <div className="absolute inset-0 bg-black/80 flex items-center justify-center rounded-lg pointer-events-none">
-                                <span className="text-white font-bold text-2xl">COMING SOON</span>
+                            <div className="absolute inset-0 bg-white/80 dark:bg-black/80 flex items-center justify-center rounded-lg pointer-events-none">
+                                <span className="text-gray-900 dark:text-white opacity-80 font-bold text-2xl">COMING SOON</span>
                             </div>
                         </div>
                     </Col>
@@ -326,8 +326,8 @@ const DashboardPage: React.FC = () => {
                                 </div>
                             </Card>
                             {/* Coming Soon Overlay */}
-                            <div className="absolute inset-0 bg-black/80 flex items-center justify-center rounded-lg pointer-events-none">
-                                <span className="text-white font-bold text-2xl">COMING SOON</span>
+                            <div className="absolute inset-0 bg-white/80 dark:bg-black/80 flex items-center justify-center rounded-lg pointer-events-none">
+                                <span className="text-gray-900 dark:text-white opacity-80 font-bold text-2xl">COMING SOON</span>
                             </div>
                         </div>
                     </Col>
@@ -381,8 +381,8 @@ const DashboardPage: React.FC = () => {
                                 </div>
                             </Card>
                             {/* Coming Soon Overlay */}
-                            <div className="absolute inset-0 bg-black/80 flex items-center justify-center rounded-lg pointer-events-none">
-                                <span className="text-white opacity-80 font-bold text-2xl">COMING SOON</span>
+                            <div className="absolute inset-0 bg-white/80 dark:bg-black/80 flex items-center justify-center rounded-lg pointer-events-none">
+                                <span className="text-gray-900 dark:text-white opacity-80 font-bold text-2xl">COMING SOON</span>
                             </div>
                         </div>
                     </Col>

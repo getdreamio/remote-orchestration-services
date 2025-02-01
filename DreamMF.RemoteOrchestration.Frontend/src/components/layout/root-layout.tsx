@@ -176,16 +176,10 @@ const RootLayout = () => {
                                 </div>
                             </Link>
                         </nav>
-                        {/* Footer */}
-                        <footer className="flex-none p-6 border-t">
-                            <div className="flex items-center justify-between">
-                                <p className="text-sm text-muted-foreground"> 2025 Dream.MF. All rights reserved. v{packageJson.version}</p>
-                            </div>
-                        </footer>
                     </aside>
 
                     {/* Main Content */}
-                    <div className={`flex-1 transition-all duration-300 ${isCollapsed ? 'lg:ml-[80px]' : 'lg:ml-[336px]'}`}>
+                    <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isCollapsed ? 'lg:ml-[80px]' : 'lg:ml-[336px]'}`}>
                         {/* Header */}
                         <header className="h-16 border-b flex items-center justify-between px-6 bg-card">
                                 <Breadcrumb />
@@ -202,11 +196,18 @@ const RootLayout = () => {
                                 </div>
                         </header>
                         {/* Page Content */}
-                        <main className="p-6">
+                        <main className="flex-1 p-6">
                             <ErrorBoundary>
                                 <Outlet />
                             </ErrorBoundary>
                         </main>
+                        {/* Footer */}
+                        <footer className="border-t p-4 mt-auto">
+                            <div className="container mx-auto flex items-center justify-between text-sm text-muted-foreground">
+                                <p>&copy; 2025 Dream.MF. All rights reserved.</p>
+                                <p>v{packageJson.version}</p>
+                            </div>
+                        </footer>
                     </div>
                 </div>
             </div>
