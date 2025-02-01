@@ -38,7 +38,6 @@ const EditHostPage: React.FC = () => {
         try {
             await attachRemote.mutateAsync({ hostId: Number(id), remoteId });
             message.success('Remote attached successfully');
-            setIsAttachModalOpen(false);
         } catch (error) {
             message.error('Failed to attach remote');
         }
