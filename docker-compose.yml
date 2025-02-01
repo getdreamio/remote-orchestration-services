@@ -2,7 +2,7 @@ version: '3.8'
 services:
   
   frontend:
-    image: dreammf/ros-frontend:0.13.0
+    image: dreammf/ros-frontend:0.14.0
     build:
       context: .
       target: frontend-server
@@ -14,7 +14,7 @@ services:
       - "3000:3000"
 
   backend:
-    image: dreammf/ros-backend:0.13.0
+    image: dreammf/ros-backend:0.14.0
     build:
       context: .
       target: final
@@ -26,3 +26,7 @@ services:
     
     volumes:
       - ~/.aspnet/https:/https:ro
+      - db-data:/app/remote_orchestration.db
+
+volumes:
+  db-data:
