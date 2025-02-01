@@ -16,6 +16,7 @@ public class RemoteResponse
     public long Updated_Date { get; set; }
     public int HostCounts { get; set; } = 0;
     public int SubRemoteCounts { get; set; } = 0;
+    public string tag_Value { get; set; } = string.Empty;
 }
 
 public class RemoteSummaryResponse

@@ -296,10 +296,14 @@ public class TagService
             var hosts = await _dbContext.Tags_Hosts
                 .Where(tr => tr.Tag_ID == tagId)
                 .Include(tr => tr.Host)
-                .Select(tr => tr.Host)
+                .Select(tr => new { Host = tr.Host, TagValue = tr.Value })
                 .ToListAsync();
 
-            return hosts.Select(HostMapper.ToResponse).ToList();
+            return hosts.Select(h => {
+                var response = HostMapper.ToResponse(h.Host);
+                response.tag_Value = h.TagValue;
+                return response;
+            }).ToList();
         }
         catch (Exception ex)
         {
@@ -319,10 +323,14 @@ public class TagService
             var remotes = await _dbContext.Tags_Remotes
                 .Where(tr => tr.Tag_ID == tagId)
                 .Include(tr => tr.Remote)
-                .Select(tr => tr.Remote)
+                .Select(tr => new { Remote = tr.Remote, TagValue = tr.Value })
                 .ToListAsync();
 
-            return remotes.Select(RemoteMapper.ToResponse).ToList();
+            return remotes.Select(r => {
+                var response = RemoteMapper.ToResponse(r.Remote);
+                response.tag_Value = r.TagValue;
+                return response;
+            }).ToList();
         }
         catch (Exception ex)
         {

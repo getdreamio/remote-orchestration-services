@@ -47,6 +47,22 @@ const EditTagPage: React.FC = () => {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
+            sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+            filterSearch: true,
+            filters: [],
+            onFilter: (value: string, record: any) => 
+                record.name.toLowerCase().includes(value.toLowerCase()),
+        },
+        {
+            title: 'Tag Value',
+            dataIndex: 'value',
+            key: 'value',
+            render: (_: any, record: any) => record.tag_Value || '-',
+            sorter: (a: any, b: any) => (a.tag_Value || '').localeCompare(b.tag_Value || ''),
+            filterSearch: true,
+            filters: [],
+            onFilter: (value: string, record: any) => 
+                (record.tag_Value || '').toLowerCase().includes(value.toLowerCase()),
         },
         {
             title: 'Actions',
@@ -69,6 +85,22 @@ const EditTagPage: React.FC = () => {
             ),
         },
     ];
+
+    const generateFilters = (data: any[] = [], field: string) => {
+        if (!data) return [];
+        const uniqueValues = Array.from(new Set(data.map(item => item[field])))
+            .filter(Boolean)
+            .sort();
+        return uniqueValues.map(value => ({ text: value, value }));
+    };
+
+    React.useEffect(() => {
+        if (remotes || hosts) {
+            const allData = [...(remotes || []), ...(hosts || [])];
+            columns[0].filters = generateFilters(allData, 'name');
+            columns[1].filters = generateFilters(allData, 'tag_Value');
+        }
+    }, [remotes, hosts]);
 
     if (isTagLoading || isRemotesLoading || isHostsLoading) {
         return (

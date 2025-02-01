@@ -15,4 +15,5 @@ public class HostResponse
     public int RemoteCount { get; set; } = 0;
     public long Created_Date { get; set; }
     public long Updated_Date { get; set; }
+    public string tag_Value { get; set; } = string.Empty;
 }
