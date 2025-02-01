@@ -37,13 +37,13 @@ const RootLayout = () => {
                                 <div className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100'}`}>
                                     <div className="flex items-center gap-2">
                                         <h2 className="text-lg leading-tight whitespace-nowrap">Dream.MF [ROS]</h2>
-                                        <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 rounded-md leading-none">ALPHA</span>
+                                        <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-red-300 rounded-md leading-none">OPEN BETA</span>
                                     </div>
                                     <p className="text-xs text-muted-foreground whitespace-nowrap">Remote Orchestration Services</p>
                                 </div>
                                 {isCollapsed && (
                                     <div className="absolute left-full ml-2 bg-popover px-2 py-1 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap">
-                                        <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 rounded-md leading-none">ALPHA</span>
+                                        <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-red-300 rounded-md leading-none">OPEN BETA</span>
                                     </div>
                                 )}
                             </div>
