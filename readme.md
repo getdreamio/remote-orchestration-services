@@ -49,7 +49,7 @@ The service architecture is designed to support scalability and reliability. It 
 
 ## Authentication 
 When you first run the service, you will have a default user registered with the following credentials:
-- Email address: `root@dreammf.com`
+- Email address: `root@getdream.io`
 - Password: `Dr34m!12345`
 
 ## Documentation

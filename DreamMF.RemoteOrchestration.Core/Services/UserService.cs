@@ -162,6 +162,9 @@ public class UserService : IUserService
         if (user == null)
             return false;
 
+        if (id == 1)
+            return false;
+
         _dbContext.Users.Remove(user);
         await _dbContext.SaveChangesAsync();
         return true;

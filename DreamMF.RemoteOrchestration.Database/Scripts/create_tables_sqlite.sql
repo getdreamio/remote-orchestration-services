@@ -110,7 +110,7 @@ INSERT INTO [User] (
     CreatedDate,
     UpdatedDate
 ) VALUES (
-    'root@dreammf.com',
+    'root@getdream.io',
     'Root Admin',
     'Root',
     'Admin',
@@ -128,7 +128,7 @@ INSERT INTO [User] (
 INSERT INTO UserRoleMapping (UserId, RoleId, CreatedDate)
 SELECT u.Id, r.Id, strftime('%s','now')
 FROM [User] u, UserRole r
-WHERE u.Email = 'root@dreammf.com' AND r.NormalizedName = 'ADMIN';
+WHERE u.Email = 'root@getdream.io' AND r.NormalizedName = 'ADMIN';
 
 CREATE TABLE Version (
     Version_ID INTEGER PRIMARY KEY AUTOINCREMENT,
