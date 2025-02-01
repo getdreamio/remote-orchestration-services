@@ -135,154 +135,6 @@ const DashboardPage: React.FC = () => {
                 </Col>
             </Row>
 
-            <div className="mt-8">
-                <h2 className="text-xl font-semibold mb-4">Analytics Overview</h2>
-                <Row gutter={[16, 16]}>
-                    <Col xs={24} sm={8}>
-                        <Card title="System Health" className="h-full bg-gray-50 dark:bg-gray-800">
-                            <div className="space-y-4">
-                                <div className="grid grid-cols-3 gap-4">
-                                    <div>
-                                        <Statistic
-                                            title="AWS S3"
-                                            value={analyticsData.s3ResponseTime || 42}
-                                            suffix="ms"
-                                            valueStyle={{ color: '#3f8600' }}
-                                        />
-                                    </div>
-                                    <div>
-                                        <Statistic
-                                            title="Azure Blob"
-                                            value={analyticsData.azureResponseTime || 38}
-                                            suffix="ms"
-                                            valueStyle={{ color: '#3f8600' }}
-                                        />
-                                    </div>
-                                    <div>
-                                        <Statistic
-                                            title="Database"
-                                            value={analyticsData.dbResponseTime || 12}
-                                            suffix="ms"
-                                            valueStyle={{ color: '#3f8600' }}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </Card>
-                    </Col>
-                    <Col xs={24} sm={8}>
-                    <Card 
-                        title="Remote Usage"
-                        className="h-full bg-gray-50 dark:bg-gray-800"
-                        extra={<Button type="link" onClick={() => navigate('/analytics')}>View Usage</Button>}>
-                            {isLoadingAnalytics ? (
-                                <div className="h-24 flex items-center justify-center">
-                                    <Spin />
-                                </div>
-                            ) : error ? (
-                                <div className="h-24 flex items-center justify-center text-red-500">
-                                    Error loading data
-                                </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <Statistic
-                                            title="24 Hour Total"
-                                            value={recentAnalytics?.last24HoursCount ?? 0}
-                                            suffix="requests"
-                                        />
-                                        <Statistic
-                                            title="30 Day Total"
-                                            value={recentAnalytics?.last30DaysCount ?? 0}
-                                            suffix="requests"
-                                        />
-                                    </div>
-                                </div>
-                            )}
-                        </Card>
-                    </Col>
-                    <Col xs={24} sm={8}>
-                        <Card 
-                            title="Error Rate"
-                            className="h-full bg-gray-50 dark:bg-gray-800"
-                            extra={<Button type="link" onClick={() => navigate('/analytics')}>View Analytics</Button>}>
-                            <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Statistic
-                                        title="24 Hour Average"
-                                        value={analyticsData.errors24h}
-                                        suffix="errors"
-                                        valueStyle={{ color: analyticsData.errors24h > 50 ? '#cf1322' : '#3f8600' }}
-                                    />
-                                    <Statistic
-                                        title="30 Day Average"
-                                        value={Math.round(analyticsData.errors30d / 30)}
-                                        suffix="errors"
-                                        valueStyle={{ color: (analyticsData.errors30d / 30) > 50 ? '#cf1322' : '#3f8600' }}
-                                    />
-                                </div>
-                                <div className="pt-2">
-                                    <Progress
-                                        percent={Math.round((analyticsData.errors24h / 100) * 100)}
-                                        size="small"
-                                        strokeColor={analyticsData.errors24h > 50 ? '#cf1322' : '#3f8600'}
-                                        showInfo={false}
-                                    />
-                                </div>
-                            </div>
-                        </Card>
-                    </Col>
-                </Row>
-            </div>
-
-            <div className="mt-8">
-                <h2 className="text-xl font-semibold mb-4">System Logging</h2>
-                <Row gutter={[16, 16]}>
-                    <Col xs={24}>
-                        <Card 
-                            title="Recent Logs"
-                            className="h-full bg-gray-50 dark:bg-gray-800"
-                            extra={<Button type="link" onClick={() => navigate('/logging')}>View All Logs</Button>}
-                        >
-                            <div className="grid grid-cols-3 gap-4">
-                                <div>
-                                    <h3 className="text-base font-medium mb-2 text-blue-600 dark:text-blue-400">Information</h3>
-                                    <div className="space-y-2">
-                                        {recentLogs.information.map((log, i) => (
-                                            <div key={i} className="text-sm">
-                                                <div className="text-gray-500 dark:text-gray-400 text-xs">{log.timestamp}</div>
-                                                <div className="text-gray-900 dark:text-gray-100">{log.message}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div>
-                                    <h3 className="text-base font-medium mb-2 text-yellow-600 dark:text-yellow-400">Warnings</h3>
-                                    <div className="space-y-2">
-                                        {recentLogs.warnings.map((log, i) => (
-                                            <div key={i} className="text-sm">
-                                                <div className="text-gray-500 dark:text-gray-400 text-xs">{log.timestamp}</div>
-                                                <div className="text-gray-900 dark:text-gray-100">{log.message}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div>
-                                    <h3 className="text-base font-medium mb-2 text-red-600 dark:text-red-400">Exceptions</h3>
-                                    <div className="space-y-2">
-                                        {recentLogs.exceptions.map((log, i) => (
-                                            <div key={i} className="text-sm">
-                                                <div className="text-gray-500 dark:text-gray-400 text-xs">{log.timestamp}</div>
-                                                <div className="text-gray-900 dark:text-gray-100">{log.message}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </Card>
-                    </Col>
-                </Row>
-            </div>
 
             <div className="mt-8">
                 <h2 className="text-xl font-semibold mb-4">Recent Changes</h2>
@@ -363,6 +215,180 @@ const DashboardPage: React.FC = () => {
                     </Col>
                 </Row>
             </div>
+
+            <div className="mt-8">
+                <h2 className="text-xl opacity-20 font-semibold mb-4">Analytics Overview</h2>
+                <Row gutter={[16, 16]}>
+                    <Col xs={24} sm={8}>
+                        <div className="relative h-full">
+                            <Card title="System Health" className="h-full bg-gray-50 dark:bg-gray-800">
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-3 gap-4">
+                                        <div>
+                                            <Statistic
+                                                title="AWS S3"
+                                                value={analyticsData.s3ResponseTime || 42}
+                                                suffix="ms"
+                                                valueStyle={{ color: '#3f8600' }}
+                                            />
+                                        </div>
+                                        <div>
+                                            <Statistic
+                                                title="Azure Blob"
+                                                value={analyticsData.azureResponseTime || 38}
+                                                suffix="ms"
+                                                valueStyle={{ color: '#3f8600' }}
+                                            />
+                                        </div>
+                                        <div>
+                                            <Statistic
+                                                title="Database"
+                                                value={analyticsData.dbResponseTime || 12}
+                                                suffix="ms"
+                                                valueStyle={{ color: '#3f8600' }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </Card>
+                            {/* Coming Soon Overlay */}
+                            <div className="absolute inset-0 bg-black/80 flex items-center justify-center rounded-lg pointer-events-none">
+                                <span className="text-white font-bold text-2xl">COMING SOON</span>
+                            </div>
+                        </div>
+                    </Col>
+                    <Col xs={24} sm={8}>
+                        <div className="relative h-full">
+                            <Card 
+                                title="Remote Usage"
+                                className="h-full bg-gray-50 dark:bg-gray-800"
+                                extra={<Button type="link" onClick={() => navigate('/analytics')}>View Usage</Button>}>
+                                {isLoadingAnalytics ? (
+                                    <div className="h-24 flex items-center justify-center">
+                                        <Spin />
+                                    </div>
+                                ) : error ? (
+                                    <div className="h-24 flex items-center justify-center text-red-500">
+                                        Error loading data
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <Statistic
+                                                title="24 Hour Total"
+                                                value={recentAnalytics?.last24HoursCount ?? 0}
+                                                suffix="requests"
+                                            />
+                                            <Statistic
+                                                title="30 Day Total"
+                                                value={recentAnalytics?.last30DaysCount ?? 0}
+                                                suffix="requests"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </Card>
+                            {/* Coming Soon Overlay */}
+                            <div className="absolute inset-0 bg-black/80 flex items-center justify-center rounded-lg pointer-events-none">
+                                <span className="text-white font-bold text-2xl">COMING SOON</span>
+                            </div>
+                        </div>
+                    </Col>
+                    <Col xs={24} sm={8}>
+                        <div className="relative h-full">
+                            <Card 
+                                title="Error Rate"
+                                className="h-full bg-gray-50 dark:bg-gray-800"
+                                extra={<Button type="link" onClick={() => navigate('/analytics')}>View Analytics</Button>}>
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <Statistic
+                                            title="24 Hour Average"
+                                            value={analyticsData.errors24h}
+                                            suffix="errors"
+                                            valueStyle={{ color: analyticsData.errors24h > 50 ? '#cf1322' : '#3f8600' }}
+                                        />
+                                        <Statistic
+                                            title="30 Day Average"
+                                            value={Math.round(analyticsData.errors30d / 30)}
+                                            suffix="errors"
+                                            valueStyle={{ color: (analyticsData.errors30d / 30) > 50 ? '#cf1322' : '#3f8600' }}
+                                        />
+                                    </div>
+                                    <div className="pt-2">
+                                        <Progress
+                                            percent={Math.round((analyticsData.errors24h / 100) * 100)}
+                                            size="small"
+                                            strokeColor={analyticsData.errors24h > 50 ? '#cf1322' : '#3f8600'}
+                                            showInfo={false}
+                                        />
+                                    </div>
+                                </div>
+                            </Card>
+                            {/* Coming Soon Overlay */}
+                            <div className="absolute inset-0 bg-black/80 flex items-center justify-center rounded-lg pointer-events-none">
+                                <span className="text-white font-bold text-2xl">COMING SOON</span>
+                            </div>
+                        </div>
+                    </Col>
+                </Row>
+            </div>
+
+            <div className="mt-8">
+                <h2 className="text-xl opacity-20 font-semibold mb-4">System Logging</h2>
+                <Row gutter={[16, 16]}>
+                    <Col xs={24}>
+                        <div className="relative h-full">
+                            <Card 
+                                title="Recent Logs"
+                                className="h-full bg-gray-50 dark:bg-gray-800"
+                                extra={<Button type="link" onClick={() => navigate('/logging')}>View All Logs</Button>}
+                            >
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div>
+                                        <h3 className="text-base font-medium mb-2 text-blue-600 dark:text-blue-400">Information</h3>
+                                        <div className="space-y-2">
+                                            {recentLogs.information.map((log, i) => (
+                                                <div key={i} className="text-sm">
+                                                    <div className="text-gray-500 dark:text-gray-400 text-xs">{log.timestamp}</div>
+                                                    <div className="text-gray-900 dark:text-gray-100">{log.message}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-base font-medium mb-2 text-yellow-600 dark:text-yellow-400">Warnings</h3>
+                                        <div className="space-y-2">
+                                            {recentLogs.warnings.map((log, i) => (
+                                                <div key={i} className="text-sm">
+                                                    <div className="text-gray-500 dark:text-gray-400 text-xs">{log.timestamp}</div>
+                                                    <div className="text-gray-900 dark:text-gray-100">{log.message}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-base font-medium mb-2 text-red-600 dark:text-red-400">Exceptions</h3>
+                                        <div className="space-y-2">
+                                            {recentLogs.exceptions.map((log, i) => (
+                                                <div key={i} className="text-sm">
+                                                    <div className="text-gray-500 dark:text-gray-400 text-xs">{log.timestamp}</div>
+                                                    <div className="text-gray-900 dark:text-gray-100">{log.message}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </Card>
+                            {/* Coming Soon Overlay */}
+                            <div className="absolute inset-0 bg-black/80 flex items-center justify-center rounded-lg pointer-events-none">
+                                <span className="text-white opacity-80 font-bold text-2xl">COMING SOON</span>
+                            </div>
+                        </div>
+                    </Col>
+                </Row>
+            </div>
+
         </div>
     );
 };

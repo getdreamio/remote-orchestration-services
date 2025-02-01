@@ -8,7 +8,7 @@ interface ApiSettingsFormProps {
 
 export const ApiSettingsForm: React.FC<ApiSettingsFormProps> = () => {
     
-    const baseUrl = window.DreamMF?.config?.BACKEND_URL || 'https://localhost:4001';
+    const baseUrl = window.DreamMF?.config?.BACKEND_URL || 'http://localhost:4000';
     const remotesUrl = `${baseUrl}/remotes`;
     const swaggerUrl = `${baseUrl}/swagger`;
 
@@ -37,7 +37,7 @@ export const ApiSettingsForm: React.FC<ApiSettingsFormProps> = () => {
                         { required: true, message: 'Please input the API base URL!' },
                         { type: 'url', message: 'Please enter a valid URL!' },
                     ]}
-                    tooltip="The base URL for the backend API (e.g., https://localhost:4001)"
+                    tooltip="The base URL for the backend API (e.g., http://localhost:4000)"
                 >
                     <Input style={{ maxWidth: 400 }} readOnly disabled placeholder={'Reading from env-config.json...'} />
                 </Form.Item>

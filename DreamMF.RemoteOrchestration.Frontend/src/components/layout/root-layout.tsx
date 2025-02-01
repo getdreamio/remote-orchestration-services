@@ -118,7 +118,7 @@ const RootLayout = () => {
                             </Link>
                             <hr className="my-2 border-border" />
                             <div
-                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 cursor-not-allowed opacity-20 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <Shield className="h-5 w-5 text-red-500 dark:text-red-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -127,7 +127,7 @@ const RootLayout = () => {
                                 </div>
                             </div>
                             <div
-                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 cursor-not-allowed opacity-20 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <ToggleLeft className="h-5 w-5 text-yellow-500 dark:text-yellow-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>
@@ -136,7 +136,7 @@ const RootLayout = () => {
                                 </div>
                             </div>
                             <div
-                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 cursor-not-allowed opacity-50 relative ${isCollapsed ? 'justify-center' : ''}`}
+                                className={`flex items-center gap-2 p-2 rounded-md hover:bg-white hover:shadow-md dark:hover:bg-muted/50 cursor-not-allowed opacity-20 relative ${isCollapsed ? 'justify-center' : ''}`}
                             >
                                 <ScrollText className="h-5 w-5 text-indigo-500 dark:text-indigo-400 flex-shrink-0" />
                                 <div className={`flex flex-col transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden absolute left-full ml-2 bg-popover px-3 py-2 rounded-md shadow-md invisible group-hover:visible whitespace-nowrap' : 'opacity-100'}`}>

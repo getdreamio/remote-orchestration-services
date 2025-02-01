@@ -5,6 +5,7 @@ import './styles/globals.css';
 import { ThemeProvider } from './components/theme/theme-provider';
 import { AntThemeProvider } from './components/theme/ant-theme-provider';
 import { loadDreamConfig } from './utils/api';
+import { VersionAlert } from './components/VersionAlert';
 
 const App = () => {
     useEffect(() => {
@@ -14,6 +15,7 @@ const App = () => {
         <ThemeProvider>
             <AntThemeProvider>
                 <RouterProvider router={router} />
+                <VersionAlert />
             </AntThemeProvider>
         </ThemeProvider>
     );
