@@ -54,7 +54,6 @@ const createConfiguration = async (data: ConfigurationRequest): Promise<Configur
 };
 
 const updateConfigurationBatch = async (data: ConfigurationRequest[]): Promise<Configuration[]> => {
-    console.log('Hook Saves',data);
     const response = await fetchWithAuth(getApiUrl('/api/configurations/batch'), {
         method: 'POST',
         headers: {

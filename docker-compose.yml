@@ -2,7 +2,7 @@ version: '3.8'
 services:
   
   frontend:
-    image: dreammf/ros-frontend:0.14.0
+    image: dreammf/ros-frontend:1.1.0
     build:
       context: .
       target: frontend-server
@@ -17,7 +17,7 @@ services:
       - "3000:3000"
 
   backend:
-    image: dreammf/ros-backend:0.14.0
+    image: dreammf/ros-backend:1.1.0
     build:
       context: .
       target: final

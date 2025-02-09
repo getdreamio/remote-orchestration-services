@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Form, Input, Select, Card, InputNumber, Button } from 'antd';
+import { Form, Input, Select, Card, InputNumber, Button, Modal, Upload, message } from 'antd';
+import { UploadOutlined, DatabaseOutlined } from '@ant-design/icons';
 import {
     Configuration,
     DatabaseType,
@@ -28,6 +29,10 @@ export const DatabaseSettingsForm: React.FC<DatabaseSettingsFormProps> = ({
     const [selectedDatabaseType, setSelectedDatabaseType] = useState<string>(
         configurations?.find(c => c.key === DB_HOST_TYPE)?.value || 'sqlite'
     );
+    const [isBackupModalVisible, setIsBackupModalVisible] = useState(false);
+    const [isRestoreModalVisible, setIsRestoreModalVisible] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const getConfigValue = (key: string) => {
         return configurations?.find(c => c.key === key)?.value || '';
@@ -64,6 +69,65 @@ export const DatabaseSettingsForm: React.FC<DatabaseSettingsFormProps> = ({
         }
     };
 
+    const handleBackup = async () => {
+        try {
+            setIsLoading(true);
+            const response = await fetch('/api/backup/database');
+            if (!response.ok) {
+                throw new Error('Failed to backup database');
+            }
+            
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'remote_orchestration_backup.db');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            
+            message.success('Database backup downloaded successfully');
+        } catch (error) {
+            message.error('Failed to backup database');
+            console.error('Backup error:', error);
+        } finally {
+            setIsLoading(false);
+            setIsBackupModalVisible(false);
+        }
+    };
+
+    const handleRestore = async () => {
+        if (!selectedFile) {
+            message.error('Please select a file to restore');
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            const response = await fetch('/api/backup/restore', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to restore database');
+            }
+
+            message.success('Database restored successfully');
+            setSelectedFile(null);
+        } catch (error) {
+            message.error('Failed to restore database');
+            console.error('Restore error:', error);
+        } finally {
+            setIsLoading(false);
+            setIsRestoreModalVisible(false);
+        }
+    };
+
     const renderConnectionDetails = () => {
         switch (selectedDatabaseType) {
             case 'sqlite':
@@ -82,6 +146,24 @@ export const DatabaseSettingsForm: React.FC<DatabaseSettingsFormProps> = ({
                                 placeholder={defaultSqlitePath}
                             />
                         </Form.Item>
+                        <div className="" style={{ marginBottom: 20, marginTop: -20 }}>
+                            <Button
+                                icon={<DatabaseOutlined />}
+                                onClick={() => setIsBackupModalVisible(true)}
+                                loading={isLoading}
+                                style={{ marginRight: 5, width: 200 }}
+                            >
+                                Backup Database
+                            </Button>
+                            <Button
+                                icon={<UploadOutlined />}
+                                onClick={() => setIsRestoreModalVisible(true)}
+                                loading={isLoading}
+                                style={{ width: 200 }}
+                            >
+                                Restore Database
+                            </Button>
+                        </div>
                     </div>
                 );
 
@@ -164,24 +246,29 @@ export const DatabaseSettingsForm: React.FC<DatabaseSettingsFormProps> = ({
     };
 
     return (
-        <Form form={form} onFinish={handleSubmit} layout="vertical">
-            <h2 className="text-lg font-semibold mb-4">Database Settings</h2>
-            <div className="space-y-4">
+        <>
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={handleSubmit}
+                initialValues={{
+                    databaseType: selectedDatabaseType,
+                }}
+            >
                 <Form.Item
                     label="Database Type"
                     name="databaseType"
-                    initialValue={selectedDatabaseType}
                     required
-                    tooltip="Choose your database type"
+                    tooltip="The type of database to use"
                 >
-                    <Select 
+                    <Select
                         style={{ maxWidth: 400 }}
                         onChange={(value) => setSelectedDatabaseType(value)}
                     >
-                        <Select.Option value="sqlite">SQLite</Select.Option>
+                        <Select.Option value="sqlite">SQLite (local)</Select.Option>
                         <Select.Option value="sqlserver" disabled>SQL Server</Select.Option>
-                        <Select.Option value="postgres" disabled>PostgreSQL</Select.Option>
                         <Select.Option value="mysql" disabled>MySQL</Select.Option>
+                        <Select.Option value="postgres" disabled>PostgreSQL</Select.Option>
                     </Select>
                 </Form.Item>
 
@@ -192,7 +279,49 @@ export const DatabaseSettingsForm: React.FC<DatabaseSettingsFormProps> = ({
                         Save Changes
                     </Button>
                 </Form.Item>
-            </div>
-        </Form>
+            </Form>
+
+            {/* Backup Confirmation Modal */}
+            <Modal
+                title="Backup Database"
+                open={isBackupModalVisible}
+                onOk={handleBackup}
+                onCancel={() => setIsBackupModalVisible(false)}
+                confirmLoading={isLoading}
+            >
+                <p>Are you sure you want to backup the database? This will download a copy of your current database.</p>
+            </Modal>
+
+            {/* Restore Confirmation Modal */}
+            <Modal
+                title="Restore Database"
+                open={isRestoreModalVisible}
+                onOk={handleRestore}
+                onCancel={() => setIsRestoreModalVisible(false)}
+                confirmLoading={isLoading}
+            >
+                <div className="space-y-4">
+                    <p>Are you sure you want to restore the database? This will replace your current database with the selected backup file.</p>
+                    <Upload.Dragger
+                        beforeUpload={(file) => {
+                            setSelectedFile(file);
+                            return false;
+                        }}
+                        onRemove={() => setSelectedFile(null)}
+                        maxCount={1}
+                        accept=".db"
+                        className="p-4"
+                    >
+                        <p className="ant-upload-drag-icon">
+                            <UploadOutlined />
+                        </p>
+                        <p className="ant-upload-text">Click or drag database backup file to this area</p>
+                        <p className="ant-upload-hint">
+                            Only .db files are supported
+                        </p>
+                    </Upload.Dragger>
+                </div>
+            </Modal>
+        </>
     );
 };

@@ -49,7 +49,6 @@ export const StorageSettingsForm: React.FC<StorageSettingsFormProps> = ({
     }, [configurations]);
 
     const handleSubmit = async (values: any) => {
-        console.log('Form values:', values); // Debug log
 
         // Create a map of field names to their corresponding configuration keys
         const fieldToConfigKey: { [key: string]: string } = {
@@ -74,8 +73,6 @@ export const StorageSettingsForm: React.FC<StorageSettingsFormProps> = ({
                 key: fieldToConfigKey[field],
                 value: value as string
             }));
-
-        console.log('###', 'Changes to submit:', changes); // Debug log
 
         // Send all changes in a single batch
         if (changes.length > 0) {

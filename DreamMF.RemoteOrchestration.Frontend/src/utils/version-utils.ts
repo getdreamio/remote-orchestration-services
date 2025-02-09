@@ -19,14 +19,10 @@ export const requireUpdate = (current: string, latest: string): boolean => {
     const currentVer = parseVersion(current);
     const latestVer = parseVersion(latest);
 
-    // Check each version component in order (major, minor, patch)
-    if (latestVer.major > currentVer.major) {
-        return true;
-    }
-    if (latestVer.minor > currentVer.minor) {
-        return true;
-    }
-    if (latestVer.patch > currentVer.patch) {
+    // Check if the latest version is greater than the current version
+    if (latestVer.major > currentVer.major || 
+        (latestVer.major === currentVer.major && latestVer.minor > currentVer.minor) || 
+        (latestVer.major === currentVer.major && latestVer.minor === currentVer.minor && latestVer.patch > currentVer.patch)) {
         return true;
     }
 

@@ -329,7 +329,8 @@ const EditRemotePage: React.FC = () => {
                             </Form.Item>
 
                         </TabPane>
-                        <TabPane tab="Information" key="information">
+
+                        {/* <TabPane tab="Information" key="information">
                             <Form.Item
                                 label="Repository"
                                 name="repository"
@@ -369,7 +370,7 @@ const EditRemotePage: React.FC = () => {
                         </TabPane>
                         <TabPane tab="Sub-Remotes" key="remotes">
                             Coming soon....
-                        </TabPane>
+                        </TabPane> */}
                         <TabPane tab="Versions" key="versions">
                             <Table
                                 dataSource={versions}

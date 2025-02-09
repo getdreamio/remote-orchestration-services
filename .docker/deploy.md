@@ -67,11 +67,16 @@ Build your image with:
 docker-compose build
 ```
 
+Build for multiple architectures:
+```bash
+DOCKER_BUILDKIT=1 docker buildx bake
+```
+
 Assuming your Docker Hub username is `dreammf`, tag your images like this:
 
 ```bash
-docker tag dreammf/ros-frontend:0.13.0 dreammf/ros-frontend:latest
-docker tag dreammf/ros-backend:0.13.0 dreammf/ros-backend:latest
+docker tag dreammf/ros-frontend:1.0.0 dreammf/ros-frontend:latest
+docker tag dreammf/ros-backend:1.0.0 dreammf/ros-backend:latest
 ```
 
 ### Step 3: Push the Images
@@ -81,8 +86,8 @@ Push the tagged images to Docker Hub:
 ```bash
 docker push dreammf/ros-frontend:latest
 docker push dreammf/ros-backend:latest
-docker push dreammf/ros-frontend:0.13.0
-docker push dreammf/ros-backend:0.13.0
+docker push dreammf/ros-frontend:1.0.0
+docker push dreammf/ros-backend:1.0.0
 ```
 
 ## Health Check

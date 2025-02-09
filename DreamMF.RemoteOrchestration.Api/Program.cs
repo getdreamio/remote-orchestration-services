@@ -22,16 +22,26 @@ builder.Configuration
 builder.Services.AddScoped<IRootConfigurationService, RootConfigurationService>();
 builder.Services.AddScoped<IDbContextFactory, DbContextFactory>();
 
-builder.Services.AddScoped<IConfigurationDbContext>(provider => 
+builder.Services.AddTransient<IConfigurationDbContext>(provider => 
 {
     var factory = provider.GetRequiredService<IDbContextFactory>();
-    return factory.CreateConfigurationDbContext();
+    var context = factory.CreateConfigurationDbContext();
+    if (context is DbContext dbContext)
+    {
+        dbContext.Database.AutoTransactionBehavior = AutoTransactionBehavior.Never;
+    }
+    return context;
 });
 
-builder.Services.AddScoped<IRemoteOrchestrationDbContext>(provider => 
+builder.Services.AddTransient<IRemoteOrchestrationDbContext>(provider => 
 {
     var factory = provider.GetRequiredService<IDbContextFactory>();
-    return factory.CreateDbContext();
+    var context = factory.CreateDbContext();
+    if (context is DbContext dbContext)
+    {
+        dbContext.Database.AutoTransactionBehavior = AutoTransactionBehavior.Never;
+    }
+    return context;
 });
 
 builder.Services.AddMemoryCache();
@@ -148,6 +158,7 @@ builder.Services.AddScoped<IDreamService, DreamService>();
 builder.Services.AddScoped<IUploadService, UploadService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IBackupService, BackupService>();
 
 builder.Services.AddAntiforgery();
 
@@ -184,6 +195,7 @@ app.MapDreamRoutes();
 app.MapUploadRoutes();
 app.MapUserRoutes();
 app.MapAuthRoutes();
+app.MapDatabaseRoutes();
 
 var provider = new FileExtensionContentTypeProvider();
 provider.Mappings[".js"] = "application/javascript";

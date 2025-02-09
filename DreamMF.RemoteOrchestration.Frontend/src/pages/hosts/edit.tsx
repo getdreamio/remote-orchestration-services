@@ -206,7 +206,7 @@ const EditHostPage: React.FC = () => {
                             }}
                         />
                     </TabPane>
-                    <TabPane tab="Information" key="information">
+                    {/* <TabPane tab="Information" key="information">
                         <HostForm
                             onSuccess={handleSuccess}
                             mode="information"
@@ -231,7 +231,7 @@ const EditHostPage: React.FC = () => {
                                 documentationUrl: host.documentationUrl
                             }}
                         />
-                    </TabPane>
+                    </TabPane> */}
                     <TabPane tab="Remotes" key="remotes">
                         <div className="space-y-4">
                             <div className="flex justify-end">

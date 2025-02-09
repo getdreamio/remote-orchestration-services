@@ -14,7 +14,6 @@ const SettingsPage = () => {
     const { mutate: updateSettingBatch, isPending: isUpdating } = useUpdateConfigurationBatch();
 
     const handleSave = async (changes: { key: string, value: string }[]) => {
-        console.log('Saving changes:', changes); // Debug log
         if (changes && changes.length > 0) {
             updateSettingBatch(changes);
         }

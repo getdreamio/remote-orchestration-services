@@ -17,14 +17,10 @@ export const useVersionCheck = () => {
   useEffect(() => {
     const checkVersion = async () => {
       try {
-        console.log('Checking for version updates...');
         // Use the same base URL as other API calls
         const response = await fetch('https://www.getdream.io/ros_version.json');
         const data: VersionInfo = await response.json();
-        console.log('Version data received:', data);
-        
         const isNewer = requireUpdate(pkg.version, data.version);
-        console.log('Is newer version?', isNewer, pkg.version, data.version);
         
         setVersionInfo(data);
         setNeedsUpdate(isNewer);
