@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Form, Input, Button, Card, message, Tabs, Table, Input as AntInput, Typography, Empty, InputRef, AutoComplete, Modal } from 'antd';
+import { Form, Input, Button, Card, message, Tabs, Table, Input as AntInput, Typography, Empty, InputRef, AutoComplete, Modal, Upload } from 'antd';
 import { useUpdateRemote, useRemote, RemoteModule, useRemoteVersions, useUpdateRemoteUrl, fetchModules, useDeleteRemote } from '@/hooks/useRemotes';
-import { PlusOutlined, DeleteOutlined, CodeOutlined, CopyOutlined, LinkOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, CodeOutlined, CopyOutlined, LinkOutlined, CheckCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import { formatDate } from '@/lib/date-utils';
 import { TagInput, TagItem } from '@/components/tags/tag-input';
 import { useTags } from '@/hooks/useTags';
@@ -34,6 +34,8 @@ const EditRemotePage: React.FC = () => {
     const [modules, setModules] = useState<RemoteModule[]>([]);
     const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
     const debouncedModuleInput = useDebounce(moduleInput, 300);
+    const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
+    const [uploadForm] = Form.useForm();
 
     useEffect(() => {
         if (remote) {
@@ -121,27 +123,31 @@ const EditRemotePage: React.FC = () => {
             key: 'actions',
             render: (_, record: Version) => {
                 const isCurrentVersion = remote?.url?.includes(`/${record.value}/`);
-                return isCurrentVersion ? (
-                    <span className="text-green-500 flex items-center gap-1">
-                        <CheckCircleOutlined /> Currently Active
-                    </span>
-                ) : (
-                    <Button
-                        type="primary"
-                        onClick={async () => {
-                            try {
-                                await updateRemoteUrl.mutateAsync({
-                                    id: Number(id),
-                                    version: record.value
-                                });
-                                message.success('Remote URL updated successfully');
-                            } catch (error) {
-                                message.error('Failed to update remote URL');
-                            }
-                        }}
-                    >
-                        Make Current
-                    </Button>
+                return (
+                    <div className="flex items-center gap-2">
+                        {isCurrentVersion ? (
+                            <span className="text-green-500 flex items-center gap-1">
+                                <CheckCircleOutlined /> Currently Active
+                            </span>
+                        ) : (
+                            <Button
+                                type="primary"
+                                onClick={async () => {
+                                    try {
+                                        await updateRemoteUrl.mutateAsync({
+                                            id: Number(id),
+                                            version: record.value
+                                        });
+                                        message.success('Remote URL updated successfully');
+                                    } catch (error) {
+                                        message.error('Failed to update remote URL');
+                                    }
+                                }}
+                            >
+                                Make Current
+                            </Button>
+                        )}
+                    </div>
                 );
             },
         },
@@ -378,6 +384,95 @@ const EditRemotePage: React.FC = () => {
                                 rowKey="version_ID"
                                 loading={versionsLoading}
                             />
+                            <div className="flex justify-start items-center mt-4">
+                                <Button
+                                    className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-white"
+                                    icon={<UploadOutlined />}
+                                    onClick={() => setIsUploadModalVisible(true)}
+                                >
+                                    Upload New Version
+                                </Button>
+                            </div>
+                            <Modal
+                                title="Upload New Version"
+                                open={isUploadModalVisible}
+                                onCancel={() => {
+                                    setIsUploadModalVisible(false);
+                                    uploadForm.resetFields();
+                                }}
+                                footer={null}
+                                className="theme-dialog"
+                            >
+                                <Form
+                                    form={uploadForm}
+                                    layout="vertical"
+                                    onFinish={async (values) => {
+                                        try {
+                                            const formData = new FormData();
+                                            formData.append('file', values.file.file.originFileObj);
+                                            
+                                            const response = await fetch(`/api/upload/remote/${remote?.name}/${values.version}/${remote?.key}/${remote?.scope}`, {
+                                                method: 'POST',
+                                                body: formData,
+                                            });
+
+                                            if (response.ok) {
+                                                message.success('Version uploaded successfully');
+                                                setIsUploadModalVisible(false);
+                                                uploadForm.resetFields();
+                                            } else {
+                                                throw new Error('Upload failed');
+                                            }
+                                        } catch (error) {
+                                            message.error('Failed to upload version');
+                                        }
+                                    }}
+                                >
+                                    <Form.Item
+                                        label="Version"
+                                        name="version"
+                                        rules={[{ required: true, message: 'Please input the version!' }]}
+                                    >
+                                        <Input placeholder="e.g., 1.0.0" />
+                                    </Form.Item>
+
+                                    <Form.Item
+                                        label="File"
+                                        name="file"
+                                        rules={[{ required: true, message: 'Please upload a file!' }]}
+                                    >
+                                        <Upload.Dragger
+                                            name="file"
+                                            accept=".zip"
+                                            maxCount={1}
+                                            beforeUpload={() => false}
+                                        >
+                                            <p className="ant-upload-drag-icon">
+                                                <UploadOutlined />
+                                            </p>
+                                            <p className="ant-upload-text">Click or drag ZIP file to this area to upload</p>
+                                        </Upload.Dragger>
+                                    </Form.Item>
+
+                                    <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-md">
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                            <strong>Note:</strong> For automated deployments, consider using the <code>/api/upload/remote/{'{name}'}/{'{version}'}/{'{key}'}/{'{scope}'}</code> endpoint in your build pipeline.
+                                        </p>
+                                    </div>
+
+                                    <div className="flex justify-end gap-2 mt-4">
+                                        <Button onClick={() => {
+                                            setIsUploadModalVisible(false);
+                                            uploadForm.resetFields();
+                                        }}>
+                                            Cancel
+                                        </Button>
+                                        <Button type="primary" htmlType="submit">
+                                            Upload
+                                        </Button>
+                                    </div>
+                                </Form>
+                            </Modal>
                         </TabPane>
                     </Tabs>
                     <Form.Item>
