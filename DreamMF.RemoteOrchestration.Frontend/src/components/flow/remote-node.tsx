@@ -9,7 +9,7 @@ const RemoteNode = ({ data }: { data: any }) => {
 
     const handleEdit = (e: React.MouseEvent) => {
         e.stopPropagation(); // Prevent node selection/drag
-        navigate(`/remotes/${data.id}/edit`);
+        navigate(`/remotes/${data.id}`);
     };
 
     return (
