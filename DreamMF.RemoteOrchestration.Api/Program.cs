@@ -44,6 +44,27 @@ builder.Services.AddTransient<IRemoteOrchestrationDbContext>(provider =>
     return context;
 });
 
+// Configure authorization policies
+var authBuilder = builder.Services.AddAuthorizationBuilder();
+
+authBuilder.AddPolicy("Administrator", policy =>
+    policy.RequireRole("Administrator"));
+
+authBuilder.AddPolicy("CanCreateEditRemotes", policy =>
+    policy.RequireRole("Administrator", "CanCreateEditRemotes"));
+
+authBuilder.AddPolicy("CanCreateEditTags", policy =>
+    policy.RequireRole("Administrator", "CanCreateEditTags"));
+
+authBuilder.AddPolicy("CanCreateEditHosts", policy =>
+    policy.RequireRole("Administrator", "CanCreateEditHosts"));
+
+authBuilder.AddPolicy("CanMakeConfigurationChanges", policy =>
+    policy.RequireRole("Administrator", "CanMakeConfigurationChanges"));
+
+authBuilder.AddPolicy("CanUploadRemotes", policy =>
+    policy.RequireRole("Administrator", "CanUploadRemotes"));
+
 builder.Services.AddMemoryCache();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -57,7 +78,7 @@ To use protected endpoints:
 2. Click 'Try it out'
 3. Enter your credentials and execute
 4. Copy the token from the response
-5. Click 'Authorize' at the top
+5. Click 'Authorize' button above the routes
 6. Enter the token as: Bearer your-token-here"
     });
     
@@ -115,8 +136,6 @@ builder.Services.AddAuthentication("Bearer")
                 System.Text.Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
-
-builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options =>
 {

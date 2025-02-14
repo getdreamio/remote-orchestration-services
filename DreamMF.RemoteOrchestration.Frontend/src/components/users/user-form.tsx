@@ -20,10 +20,12 @@ export enum UserStatus {
     PendingVerification = 'PendingVerification'
 }
 
-export enum UserRoles {
-    Admin = 'Administrator',
-    User = 'Normal User',
-    Readonly = 'Readonly',
+interface Role {
+    id: number;
+    name: string;
+    description: string;
+    createdDate: number;
+    updatedDate: number;
 }
 
 interface UserFormProps {
@@ -34,7 +36,7 @@ interface UserFormProps {
         firstName?: string;
         lastName?: string;
         status?: UserStatus;
-        roles?: UserRoles[];
+        roles?: string[];
         authProvider?: AuthProvider;
         authUserId?: string;
         isTwoFactorEnabled?: boolean;
@@ -65,15 +67,31 @@ const UserForm: React.FC<UserFormProps> = ({
 
     const isEditing = editingUser && editingUser.id > 0;
 
+    // Set initial form values and update roles when role data is loaded
     React.useEffect(() => {
         if (editingUser) {
-            form.setFieldsValue(editingUser);
+            const formValues = { ...editingUser };
+            
+            // Convert role names to IDs if roles data is available
+            if (roles.length > 0 && Array.isArray(editingUser.roles)) {
+                const roleIds = editingUser.roles.map(roleName => 
+                    roles.find(r => r.name === roleName)?.id
+                ).filter(Boolean) as number[];
+                formValues.roles = roleIds;
+            }
+            
+            form.setFieldsValue(formValues);
         }
-    }, [editingUser, form]);
+    }, [editingUser, roles, form]);
 
     const handleSubmit = async (values: any) => {
         try {
             if (isEditing) {
+                // Convert role IDs to role names
+                const selectedRoles = values.roles?.map((roleId: number) => 
+                    roles.find(r => r.id === roleId)?.name
+                ).filter(Boolean) || [];
+
                 const updateData = {
                     id: editingUser.id,
                     user: {
@@ -83,7 +101,7 @@ const UserForm: React.FC<UserFormProps> = ({
                         status: values.status,
                         newPassword: values.newPassword,
                         isTwoFactorEnabled: values.isTwoFactorEnable,
-                        roles: values.roles
+                        roles: selectedRoles
                     }
                 };
                 await updateUser.mutateAsync(updateData);
@@ -197,9 +215,18 @@ const UserForm: React.FC<UserFormProps> = ({
                 label="Roles"
                 rules={[{ required: true, message: 'Please select at least one role.', type: 'array' }]}
             >
-                <Select mode="multiple" placeholder="Select roles">
-                    {roles.map((role: string, i: number) => (
-                        <Option key={i} value={role}>{role}</Option>
+                <Select mode="multiple" placeholder="Select roles" optionLabelProp="label" listHeight={500}>
+                    {roles.map((role: Role) => (
+                        <Option 
+                            key={role.id} 
+                            value={role.id} 
+                            label={role.name}
+                        >
+                            <div>
+                                <div className="font-medium">{role.name}</div>
+                                <div className="text-gray-500 text-sm">{role.description}</div>
+                            </div>
+                        </Option>
                     ))}
                 </Select>
             </Form.Item>

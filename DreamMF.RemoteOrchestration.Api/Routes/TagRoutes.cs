@@ -31,6 +31,7 @@ public static class TagRoutes
         group.RequireAuthorization();
 
         group.MapGet("", GetAllTags)
+            .RequireAuthorization()
             .Produces<List<TagResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(500)
@@ -39,6 +40,7 @@ public static class TagRoutes
             .WithDescription("Retrieves a list of all registered tags");
 
         group.MapGet("{id}", GetTagById)
+            .RequireAuthorization()
             .Produces<TagResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
@@ -48,32 +50,36 @@ public static class TagRoutes
             .WithDescription("Retrieves a specific tag by its unique identifier");
 
         group.MapPost("", CreateTag)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditTags" })
             .Produces<TagResponse>(StatusCodes.Status201Created)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(500)
             .WithMetadata(new EndpointNameMetadata("Create a new tag"))
-            .WithSummary("Create a New Tag")
-            .WithDescription("Creates a new tag with the provided information");
+            .WithSummary("Create Tag")
+            .WithDescription("Creates a new tag with the provided details");
 
         group.MapPut("{id}", UpdateTag)
-            .Produces(StatusCodes.Status204NoContent)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditTags" })
+            .Produces<TagResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
             .Produces<HandledResponseModel>(500)
-            .WithMetadata(new EndpointNameMetadata("Update a tag"))
-            .WithSummary("Update a Tag")
-            .WithDescription("Updates an existing tag with the provided information");
+            .WithMetadata(new EndpointNameMetadata("Update an existing tag"))
+            .WithSummary("Update Tag")
+            .WithDescription("Updates an existing tag with the provided details");
 
         group.MapDelete("{id}", DeleteTag)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditTags" })
             .Produces(StatusCodes.Status204NoContent)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
             .Produces<HandledResponseModel>(500)
-            .WithMetadata(new EndpointNameMetadata("Delete tag"))
+            .WithMetadata(new EndpointNameMetadata("Delete a tag"))
             .WithSummary("Delete Tag")
-            .WithDescription("Deletes a specific tag by its unique identifier");
+            .WithDescription("Deletes a tag by its unique identifier");
 
         group.MapGet("{id}/hosts", GetTagHosts)
+            .RequireAuthorization()
             .Produces<List<HostResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
@@ -83,6 +89,7 @@ public static class TagRoutes
             .WithDescription("Retrieves all hosts that are using this tag");
 
         group.MapGet("{id}/remotes", GetTagRemotes)
+            .RequireAuthorization()
             .Produces<List<RemoteResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
@@ -92,6 +99,7 @@ public static class TagRoutes
             .WithDescription("Retrieves all remotes that are using this tag");
 
         group.MapPost("/add-to-entity", AddTagToEntity)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditTags" })
             .Produces<TagEntityResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(500)
@@ -100,6 +108,7 @@ public static class TagRoutes
             .WithDescription("Adds a tag to a remote entity");
 
         group.MapGet("host/{hostId}", GetTagsByHostId)
+            .RequireAuthorization()
             .Produces<List<TagResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
@@ -109,6 +118,7 @@ public static class TagRoutes
             .WithDescription("Retrieves a list of tags associated with a host entity");
 
         group.MapDelete("host/{hostId}/remove/{tagId}", RemoveTagFromHost)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditTags" })
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .WithMetadata(new EndpointNameMetadata("Remove tag from host"))
@@ -116,6 +126,7 @@ public static class TagRoutes
             .WithDescription("Removes a tag from a host entity");
 
         group.MapGet("remote/{remoteId}", GetTagsByRemoteId)
+            .RequireAuthorization()
             .Produces<List<TagResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
@@ -125,6 +136,7 @@ public static class TagRoutes
             .WithDescription("Retrieves a list of tags associated with a remote entity");
 
         group.MapDelete("remote/{remoteId}/remove/{tagId}", RemoveTagFromRemote)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditTags" })
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .WithMetadata(new EndpointNameMetadata("Remove tag from remote"))

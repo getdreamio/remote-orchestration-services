@@ -17,7 +17,10 @@ public static class UploadRoutes
 
     private static RouteGroupBuilder MapUploadApi(this RouteGroupBuilder group)
     {
+        group.RequireAuthorization();
+
         group.MapPost("/remote/{name}/{version}/{key}/{scope}", UploadRemoteZip)
+            .RequireAuthorization(new[] { "Administrator", "CanUploadRemotes" })
             .WithTags(GroupName)
             .Produces(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)

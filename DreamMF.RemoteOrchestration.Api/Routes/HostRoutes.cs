@@ -21,6 +21,7 @@ public static class HostRoutes
         group.RequireAuthorization();
 
         group.MapGet("/", GetHosts)
+            .RequireAuthorization()
             .WithTags(GroupName)
             .Produces<List<HostResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
@@ -30,6 +31,7 @@ public static class HostRoutes
             .WithDescription("Retrieves a list of all registered host instances");
 
         group.MapGet("/{id}", GetHost)
+            .RequireAuthorization()
             .WithTags(GroupName)
             .Produces<HostResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
@@ -40,6 +42,7 @@ public static class HostRoutes
             .WithDescription("Retrieves a specific host instance by its unique identifier");
 
         group.MapPost("/", CreateHost)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditHosts" })
             .WithTags(GroupName)
             .Produces<HostResponse>(StatusCodes.Status201Created)
             .WithMetadata(new EndpointNameMetadata("Create a new host"))
@@ -47,6 +50,7 @@ public static class HostRoutes
             .WithDescription("Creates a new host instance with the provided details");
         
         group.MapPut("/{id}", UpdateHost)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditHosts" })
             .WithTags(GroupName)
             .Produces(StatusCodes.Status204NoContent)
             .Produces<HandledResponseModel>(400)
@@ -56,6 +60,7 @@ public static class HostRoutes
             .WithDescription("Updates an existing host instance with the provided details");
 
         group.MapDelete("/{id}", DeleteHost)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditHosts" })
             .WithTags(GroupName)
             .Produces(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
@@ -65,6 +70,7 @@ public static class HostRoutes
             .WithDescription("Deletes a specific host instance by its unique identifier");
 
         group.MapGet("/{id}/remotes", GetRemotesByHostId)
+            .RequireAuthorization()
             .WithTags(GroupName)
             .Produces<List<RemoteResponse>>(StatusCodes.Status200OK)
             .WithMetadata(new EndpointNameMetadata("List remotes by host ID"))
@@ -72,6 +78,7 @@ public static class HostRoutes
             .WithDescription("Retrieves a list of remotes associated with a specific host instance");
 
         group.MapPost("/{id}/attach", AttachRemoteToHost)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditHosts" })
             .WithTags(GroupName)
             .Produces(StatusCodes.Status204NoContent)
             .Produces<HandledResponseModel>(400)
@@ -81,6 +88,7 @@ public static class HostRoutes
             .WithDescription("Associates a remote instance with a specific host instance");
 
         group.MapPost("/{id}/detach", DetachRemoteFromHost)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditHosts" })
             .WithTags(GroupName)
             .Produces(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
@@ -90,6 +98,7 @@ public static class HostRoutes
             .WithDescription("Detaches a remote instance from a specific host instance");
 
         group.MapGet("/environment/{environment}", GetHostsByEnvironment)
+            .RequireAuthorization()
             .WithTags(GroupName)
             .Produces<List<HostResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)

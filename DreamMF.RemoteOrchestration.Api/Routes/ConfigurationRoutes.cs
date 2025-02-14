@@ -20,6 +20,7 @@ public static class ConfigurationRoutes
         group.RequireAuthorization();
 
         group.MapGet("", GetAllConfigurations)
+            .RequireAuthorization()
             .Produces<List<ConfigurationResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(500)
@@ -28,6 +29,7 @@ public static class ConfigurationRoutes
             .WithDescription("Retrieves a list of all configurations");
 
         group.MapGet("{id}", GetConfigurationById)
+            .RequireAuthorization()
             .Produces<ConfigurationResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
@@ -37,6 +39,7 @@ public static class ConfigurationRoutes
             .WithDescription("Retrieves a specific configuration by its unique identifier");
 
         group.MapGet("key/{key}", GetConfigurationByKey)
+            .RequireAuthorization()
             .Produces<ConfigurationResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
@@ -46,6 +49,7 @@ public static class ConfigurationRoutes
             .WithDescription("Retrieves a specific configuration by its key");
 
         group.MapPost("", UpdateConfiguration)
+            .RequireAuthorization(new[] { "Administrator", "CanMakeConfigurationChanges" })
             .Produces<ConfigurationResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
@@ -55,6 +59,7 @@ public static class ConfigurationRoutes
             .WithDescription("Updates an existing configuration");
 
         group.MapPost("batch", UpdateConfigurationBatch)
+            .RequireAuthorization(new[] { "Administrator", "CanMakeConfigurationChanges" })
             .Produces<List<ConfigurationResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(500)
@@ -63,6 +68,7 @@ public static class ConfigurationRoutes
             .WithDescription("Updates multiple configurations in a single request");
 
         group.MapDelete("{id}", DeleteConfiguration)
+            .RequireAuthorization(new[] { "Administrator", "CanMakeConfigurationChanges" })
             .Produces(StatusCodes.Status204NoContent)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)

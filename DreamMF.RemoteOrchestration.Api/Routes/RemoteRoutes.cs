@@ -23,6 +23,7 @@ public static class RemoteRoutes
         group.RequireAuthorization();
 
         group.MapGet("/", GetAllRemotes)
+            .RequireAuthorization()
             .WithTags(GroupName)
             .Produces<List<RemoteResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
@@ -32,6 +33,7 @@ public static class RemoteRoutes
             .WithDescription("Retrieves a list of all registered remote instances");
 
         group.MapGet("/modules", GetAllRemoteModules)
+            .RequireAuthorization()
             .WithTags(GroupName)
             .Produces<List<ModuleResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
@@ -41,6 +43,7 @@ public static class RemoteRoutes
             .WithDescription("Retrieves a list of all registered remote modules");
 
         group.MapGet("/{id}", GetRemoteById)
+            .RequireAuthorization()
             .WithTags(GroupName)
             .Produces<RemoteResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
@@ -51,6 +54,7 @@ public static class RemoteRoutes
             .WithDescription("Retrieves a specific remote instance by its unique identifier");
 
         group.MapGet("/{id}/versions", GetVersionsByRemoteId)
+            .RequireAuthorization()
             .WithTags(GroupName)
             .Produces<List<VersionResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
@@ -61,6 +65,7 @@ public static class RemoteRoutes
             .WithDescription("Retrieves all versions for a specific remote instance");
 
         group.MapPost("/", CreateRemote)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditRemotes" })
             .WithTags(GroupName)
             .Produces<RemoteResponse>(StatusCodes.Status201Created)
             .Produces<HandledResponseModel>(400)
@@ -70,24 +75,26 @@ public static class RemoteRoutes
             .WithDescription("Creates a new remote instance with the provided details");
 
         group.MapPut("/{id}", UpdateRemote)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditRemotes" })
             .WithTags(GroupName)
             .Produces(StatusCodes.Status204NoContent)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
             .Produces<HandledResponseModel>(500)
-            .WithMetadata(new EndpointNameMetadata("Update a remote"))
-            .WithSummary("Update a Remote")
+            .WithMetadata(new EndpointNameMetadata("Update an existing remote"))
+            .WithSummary("Update Remote")
             .WithDescription("Updates an existing remote instance with the provided details");
 
         group.MapDelete("/{id}", DeleteRemote)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditRemotes" })
             .WithTags(GroupName)
             .Produces(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
             .Produces<HandledResponseModel>(500)
-            .WithMetadata(new EndpointNameMetadata("Delete a remote by ID"))
-            .WithSummary("Delete a Remote by ID")
-            .WithDescription("Deletes a specific remote instance by its unique identifier");
+            .WithMetadata(new EndpointNameMetadata("Delete a remote"))
+            .WithSummary("Delete Remote")
+            .WithDescription("Deletes a remote instance by its unique identifier");
 
         return group;
     }

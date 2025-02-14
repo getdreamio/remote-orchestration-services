@@ -21,6 +21,7 @@ public static class UserRoutes
         group.RequireAuthorization();
 
         group.MapGet("/", GetUsers)
+            .RequireAuthorization()
             .WithTags(GroupName)
             .Produces<List<UserResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
@@ -30,6 +31,7 @@ public static class UserRoutes
             .WithDescription("Retrieves a list of all registered users");
 
         group.MapGet("/{id}", GetUser)
+            .RequireAuthorization()
             .WithTags(GroupName)
             .Produces<UserResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
@@ -40,6 +42,7 @@ public static class UserRoutes
             .WithDescription("Retrieves a specific user by their unique identifier");
 
         group.MapPost("/", CreateUser)
+            .RequireAuthorization("Administrator")
             .WithTags(GroupName)
             .Produces<UserResponse>(StatusCodes.Status201Created)
             .Produces<HandledResponseModel>(400)
@@ -49,8 +52,9 @@ public static class UserRoutes
             .WithDescription("Creates a new user with the provided details");
 
         group.MapPut("/{id}", UpdateUser)
+            .RequireAuthorization("Administrator")
             .WithTags(GroupName)
-            .Produces(StatusCodes.Status204NoContent)
+            .Produces<UserResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
             .Produces<HandledResponseModel>(500)
@@ -59,6 +63,7 @@ public static class UserRoutes
             .WithDescription("Updates an existing user's details");
 
         group.MapDelete("/{id}", DeleteUser)
+            .RequireAuthorization("Administrator")
             .WithTags(GroupName)
             .Produces(StatusCodes.Status204NoContent)
             .Produces<HandledResponseModel>(400)
@@ -69,6 +74,7 @@ public static class UserRoutes
             .WithDescription("Deletes a user by their unique identifier");
 
         group.MapGet("/{id}/roles", GetUserRoles)
+            .RequireAuthorization()
             .WithTags(GroupName)
             .Produces<List<string>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
@@ -79,6 +85,7 @@ public static class UserRoutes
             .WithDescription("Retrieves all roles assigned to a specific user");
 
         group.MapPost("/{id}/roles/{roleId}", AddUserRole)
+            .RequireAuthorization("Administrator")
             .WithTags(GroupName)
             .Produces(StatusCodes.Status204NoContent)
             .Produces<HandledResponseModel>(400)
@@ -89,6 +96,7 @@ public static class UserRoutes
             .WithDescription("Assigns a role to a specific user");
 
         group.MapDelete("/{id}/roles/{roleId}", RemoveUserRole)
+            .RequireAuthorization("Administrator")
             .WithTags(GroupName)
             .Produces(StatusCodes.Status204NoContent)
             .Produces<HandledResponseModel>(400)
@@ -99,8 +107,9 @@ public static class UserRoutes
             .WithDescription("Removes a role from a specific user");
 
         group.MapGet("/roles", GetAvailableRoles)
+            .RequireAuthorization()
             .WithTags(GroupName)
-            .Produces<List<string>>(StatusCodes.Status200OK)
+            .Produces<List<UserRoleResponse>>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(500)
             .WithMetadata(new EndpointNameMetadata("Get available roles"))
@@ -136,7 +145,7 @@ public static class UserRoutes
     {
         // Use a mapper here from requesdt to user
         var user = await userService.UpdateUserAsync(id, request);
-        return Results.NoContent();
+        return Results.Ok(user);
     }
 
     private static async Task<IResult> DeleteUser(int id, IUserService userService)

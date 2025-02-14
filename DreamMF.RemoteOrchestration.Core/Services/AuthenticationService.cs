@@ -117,6 +117,15 @@ public class AuthenticationService : IAuthenticationService
         if (!string.IsNullOrEmpty(user.LastName))
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
+        // Add user roles to claims
+        if (user.UserRoleMappings != null)
+        {
+            foreach (var roleMapping in user.UserRoleMappings)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, roleMapping.Role.Name));
+            }
+        }
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),

@@ -16,10 +16,10 @@ public interface IUserService
     Task<UserResponse?> CreateUserAsync(CreateUserRequest request);
     Task<UserResponse> UpdateUserAsync(int id, UpdateUserRequest request);
     Task<bool> DeleteUserAsync(int id);
-    Task<IEnumerable<string>> GetUserRolesAsync(int userId);
+    Task<IEnumerable<UserRoleResponse>> GetUserRolesAsync(int userId);
     Task<bool> AddUserRoleAsync(int userId, int roleId);
     Task<bool> RemoveUserRoleAsync(int userId, int roleId);
-    Task<IEnumerable<string>> GetAvailableRolesAsync();
+    Task<IEnumerable<UserRoleResponse>> GetAvailableRolesAsync();
 }
 
 public class UserService : IUserService
@@ -170,7 +170,7 @@ public class UserService : IUserService
         return true;
     }
 
-    public async Task<IEnumerable<string>> GetUserRolesAsync(int userId)
+    public async Task<IEnumerable<UserRoleResponse>> GetUserRolesAsync(int userId)
     {
         var user = await _dbContext.Users
             .Include(u => u.UserRoleMappings)
@@ -178,8 +178,15 @@ public class UserService : IUserService
             .FirstOrDefaultAsync(u => u.Id == userId);
 
         return user?.UserRoleMappings
-            .Select(ur => ur.Role.Name)
-            .ToList() ?? new List<string>();
+            .Select(ur => new UserRoleResponse
+            {
+                Id = ur.Role.Id,
+                Name = ur.Role.Name,
+                Description = ur.Role.Description ?? string.Empty,
+                CreatedDate = ur.Role.CreatedDate,
+                UpdatedDate = ur.Role.UpdatedDate
+            })
+            .ToList() ?? new List<UserRoleResponse>();
     }
 
     public async Task<bool> AddUserRoleAsync(int userId, int roleId)
@@ -215,11 +222,18 @@ public class UserService : IUserService
         return true;
     }
 
-    public async Task<IEnumerable<string>> GetAvailableRolesAsync()
+    public async Task<IEnumerable<UserRoleResponse>> GetAvailableRolesAsync()
     {
         var roles = await _dbContext.UserRoles
             .OrderBy(r => r.Name)
-            .Select(r => r.Name)
+            .Select(r => new UserRoleResponse
+            {
+                Id = r.Id,
+                Name = r.Name,
+                Description = r.Description ?? string.Empty,
+                CreatedDate = r.CreatedDate,
+                UpdatedDate = r.UpdatedDate
+            })
             .ToListAsync();
         
         return roles;

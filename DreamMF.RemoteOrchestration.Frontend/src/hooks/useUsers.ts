@@ -108,7 +108,7 @@ const fetchUserRoles = async (userId: number) => {
 };
 
 const fetchAllRoles = async () => {
-    const response = await fetchWithAuth(getApiUrl('/api/roles'));
+    const response = await fetchWithAuth(getApiUrl('/api/users/roles'));
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
