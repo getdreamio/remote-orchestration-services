@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { message } from 'antd';
+import notify from '../utils/notifications';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 import { getApiUrl } from '../utils/api';
 
@@ -187,10 +187,10 @@ export const useCreateTag = () => {
         mutationFn: createTag,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tags'] });
-            message.success('Tag created successfully');
+            notify.success('Tag created successfully');
         },
         onError: () => {
-            message.error('Failed to create tag');
+            notify.error('Error', 'Failed to create tag');
         },
     });
 };
@@ -202,10 +202,10 @@ export const useUpdateTag = () => {
         mutationFn: updateTag,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tags'] });
-            message.success('Tag updated successfully');
+            notify.success('Tag updated successfully');
         },
         onError: () => {
-            message.error('Failed to update tag');
+            notify.error('Error', 'Failed to update tag');
         },
     });
 };
@@ -228,10 +228,10 @@ export const useRemoveTagAssociation = () => {
         mutationFn: removeTagAssociation,
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['tags', variables.type, variables.itemId] });
-            message.success(`Tag removed from ${variables.type} successfully`);
+            notify.success(`Tag removed from ${variables.type} successfully`);
         },
         onError: (_, variables) => {
-            message.error(`Failed to remove tag from ${variables.type}`);
+            notify.error('Error', `Failed to remove tag from ${variables.type}`);
         },
     });
 };
@@ -261,10 +261,10 @@ export const useAddTagToEntity = () => {
             queryClient.invalidateQueries({ 
                 queryKey: ['tags', variables.entityType, variables.entityId] 
             });
-            message.success('Tag added successfully');
+            notify.success('Tag added successfully');
         },
         onError: () => {
-            message.error('Failed to add tag');
+            notify.error('Error', 'Failed to add tag');
         },
     });
 };

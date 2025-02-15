@@ -166,8 +166,8 @@ public static class TagRoutes
 
     private static async Task<IResult> UpdateTag(int id, TagRequest request, TagService tagService)
     {
-        var success = await tagService.UpdateTagAsync(id, request);
-        return success ? Results.NoContent() : Results.NotFound();
+        var tag = await tagService.UpdateTagAsync(id, request);
+        return tag != null ? Results.Ok(tag) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteTag(int id, TagService tagService)

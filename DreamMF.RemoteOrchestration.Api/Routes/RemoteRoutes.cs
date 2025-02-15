@@ -77,7 +77,7 @@ public static class RemoteRoutes
         group.MapPut("/{id}", UpdateRemote)
             .RequireAuthorization(new[] { "Administrator", "CanCreateEditRemotes" })
             .WithTags(GroupName)
-            .Produces(StatusCodes.Status204NoContent)
+            .Produces<RemoteResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(404)
             .Produces<HandledResponseModel>(500)
@@ -125,8 +125,8 @@ public static class RemoteRoutes
 
     private static async Task<IResult> UpdateRemote(int id, RemoteRequest request, RemoteService remoteService)
     {
-        var success = await remoteService.UpdateRemoteAsync(id, request);
-        return success ? Results.NoContent() : Results.NotFound();
+        var remote = await remoteService.UpdateRemoteAsync(id, request);
+        return Results.Ok(remote);
     }
 
     private static async Task<IResult> DeleteRemote(int id, RemoteService remoteService)

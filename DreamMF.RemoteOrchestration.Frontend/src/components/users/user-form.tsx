@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Form, Input, Select, Alert, InputNumber, Switch, message } from 'antd';
+import { Form, Input, Select, Alert, InputNumber, Switch } from 'antd';
 import { useCreateUser, useUpdateUser, useRoles } from '@/hooks/useUsers';
 import PasswordStrength from './password-strength';
 import { getErrorMessage } from '@/utils/errors'; 
+import notify from '../../utils/notifications';
 
 const { Option } = Select;
 
@@ -106,19 +107,19 @@ const UserForm: React.FC<UserFormProps> = ({
                     }
                 };
                 await updateUser.mutateAsync(updateData);
-                message.success('User updated successfully');
+                notify.success('User updated successfully');
             } else {
                 const createData = {
                     ...values,
                     roles: selectedRoles
                 };
                 await createUser.mutateAsync(createData);
-                message.success('User created successfully');
+                notify.success('User created successfully');
             }
             onSuccess?.();
         } catch (error: any) {
             const errorMessage = getErrorMessage(error);
-            message.error(errorMessage);
+            notify.error('Error', errorMessage);
         }
     };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Form, Input, Button, Card, message, Tabs, Table, Input as AntInput, Typography, Empty, InputRef, AutoComplete, Modal, Upload } from 'antd';
+import { Form, Input, Button, Card, Tabs, Table, Input as AntInput, Typography, Empty, InputRef, AutoComplete, Modal, Upload } from 'antd';
 import { useUpdateRemote, useRemote, RemoteModule, useRemoteVersions, useUpdateRemoteUrl, fetchModules, useDeleteRemote } from '@/hooks/useRemotes';
 import { PlusOutlined, DeleteOutlined, CodeOutlined, CopyOutlined, LinkOutlined, CheckCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import { formatDate } from '@/lib/date-utils';
@@ -8,6 +8,7 @@ import { TagInput } from '@/components/tags/tag-input';
 import { useTags } from '@/hooks/useTags';
 import { Helmet } from 'react-helmet';
 import useDebounce from '@/hooks/useDebounce';
+import notify from '../../utils/notifications';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -72,11 +73,9 @@ const EditRemotePage: React.FC = () => {
                     modules,
                 }
             });
-            if (result >= 200 && result < 400) {
-                message.success('Remote updated successfully');
-            }
+            notify.success('Remote updated successfully');
         } catch (error) {
-            message.error('Failed to update remote');
+            notify.error('Error', 'Failed to update remote');
         }
     };
 
@@ -138,9 +137,9 @@ const EditRemotePage: React.FC = () => {
                                             id: Number(id),
                                             version: record.value
                                         });
-                                        message.success('Remote URL updated successfully');
+                                        notify.success('Remote URL updated successfully');
                                     } catch (error) {
-                                        message.error('Failed to update remote URL');
+                                        notify.error('Error', 'Failed to update remote URL');
                                     }
                                 }}
                             >
@@ -172,10 +171,10 @@ const EditRemotePage: React.FC = () => {
             onOk: async () => {
                 try {
                     await deleteRemote.mutateAsync(Number(id));
-                    message.success('Remote deleted successfully');
+                    notify.success('Remote deleted successfully');
                     navigate('/remotes');
                 } catch (error) {
-                    message.error('Failed to delete remote');
+                    notify.error('Error', 'Failed to delete remote');
                 }
             }
         });
@@ -258,7 +257,7 @@ const EditRemotePage: React.FC = () => {
                                         onClick={() => {
                                             if (remote?.url) {
                                                 navigator.clipboard.writeText(remote.url);
-                                                message.success('URL copied to clipboard');
+                                                notify.success('URL copied to clipboard');
                                             }
                                         }}
                                         title="Copy URL"
@@ -417,14 +416,14 @@ const EditRemotePage: React.FC = () => {
                                             });
 
                                             if (response.ok) {
-                                                message.success('Version uploaded successfully');
+                                                notify.success('Version uploaded successfully');
                                                 setIsUploadModalVisible(false);
                                                 uploadForm.resetFields();
                                             } else {
                                                 throw new Error('Upload failed');
                                             }
                                         } catch (error) {
-                                            message.error('Failed to upload version');
+                                            notify.error('Error', 'Failed to upload version');
                                         }
                                     }}
                                 >

@@ -1,3 +1,7 @@
+.ant-notification-notice-wrapper {
+  /* margin-top: 0px !important; */
+}
+
 .ant-notification-notice {
   padding: 16px 20px 16px 16px;
   border-radius: 4px;
@@ -84,7 +88,7 @@
 
 /* Dark theme */
 .dark {
-  --notification-bg: #1a1b1e;
+  --notification-bg: #243246;
   --text-color: #ffffff;
   --heading-color: #ffffff;
   --close-icon-color: rgba(255, 255, 255, 0.65);

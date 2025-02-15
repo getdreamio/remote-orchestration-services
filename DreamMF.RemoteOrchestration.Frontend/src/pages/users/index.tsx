@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Card, Avatar, Table, Button, Tag, message, Tooltip, Popconfirm, Modal, Form, Input, Select, Typography } from 'antd';
+import { Card, Avatar, Table, Button, Tag, Tooltip, Popconfirm, Modal, Form, Input, Select, Typography } from 'antd';
 import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined } from '@ant-design/icons';
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
 import { useUsers, useCreateUser, useDeleteUser, User, CreateUserRequest, AuthProvider } from '@/hooks/useUsers';
 import { formatDateShort, formatDateFull } from '@/lib/date-utils';
+import notify from '../../utils/notifications';
 
 const { Option } = Select;
 
@@ -21,20 +22,20 @@ const UsersPage: React.FC = () => {
     const handleCreateUser = async (values: CreateUserRequest) => {
         try {
             await createUserMutation.mutateAsync(values);
-            message.success('User created successfully');
+            notify.success('User created successfully');
             setIsCreateModalVisible(false);
             createForm.resetFields();
         } catch (error: any) {
-            message.error(error.message || 'Failed to create user');
+            notify.error('Error', error.message || 'Failed to create user');
         }
     };
 
     const handleDeleteUser = async (user: User) => {
         try {
             await deleteUserMutation.mutateAsync(user.id);
-            message.success('User deleted successfully');
+            notify.success('User deleted successfully');
         } catch (error: any) {
-            message.error(error.message || 'Failed to delete user');
+            notify.error('Error', error.message || 'Failed to delete user');
         }
     };
 

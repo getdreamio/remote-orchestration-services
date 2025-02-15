@@ -49,7 +49,7 @@ const HostForm: React.FC<HostFormProps> = ({ onSuccess, editingHost, renderFoote
             };
 
             if (editingHost) {
-                await updateHost.mutateAsync({ id: editingHost.id, host: hostData });
+                await updateHost.mutateAsync({ id: editingHost.id, data: hostData });
                 notify.success('Host updated successfully', 'The host has been updated with the new configuration.');
             } else {
                 await createHost.mutateAsync(hostData);

@@ -5,6 +5,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { useTag, useUpdateTag, useTagRemotes, useTagHosts, useRemoveTagAssociation, type Tag } from '@/hooks/useTags';
 import { Helmet } from 'react-helmet';
 import TagFormFields from './form-fields';
+import notify from '../../utils/notifications';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -28,9 +29,9 @@ const EditTagPage: React.FC = () => {
     const onFinish = async (tag: Tag) => {
         try {
             await updateTag.mutateAsync({ id: Number(id), tag });
-            navigate('/tags');
+            notify.success('Tag updated successfully');
         } catch (error) {
-            // Error is handled by the mutation
+            notify.error('Error', 'Failed to update tag');
         }
     };
 

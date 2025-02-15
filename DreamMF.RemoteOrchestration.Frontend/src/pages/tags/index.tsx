@@ -1,10 +1,11 @@
 import type React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Table, Popconfirm, message, Tooltip } from 'antd';
+import { Button, Table, Popconfirm, Tooltip } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTags, useDeleteTag, Tag } from '@/hooks/useTags';
 import { Helmet } from 'react-helmet';
 import { formatDateShort, formatDateFull } from '@/lib/date-utils';
+import notify from '../../utils/notifications';
 
 const TagsPage: React.FC = () => {
     const navigate = useNavigate();
@@ -14,9 +15,9 @@ const TagsPage: React.FC = () => {
     const handleDelete = async (id: number) => {
         try {
             await deleteTag.mutateAsync(id);
-            message.success('Tag deleted successfully');
+            notify.success('Tag deleted successfully');
         } catch (error) {
-            message.error('Failed to delete tag');
+            notify.error('Error', 'Failed to delete tag');
         }
     };
 

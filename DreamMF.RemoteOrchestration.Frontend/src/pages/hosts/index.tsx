@@ -1,10 +1,11 @@
 import React from 'react';
-import { Button, Table, message, Tag, Typography, Tooltip, Popconfirm, Modal } from 'antd';
+import { Button, Table, Tag, Typography, Tooltip, Popconfirm, Modal } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined, ApiOutlined } from '@ant-design/icons';
 import { useHosts, useDeleteHost } from '@/hooks/useHosts';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { formatDateShort, formatDateFull } from '@/lib/date-utils';
+import notify from '../../utils/notifications';
 
 const { Text } = Typography;
 
@@ -23,9 +24,9 @@ const HostsPage: React.FC = () => {
             onOk: async () => {
                 try {
                     await deleteHost.mutateAsync(id);
-                    message.success('Host deleted successfully');
+                    notify.success('Host deleted successfully');
                 } catch (error) {
-                    message.error('Failed to delete host');
+                    notify.error('Error', 'Failed to delete host');
                 }
             }
         });
@@ -33,7 +34,7 @@ const HostsPage: React.FC = () => {
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
-        message.success('Key copied to clipboard');
+        notify.success('Key copied to clipboard');
     };
 
     const getEnvironmentColor = (environment: string) => {

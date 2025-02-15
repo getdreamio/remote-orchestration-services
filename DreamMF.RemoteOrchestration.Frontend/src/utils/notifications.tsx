@@ -4,7 +4,7 @@ import { CheckCircleFilled, ExclamationCircleFilled, InfoCircleFilled, CloseCirc
 // Initialize notification settings
 notification.config({
   top: 24,
-  duration: 1000,
+  duration: 3,
   maxCount: 1,
   placement: 'topRight',
 });

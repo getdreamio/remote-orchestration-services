@@ -1,6 +1,7 @@
 import React from 'react';
-import { Form, Input, Card, Button, message } from 'antd';
+import { Form, Input, Card, Button } from 'antd';
 import { CopyOutlined, LinkOutlined } from '@ant-design/icons';
+import notify from '../../utils/notifications';
 
 interface ApiSettingsFormProps {
     
@@ -49,7 +50,7 @@ export const ApiSettingsForm: React.FC<ApiSettingsFormProps> = () => {
                             onClick={() => {
                                 if (remotesUrl) {
                                     navigator.clipboard.writeText(remotesUrl);
-                                    message.success('URL copied to clipboard');
+                                    notify.success('URL copied to clipboard');
                                 }
                             }}
                             title="Copy URL"
@@ -80,7 +81,7 @@ export const ApiSettingsForm: React.FC<ApiSettingsFormProps> = () => {
                             onClick={() => {
                                 if (swaggerUrl) {
                                     navigator.clipboard.writeText(swaggerUrl);
-                                    message.success('URL copied to clipboard');
+                                    notify.success('URL copied to clipboard');
                                 }
                             }}
                             title="Copy URL"

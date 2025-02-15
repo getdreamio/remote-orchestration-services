@@ -52,8 +52,9 @@ public static class HostRoutes
         group.MapPut("/{id}", UpdateHost)
             .RequireAuthorization(new[] { "Administrator", "CanCreateEditHosts" })
             .WithTags(GroupName)
-            .Produces(StatusCodes.Status204NoContent)
+            .Produces<HostResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(404)
             .Produces<HandledResponseModel>(500)
             .WithMetadata(new EndpointNameMetadata("Update a host"))
             .WithSummary("Update a Host")
@@ -130,8 +131,8 @@ public static class HostRoutes
 
     private static async Task<IResult> UpdateHost(int id, HostRequest request, HostService hostService)
     {
-        var success = await hostService.UpdateHostAsync(id, request);
-        return success ? Results.NoContent() : Results.NotFound();
+        var host = await hostService.UpdateHostAsync(id, request);
+        return host != null ? Results.Ok(host) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteHost(int id, HostService hostService)

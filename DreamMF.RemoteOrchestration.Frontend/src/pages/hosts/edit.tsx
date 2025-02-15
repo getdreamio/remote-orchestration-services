@@ -1,12 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card, Typography, Spin, Tabs, Table, Button, Modal, message } from 'antd';
+import { Card, Typography, Spin, Tabs, Table, Button, Modal } from 'antd';
 import { LinkOutlined, DisconnectOutlined, DeleteOutlined } from '@ant-design/icons';
 import HostForm from '@/components/hosts/host-form';
 import { useGetHost, useHostRemotes, useAttachRemote, useDetachRemote, useDeleteHost } from '@/hooks/useHosts';
 import { useRemotes } from '@/hooks/useRemotes';
 import { formatDate } from '@/lib/date-utils';
 import { Helmet } from 'react-helmet';
+import notify from '../../utils/notifications';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -24,7 +25,7 @@ const EditHostPage: React.FC = () => {
     const [isAttachModalOpen, setIsAttachModalOpen] = useState(false);
 
     const handleSuccess = () => {
-        navigate('/hosts');
+        notify.success('Host updated successfully');
     };
 
     // Filter out already attached remotes
@@ -37,18 +38,18 @@ const EditHostPage: React.FC = () => {
     const handleAttachRemote = async (remoteId: number) => {
         try {
             await attachRemote.mutateAsync({ hostId: Number(id), remoteId });
-            message.success('Remote attached successfully');
+            notify.success('Remote attached successfully');
         } catch (error) {
-            message.error('Failed to attach remote');
+            notify.error('Error', 'Failed to attach remote');
         }
     };
 
     const handleDetachRemote = async (remoteId: number) => {
         try {
             await detachRemote.mutateAsync({ hostId: Number(id), remoteId });
-            message.success('Remote detached successfully');
+            notify.success('Remote detached successfully');
         } catch (error) {
-            message.error('Failed to detach remote');
+            notify.error('Error', 'Failed to detach remote');
         }
     };
 
@@ -62,10 +63,10 @@ const EditHostPage: React.FC = () => {
             onOk: async () => {
                 try {
                     await deleteHost.mutateAsync(Number(id));
-                    message.success('Host deleted successfully');
+                    notify.success('Host deleted successfully');
                     navigate('/hosts');
                 } catch (error) {
-                    message.error('Failed to delete host');
+                    notify.error('Error', 'Failed to delete host');
                 }
             }
         });

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Card, message, Tabs, Table, Input as AntInput, Typography } from 'antd';
+import { Form, Input, Button, Card, Tabs, Table, Input as AntInput, Typography } from 'antd';
 import { useCreateRemote } from '@/hooks/useRemotes';
 import { PlusOutlined, DeleteOutlined, CodeOutlined } from '@ant-design/icons';
 import { formatDate } from '@/lib/date-utils';
 import { TagInput, TagItem } from '@/components/tags/tag-input';
 import { useTags } from '@/hooks/useTags';
 import { Helmet } from 'react-helmet';
+import notify from '../../utils/notifications';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -43,10 +44,10 @@ const NewRemotePage: React.FC = () => {
                 ...values,
                 modules: modules.map(module => ({ id: 0, name: module }))
             });
-            message.success('Remote created successfully');
+            notify.success('Remote created successfully');
             navigate('/remotes');
         } catch (error) {
-            message.error('Failed to create remote');
+            notify.error('Error', 'Failed to create remote');
         }
     };
 

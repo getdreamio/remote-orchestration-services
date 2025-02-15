@@ -74,7 +74,7 @@ public class TagService
         }
     }
 
-    public async Task<bool> UpdateTagAsync(int id, TagRequest request)
+    public async Task<TagResponse> UpdateTagAsync(int id, TagRequest request)
     {
         if (id <= 0 || request == null)
         {
@@ -83,14 +83,14 @@ public class TagService
         try
         {
             var existingTag = await _dbContext.Tags.FindAsync(id);
-            if (existingTag == null) return false;
+            if (existingTag == null) return null;
 
             existingTag.Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             existingTag.Key = request.Key;
             existingTag.Display_Name = request.Display_Name;
             
             await _dbContext.SaveChangesAsync();
-            return true;
+            return TagMapper.ToResponse(existingTag);
         }
         catch (Exception ex)
         {

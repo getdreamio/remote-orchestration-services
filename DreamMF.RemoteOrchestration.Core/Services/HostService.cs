@@ -56,14 +56,14 @@ public class HostService
         return HostMapper.ToResponse(host);
     }
 
-    public async Task<bool> UpdateHostAsync(int id, HostRequest request)
+    public async Task<HostResponse> UpdateHostAsync(int id, HostRequest request)
     {
         if (id <= 0 || request == null)
         {
             throw new HandledException(ExceptionType.Validation, "Invalid input parameters.");
         }
         var existingHost = await _dbContext.Hosts.FindAsync(id);
-        if (existingHost == null) return false;
+        if (existingHost == null) return null;
 
         existingHost.Name = request.Name;
         existingHost.Description = request.Description;
@@ -77,7 +77,7 @@ public class HostService
 
         await _dbContext.SaveChangesAsync();
         _ = _analyticsService.LogHostReadAsync(id, "Update", 1);
-        return true;
+        return HostMapper.ToResponse(existingHost);
     }
 
     public async Task<bool> DeleteHostAsync(int id)

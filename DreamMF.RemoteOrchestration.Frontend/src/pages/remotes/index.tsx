@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Typography, Table, Button, Tag, Tooltip, Modal, message } from 'antd';
+import { Card, Typography, Table, Button, Tag, Tooltip, Modal } from 'antd';
 import { 
     PlusOutlined, 
     EditOutlined, 
@@ -13,6 +13,7 @@ import {
 import { useRemotes, useDeleteRemote } from '@/hooks/useRemotes';
 import { formatDateShort, formatDateFull } from '@/lib/date-utils';
 import { Helmet } from 'react-helmet';
+import notify from '../../utils/notifications';
 
 interface Remote {
     id: number;
@@ -41,9 +42,9 @@ const RemotesPage: React.FC = () => {
             onOk: async () => {
                 try {
                     await deleteRemote.mutateAsync(id);
-                    message.success('Remote deleted successfully');
+                    notify.success('Remote deleted successfully');
                 } catch (error) {
-                    message.error('Failed to delete remote');
+                    notify.error('Error', 'Failed to delete remote');
                 }
             }
         });

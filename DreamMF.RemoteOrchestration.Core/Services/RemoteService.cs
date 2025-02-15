@@ -110,14 +110,14 @@ public class RemoteService
         return await GetRemoteByIdAsync(remote.Remote_ID);
     }
 
-    public async Task<bool> UpdateRemoteAsync(int id, RemoteRequest request)
+    public async Task<RemoteResponse> UpdateRemoteAsync(int id, RemoteRequest request)
     {
         var remote = await _dbContext.Remotes
             .Include(r => r.RemoteModules)
                 .ThenInclude(rm => rm.Module)
             .FirstOrDefaultAsync(r => r.Remote_ID == id);
 
-        if (remote == null) return false;
+        if (remote == null) return null;
 
         // Update basic properties
         remote.Name = request.Name;
@@ -186,7 +186,8 @@ public class RemoteService
 
         await _dbContext.SaveChangesAsync();
         _ = _analyticsService.LogRemoteReadAsync(id, "Update", 1);
-        return true;
+        
+        return RemoteMapper.ToResponse(remote);
     }
 
     public async Task<bool> DeleteRemoteAsync(int id)

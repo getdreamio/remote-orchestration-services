@@ -1,9 +1,10 @@
 import type React from "react";
 import { useNavigate } from "react-router-dom";
-import { Form, Input, Button, Card, Typography, message } from "antd";
+import { Form, Input, Button, Card, Typography } from "antd";
 import { useCreateTag } from "@/hooks/useTags";
 import { Helmet } from "react-helmet";
 import TagFormFields from "./form-fields";
+import notify from '../../utils/notifications';
 
 const { Title } = Typography;
 
@@ -20,10 +21,10 @@ const NewTagPage: React.FC = () => {
 	const onFinish = async (formData: FormData) => {
 		try {
 			await createTag.mutateAsync(formData);
-			message.success("Tag created successfully");
+			notify.success("Tag created successfully");
 			navigate("/tags");
 		} catch (error) {
-			message.error("Failed to create tag");
+			notify.error("Error", "Failed to create tag");
 		}
 	};
 
