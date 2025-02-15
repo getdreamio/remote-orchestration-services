@@ -30,27 +30,21 @@ export type HostRequest = Omit<Host, 'id' | 'createdAt' | 'updatedAt'>;
 
 const fetchHosts = async (): Promise<Host[]> => {
     const response = await fetchWithAuth(getApiUrl('/api/hosts'));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const fetchHost = async (id: number): Promise<Host> => {
     const response = await fetchWithAuth(getApiUrl(`/api/hosts/${id}`));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 // Fetch remotes attached to a host
 const fetchHostRemotes = async (hostId: number): Promise<HostRemote[]> => {
     const response = await fetchWithAuth(getApiUrl(`/api/hosts/${hostId}/remotes`));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 // Attach a remote to a host
@@ -62,9 +56,8 @@ const attachRemoteToHost = async ({ hostId, remoteId }: { hostId: number; remote
         },
         body: JSON.stringify({ remoteId }),
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
+    const data = await response.json();
+    return data;
 };
 
 // Detach a remote from a host
@@ -76,9 +69,41 @@ const detachRemoteFromHost = async ({ hostId, remoteId }: { hostId: number; remo
         },
         body: JSON.stringify({ remoteId }),
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
+    const data = await response.json();
+    return data;
+};
+
+// Create a new host
+const createHost = async (data: HostRequest): Promise<Host> => {
+    const response = await fetchWithAuth(getApiUrl('/api/hosts'), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    const result = await response.json();
+    return result;
+};
+
+// Update an existing host
+const updateHost = async ({ id, data }: { id: number; data: Partial<HostRequest> }): Promise<Host> => {
+    const response = await fetchWithAuth(getApiUrl(`/api/hosts/${id}`), {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    const result = await response.json();
+    return result;
+};
+
+// Delete a host
+const deleteHost = async (id: number): Promise<void> => {
+    await fetchWithAuth(getApiUrl(`/api/hosts/${id}`), {
+        method: 'DELETE',
+    });
 };
 
 export const useHosts = () => {
@@ -100,19 +125,7 @@ export const useCreateHost = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (host: HostRequest) => {
-            const response = await fetchWithAuth(getApiUrl('/api/hosts'), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(host),
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        },
+        mutationFn: createHost,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['hosts'] });
         },
@@ -123,18 +136,7 @@ export const useUpdateHost = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ id, host }: { id: number; host: HostRequest }) => {
-            const response = await fetchWithAuth(getApiUrl(`/api/hosts/${id}`), {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(host),
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-        },
+        mutationFn: updateHost,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['hosts'] });
         },
@@ -145,14 +147,7 @@ export const useDeleteHost = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => {
-            const response = await fetchWithAuth(getApiUrl(`/api/hosts/${id}`), {
-                method: 'DELETE',
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-        },
+        mutationFn: deleteHost,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['hosts'] });
         },

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, message, Select, Typography } from 'antd';
+import { Form, Input, Button, Select, Typography } from 'antd';
 import { type HostRequest, useCreateHost, useUpdateHost } from '@/hooks/useHosts';
 import { CopyOutlined } from '@ant-design/icons';
 import { TagInput, type TagItem } from '@/components/tags/tag-input';
 import { useTags } from '@/hooks/useTags';
+import notify from '../../utils/notifications';
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -49,15 +50,15 @@ const HostForm: React.FC<HostFormProps> = ({ onSuccess, editingHost, renderFoote
 
             if (editingHost) {
                 await updateHost.mutateAsync({ id: editingHost.id, host: hostData });
-                message.success('Host updated successfully');
+                notify.success('Host updated successfully', 'The host has been updated with the new configuration.');
             } else {
                 await createHost.mutateAsync(hostData);
-                message.success('Host created successfully');
+                notify.success('Host created successfully', 'The new host has been added to the system.');
             }
             onSuccess();
             form.resetFields();
         } catch (error) {
-            message.error('Failed to save host');
+            notify.error('Failed to save host', 'There was an error while saving the host. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
@@ -65,7 +66,7 @@ const HostForm: React.FC<HostFormProps> = ({ onSuccess, editingHost, renderFoote
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
-        message.success('Key copied to clipboard');
+        notify.success('Key copied to clipboard');
     };
 
     return (

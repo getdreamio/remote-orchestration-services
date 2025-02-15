@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Input, Select, Alert, InputNumber, Switch, message } from 'antd';
 import { useCreateUser, useUpdateUser, useRoles } from '@/hooks/useUsers';
 import PasswordStrength from './password-strength';
+import { getErrorMessage } from '@/utils/errors'; 
 
 const { Option } = Select;
 
@@ -116,7 +117,8 @@ const UserForm: React.FC<UserFormProps> = ({
             }
             onSuccess?.();
         } catch (error: any) {
-            message.error(error.message || `Failed to ${isEditing ? 'update' : 'create'} user`);
+            const errorMessage = getErrorMessage(error);
+            message.error(errorMessage);
         }
     };
 

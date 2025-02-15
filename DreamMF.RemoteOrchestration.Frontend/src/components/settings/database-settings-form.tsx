@@ -15,6 +15,7 @@ import {
     DB_HOST_KEY,
     DB_PORT_KEY,
 } from '@/constants/settings_constants';
+import notify from '../../utils/notifications';
 
 interface DatabaseSettingsFormProps {
     configurations: Configuration[] | undefined;
@@ -87,9 +88,15 @@ export const DatabaseSettingsForm: React.FC<DatabaseSettingsFormProps> = ({
             link.remove();
             window.URL.revokeObjectURL(url);
             
-            message.success('Database backup downloaded successfully');
+            notify.success(
+                'Database backup downloaded successfully',
+                'Your database backup has been downloaded to your computer.'
+            );
         } catch (error) {
-            message.error('Failed to backup database');
+            notify.error(
+                'Failed to backup database',
+                'There was an error while creating the database backup. Please try again.'
+            );
             console.error('Backup error:', error);
         } finally {
             setIsLoading(false);
@@ -99,7 +106,10 @@ export const DatabaseSettingsForm: React.FC<DatabaseSettingsFormProps> = ({
 
     const handleRestore = async () => {
         if (!selectedFile) {
-            message.error('Please select a file to restore');
+            notify.error(
+                'Please select a file to restore',
+                'Please select a valid database backup file.'
+            );
             return;
         }
 
@@ -113,14 +123,23 @@ export const DatabaseSettingsForm: React.FC<DatabaseSettingsFormProps> = ({
                 body: formData,
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to restore database');
+            if (response.ok) {
+                notify.success(
+                    'Database restored successfully',
+                    'The database has been restored from the backup file.'
+                );
+                window.location.reload();
+            } else {
+                notify.error(
+                    'Failed to restore database',
+                    'There was an error while restoring the database. Please ensure the backup file is valid.'
+                );
             }
-
-            message.success('Database restored successfully');
-            setSelectedFile(null);
         } catch (error) {
-            message.error('Failed to restore database');
+            notify.error(
+                'Failed to restore database',
+                'There was an error while restoring the database. Please try again.'
+            );
             console.error('Restore error:', error);
         } finally {
             setIsLoading(false);

@@ -48,18 +48,14 @@ export interface UpdateUserRequest {
 
 const fetchUsers = async () => {
     const response = await fetchWithAuth(getApiUrl('/api/users'));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const fetchUser = async (id: number) => {
     const response = await fetchWithAuth(getApiUrl(`/api/users/${id}`));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const createUser = async (user: CreateUserRequest) => {
@@ -70,10 +66,8 @@ const createUser = async (user: CreateUserRequest) => {
         },
         body: JSON.stringify(user),
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const updateUser = async ({ id, user }: { id: number; user: UpdateUserRequest }) => {
@@ -84,35 +78,26 @@ const updateUser = async ({ id, user }: { id: number; user: UpdateUserRequest })
         },
         body: JSON.stringify(user),
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const deleteUser = async (id: number) => {
-    const response = await fetchWithAuth(getApiUrl(`/api/users/${id}`), {
+    await fetchWithAuth(getApiUrl(`/api/users/${id}`), {
         method: 'DELETE',
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
 };
 
 const fetchUserRoles = async (userId: number) => {
     const response = await fetchWithAuth(getApiUrl(`/api/users/${userId}/roles`));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const fetchAllRoles = async () => {
     const response = await fetchWithAuth(getApiUrl('/api/users/roles'));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const addUserRole = async ({ userId, roleName }: { userId: number; roleName: string }) => {
@@ -123,18 +108,16 @@ const addUserRole = async ({ userId, roleName }: { userId: number; roleName: str
         },
         body: JSON.stringify({ roleName }),
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
+    const data = await response.json();
+    return data;
 };
 
 const removeUserRole = async ({ userId, roleName }: { userId: number; roleName: string }) => {
     const response = await fetchWithAuth(getApiUrl(`/api/users/${userId}/roles/${roleName}`), {
         method: 'DELETE',
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
+    const data = await response.json();
+    return data;
 };
 
 export const useUsers = () => {

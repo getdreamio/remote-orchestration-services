@@ -4,7 +4,7 @@ import { Form, Input, Button, Card, message, Tabs, Table, Input as AntInput, Typ
 import { useUpdateRemote, useRemote, RemoteModule, useRemoteVersions, useUpdateRemoteUrl, fetchModules, useDeleteRemote } from '@/hooks/useRemotes';
 import { PlusOutlined, DeleteOutlined, CodeOutlined, CopyOutlined, LinkOutlined, CheckCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import { formatDate } from '@/lib/date-utils';
-import { TagInput, TagItem } from '@/components/tags/tag-input';
+import { TagInput } from '@/components/tags/tag-input';
 import { useTags } from '@/hooks/useTags';
 import { Helmet } from 'react-helmet';
 import useDebounce from '@/hooks/useDebounce';

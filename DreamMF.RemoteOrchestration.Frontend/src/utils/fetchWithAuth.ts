@@ -1,3 +1,5 @@
+import { ApiError } from './errors';
+
 const TOKEN_KEY = 'auth_token';
 
 interface FetchOptions extends RequestInit {
@@ -22,18 +24,24 @@ export const fetchWithAuth = async (url: string, options: FetchOptions = {}) => 
 
     const response = await fetch(url, {
         ...rest,
-        //body: rest.body ? JSON.stringify(rest.body) : undefined,
         headers: requestHeaders,
     });
 
     if (response.status === 401) {
-        // Optional: Handle token expiration
-        // window.location.href = '/auth/login';
-        throw new Error('Unauthorized');
+        throw new ApiError('Unauthorized', 401);
+    }
+
+    if (response.status === 403) {
+        throw new ApiError("You don't have permission to perform this action.", 403);
     }
 
     if (!response.ok) {
-        throw new Error('Network response was not ok');
+        const errorData = await response.json().catch(() => null);
+        throw new ApiError(
+            errorData?.message || 'Network response was not ok',
+            response.status,
+            errorData
+        );
     }
 
     return response;

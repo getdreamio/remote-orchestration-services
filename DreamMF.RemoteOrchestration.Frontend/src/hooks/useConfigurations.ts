@@ -19,10 +19,8 @@ export type DatabaseType = 'sqlite' | 'sqlserver' | 'postgres';
 
 const fetchConfigurations = async (): Promise<Configuration[]> => {
     const response = await fetchWithAuth(getApiUrl('/api/configurations'));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const updateConfiguration = async ({ id, data }: { id: number; data: ConfigurationRequest }): Promise<Configuration> => {
@@ -33,10 +31,8 @@ const updateConfiguration = async ({ id, data }: { id: number; data: Configurati
         },
         body: JSON.stringify(data),
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const result = await response.json();
+    return result;
 };
 
 const createConfiguration = async (data: ConfigurationRequest): Promise<Configuration> => {
@@ -47,10 +43,8 @@ const createConfiguration = async (data: ConfigurationRequest): Promise<Configur
         },
         body: JSON.stringify(data),
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const result = await response.json();
+    return result;
 };
 
 const updateConfigurationBatch = async (data: ConfigurationRequest[]): Promise<Configuration[]> => {
@@ -61,10 +55,8 @@ const updateConfigurationBatch = async (data: ConfigurationRequest[]): Promise<C
         },
         body: JSON.stringify(data),
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const result = await response.json();
+    return result;
 };
 
 export function useConfigurations() {

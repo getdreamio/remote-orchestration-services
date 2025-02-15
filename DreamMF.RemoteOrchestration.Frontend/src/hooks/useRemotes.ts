@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { config } from '@/config/env';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 import { getApiUrl } from '../utils/api';
+import { ApiError } from '@/utils/errors';
 
 interface Remote {
     id: number;
@@ -58,78 +59,82 @@ interface RemoteSubRemoteCount {
 // Fetch module counts for all remotes
 const fetchRemoteModuleCounts = async (): Promise<RemoteModuleCount[]> => {
     const response = await fetchWithAuth(`${config.backendUrl}/api/remotes/module-counts`);
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 // Fetch sub-remote counts for all remotes
 const fetchRemoteSubRemoteCounts = async (): Promise<RemoteSubRemoteCount[]> => {
     const response = await fetchWithAuth(`${config.backendUrl}/api/remotes/sub-remote-counts`);
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const fetchRemotes = async () => {
     const response = await fetchWithAuth(getApiUrl('/api/remotes'));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const fetchRemote = async (id: number) => {
-    const remoteResponse = await fetchWithAuth(getApiUrl(`/api/remotes/${id}`));
-    if (!remoteResponse.ok) {
-        throw new Error('Network response was not ok');
-    }
-    const remoteData = await remoteResponse.json();
-    return remoteData;
+    const response = await fetchWithAuth(getApiUrl(`/api/remotes/${id}`));
+    const data = await response.json();
+    return data;
 };
 
 export const fetchModules = async (moduleInput: string) => {
     const url = getApiUrl(`/api/remotes/modules?contains=${moduleInput}`);
-    const moduleResponse = await fetchWithAuth(url);
-    if (!moduleResponse.ok) {
-        throw new Error('Failed to fetch modules');
-    }
-    const moduleData = await moduleResponse.json();
-    return moduleData.map((module: RemoteModule) => ({ value: module.name }));
+    const response = await fetchWithAuth(url);
+    const data = await response.json();
+    return data.map((module: RemoteModule) => ({ value: module.name }));
 };
 
 const createRemote = async (remote: RemoteRequest) => {
     const response = await fetchWithAuth(getApiUrl('/api/remotes'), {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
         body: JSON.stringify(remote),
     });
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const updateRemote = async ({ id, remote }: { id: number; remote: RemoteRequest }) => {
     const response = await fetchWithAuth(getApiUrl(`/api/remotes/${id}`), {
         method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
         body: JSON.stringify(remote),
     });
-    return response.status;
+    const data = await response.json();
+    return data;
 };
 
 const deleteRemote = async (id: number) => {
-    const response = await fetchWithAuth(getApiUrl(`/api/remotes/${id}`), {
+    await fetchWithAuth(getApiUrl(`/api/remotes/${id}`), {
         method: 'DELETE',
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
 };
 
 const updateRemoteUrl = async ({ id, version }: { id: number; version: string }) => {
     const response = await fetchWithAuth(getApiUrl(`/api/remotes/${id}/url`), {
         method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ version }),
     });
-    return response.status;
+    const data = await response.json();
+    return data;
 };
 
 const fetchRemoteVersions = async (remoteId: number) => {
     const response = await fetchWithAuth(getApiUrl(`/api/remotes/${remoteId}/versions`));
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 export const useRemotes = () => {

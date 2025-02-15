@@ -1,0 +1,103 @@
+.ant-notification-notice {
+  padding: 16px 20px 16px 16px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: none;
+  border-left: 4px solid transparent;
+  background-color: var(--notification-bg);
+  color: var(--text-color);
+}
+
+.notification-success {
+  border-left-color: var(--success-color);
+}
+
+.notification-error {
+  border-left-color: var(--error-color);
+}
+
+.notification-warning {
+  border-left-color: var(--warning-color);
+}
+
+.notification-info {
+  border-left-color: var(--info-color);
+}
+
+.ant-notification-notice-icon {
+  font-size: 20px;
+  margin-right: 12px;
+  margin-top: 2px;
+}
+
+.notification-icon-success {
+  color: var(--success-color);
+}
+
+.notification-icon-error {
+  color: var(--error-color);
+}
+
+.notification-icon-warning {
+  color: var(--warning-color);
+}
+
+.notification-icon-info {
+  color: var(--info-color);
+}
+
+.ant-notification-notice-message {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--heading-color);
+  line-height: 24px;
+  padding-right: 24px;
+}
+
+.ant-notification-notice-description {
+  font-size: 14px;
+  color: var(--text-color);
+  line-height: 22px;
+  margin: 0;
+  padding-right: 24px;
+}
+
+.ant-notification-notice-close {
+  top: 16px;
+  right: 16px;
+  color: var(--close-icon-color);
+}
+
+/* Light theme */
+:root {
+  --notification-bg: #ffffff;
+  --text-color: rgba(0, 0, 0, 0.65);
+  --heading-color: rgba(0, 0, 0, 0.85);
+  --close-icon-color: rgba(0, 0, 0, 0.45);
+  
+  --success-color: #52c41a;
+  --error-color: #ff4d4f;
+  --warning-color: #faad14;
+  --info-color: #1890ff;
+}
+
+/* Dark theme */
+.dark {
+  --notification-bg: #1a1b1e;
+  --text-color: #ffffff;
+  --heading-color: #ffffff;
+  --close-icon-color: rgba(255, 255, 255, 0.65);
+  
+  --success-color: #49aa19;
+  --error-color: #dc4446;
+  --warning-color: #d89614;
+  --info-color: #177ddc;
+}
+
+/* Force dark mode text colors */
+.dark .ant-notification-notice-message,
+.dark .ant-notification-notice-close-icon,
+.dark .ant-notification-notice-description {
+  color: #eeeeee !important;
+}

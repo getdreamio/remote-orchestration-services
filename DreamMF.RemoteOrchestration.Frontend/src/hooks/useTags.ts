@@ -31,34 +31,26 @@ export interface TagEntityResponse {
 
 const fetchTags = async () => {
     const response = await fetchWithAuth(getApiUrl('/api/tags'));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const fetchTag = async (id: number) => {
     const response = await fetchWithAuth(getApiUrl(`/api/tags/${id}`));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const fetchTagRemotes = async (id: number) => {
     const response = await fetchWithAuth(getApiUrl(`/api/tags/${id}/remotes`));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const fetchTagHosts = async (id: number) => {
     const response = await fetchWithAuth(getApiUrl(`/api/tags/${id}/hosts`));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const createTag = async (tag: TagRequest) => {
@@ -73,10 +65,8 @@ const createTag = async (tag: TagRequest) => {
         },
         body: JSON.stringify(payload),
     });
-    if (!response.ok) {
-        throw new Error('Failed to create tag');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const updateTag = async ({ id, tag }: { id: number; tag: Partial<Tag> }) => {
@@ -87,18 +77,14 @@ const updateTag = async ({ id, tag }: { id: number; tag: Partial<Tag> }) => {
         },
         body: JSON.stringify(tag),
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
+    const data = await response.json();
+    return data;
 };
 
 const deleteTag = async (id: number) => {
-    const response = await fetchWithAuth(getApiUrl(`/api/tags/${id}`), {
+    await fetchWithAuth(getApiUrl(`/api/tags/${id}`), {
         method: 'DELETE',
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
 };
 
 const removeTagAssociation = async ({ tagId, itemId, type }: { tagId: number; itemId: number; type: 'host' | 'remote' }) => {
@@ -106,28 +92,21 @@ const removeTagAssociation = async ({ tagId, itemId, type }: { tagId: number; it
         ? getApiUrl(`/api/tags/host/${itemId}/remove/${tagId}`)
         : getApiUrl(`/api/tags/remote/${itemId}/remove/${tagId}`);
 
-    const response = await fetchWithAuth(endpoint, {
+    await fetchWithAuth(endpoint, {
         method: 'DELETE',
     });
-    if (!response.ok) {
-        throw new Error(`Failed to remove tag from ${type}`);
-    }
 };
 
 const fetchTagsByHost = async (hostId: number) => {
     const response = await fetchWithAuth(getApiUrl(`/api/tags/host/${hostId}`));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const fetchTagsByRemote = async (remoteId: number) => {
     const response = await fetchWithAuth(getApiUrl(`/api/tags/remote/${remoteId}`));
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 const addTagToEntity = async ({ entityType, entityId, tagId, value }: { entityType: 'host' | 'remote', entityId: number, tagId: number, value: string }) => {
@@ -143,10 +122,8 @@ const addTagToEntity = async ({ entityType, entityId, tagId, value }: { entityTy
             tagId 
         })
     });
-    if (!response.ok) {
-        throw new Error(`Failed to add tag to ${entityType}`);
-    }
-    return response.json() as Promise<TagEntityResponse>;
+    const data = await response.json();
+    return data;
 };
 
 const addTagToHost = async ({ hostId, tagId, value }: { hostId: number; tagId: number; value: string }) => {
@@ -162,19 +139,14 @@ const addTagToHost = async ({ hostId, tagId, value }: { hostId: number; tagId: n
             tagId 
         })
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json() as Promise<TagEntityResponse>;
+    const data = await response.json();
+    return data;
 };
 
 const removeTagFromHost = async ({ hostId, tagId }: { hostId: number; tagId: number }) => {
-    const response = await fetchWithAuth(getApiUrl(`/api/tags/host/${hostId}/remove/${tagId}`), {
+    await fetchWithAuth(getApiUrl(`/api/tags/host/${hostId}/remove/${tagId}`), {
         method: 'DELETE',
     });
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
 };
 
 export const useTags = () => {
