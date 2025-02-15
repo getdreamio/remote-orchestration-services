@@ -86,12 +86,12 @@ const UserForm: React.FC<UserFormProps> = ({
 
     const handleSubmit = async (values: any) => {
         try {
-            if (isEditing) {
-                // Convert role IDs to role names
-                const selectedRoles = values.roles?.map((roleId: number) => 
-                    roles.find(r => r.id === roleId)?.name
-                ).filter(Boolean) || [];
+            // Convert role IDs to role names for both create and update
+            const selectedRoles = values.roles?.map((roleId: number) => 
+                roles.find(r => r.id === roleId)?.name
+            ).filter(Boolean) || [];
 
+            if (isEditing) {
                 const updateData = {
                     id: editingUser.id,
                     user: {
@@ -107,7 +107,11 @@ const UserForm: React.FC<UserFormProps> = ({
                 await updateUser.mutateAsync(updateData);
                 message.success('User updated successfully');
             } else {
-                await createUser.mutateAsync(values);
+                const createData = {
+                    ...values,
+                    roles: selectedRoles
+                };
+                await createUser.mutateAsync(createData);
                 message.success('User created successfully');
             }
             onSuccess?.();
