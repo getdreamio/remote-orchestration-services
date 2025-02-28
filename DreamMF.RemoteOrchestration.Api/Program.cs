@@ -21,6 +21,7 @@ builder.Configuration
 
 builder.Services.AddScoped<IRootConfigurationService, RootConfigurationService>();
 builder.Services.AddScoped<IDbContextFactory, DbContextFactory>();
+builder.Services.AddScoped<IDatabaseConnectionService, DatabaseConnectionService>();
 
 builder.Services.AddTransient<IConfigurationDbContext>(provider => 
 {
@@ -128,19 +129,8 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddHealthChecks()
-    .AddDbContextCheck<RemoteOrchestrationDbContext>("Database")
-    .AddAzureBlobStorage(builder.Configuration["AzureBlobStorage:ConnectionString"], name: "Azure Blob Storage")
-    .AddS3(options =>
-    {
-        options.AccessKey = builder.Configuration["S3Storage:AccessKeyId"];
-        options.SecretKey = builder.Configuration["S3Storage:SecretAccessKey"];
-        options.BucketName = "your-bucket-name"; // Replace with actual bucket name
-        options.S3Config = new Amazon.S3.AmazonS3Config
-        {
-            RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(builder.Configuration["S3Storage:Region"])
-        };
-    }, name: "AWS S3");
+// Add health checks using the extension method from HealthRoutes
+builder.Services.AddHealthChecks(builder.Configuration);
 
 // Configure Analytics
 builder.Services.Configure<AnalyticsConfig>(builder.Configuration.GetSection("Analytics"));
