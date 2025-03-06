@@ -4,6 +4,8 @@ using Microsoft.Data.Sqlite;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Pomelo.EntityFrameworkCore.MySql;
 using Microsoft.EntityFrameworkCore.Sqlite;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using System.Collections.Generic;
 
 namespace DreamMF.RemoteOrchestration.Database;
 
@@ -77,6 +79,9 @@ public class DbContextFactory : IDbContextFactory
         typeof(Microsoft.EntityFrameworkCore.SqlServerDbContextOptionsExtensions)
             .GetMethod("UseSqlServer", new[] { typeof(DbContextOptionsBuilder), typeof(string) })
             ?.Invoke(null, new object[] { optionsBuilder, connectionString });
+            
+        // Register provider-specific migrations
+        RegisterMigrations(optionsBuilder, "sqlserver");
     }
     
     private void ConfigurePostgreSql(DbContextOptionsBuilder optionsBuilder, string connectionString)
@@ -86,6 +91,9 @@ public class DbContextFactory : IDbContextFactory
         npgsqlOptionsExtensionsType?
             .GetMethod("UseNpgsql", new[] { typeof(DbContextOptionsBuilder), typeof(string) })
             ?.Invoke(null, new object[] { optionsBuilder, connectionString });
+            
+        // Register provider-specific migrations
+        RegisterMigrations(optionsBuilder, "postgresql");
     }
     
     private void ConfigureMySql(DbContextOptionsBuilder optionsBuilder, string connectionString)
@@ -101,6 +109,88 @@ public class DbContextFactory : IDbContextFactory
         mySqlOptionsExtensionsType?
             .GetMethod("UseMySql", new[] { typeof(DbContextOptionsBuilder), typeof(string), serverVersionType })
             ?.Invoke(null, new object[] { optionsBuilder, connectionString, serverVersion });
+            
+        // Register provider-specific migrations
+        RegisterMigrations(optionsBuilder, "mysql");
+    }
+    
+    /// <summary>
+    /// Registers provider-specific migrations for the database context
+    /// </summary>
+    private void RegisterMigrations(DbContextOptionsBuilder optionsBuilder, string providerName)
+    {
+        try 
+        {
+            // This is a simpler approach that doesn't require complex reflection
+            // Configure different migration assemblies based on provider
+            if (optionsBuilder is DbContextOptionsBuilder<ConfigurationDbContext> configOptionsBuilder)
+            {
+                // For ConfigurationDbContext
+                string migrationsAssembly = $"DreamMF.RemoteOrchestration.Database";
+                
+                // Call the appropriate method based on the provider
+                if (providerName == "sqlserver")
+                {
+                    configOptionsBuilder.UseSqlServer(
+                        configOptionsBuilder.Options.FindExtension<Microsoft.EntityFrameworkCore.SqlServer.Infrastructure.Internal.SqlServerOptionsExtension>()?.ConnectionString ?? "",
+                        x => x.MigrationsAssembly(migrationsAssembly));
+                }
+                else if (providerName == "postgresql")
+                {
+                    configOptionsBuilder.UseNpgsql(
+                        configOptionsBuilder.Options.FindExtension<Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure.Internal.NpgsqlOptionsExtension>()?.ConnectionString ?? "",
+                        x => x.MigrationsAssembly(migrationsAssembly));
+                }
+                else if (providerName == "mysql")
+                {
+                    var mySqlOptions = configOptionsBuilder.Options.FindExtension<Pomelo.EntityFrameworkCore.MySql.Infrastructure.Internal.MySqlOptionsExtension>();
+                    if (mySqlOptions != null)
+                    {
+                        var serverVersion = mySqlOptions.ServerVersion;
+                        configOptionsBuilder.UseMySql(
+                            mySqlOptions.ConnectionString ?? "",
+                            serverVersion,
+                            x => x.MigrationsAssembly(migrationsAssembly));
+                    }
+                }
+            }
+            else if (optionsBuilder is DbContextOptionsBuilder<RemoteOrchestrationDbContext> mainOptionsBuilder)
+            {
+                // For RemoteOrchestrationDbContext
+                string migrationsAssembly = $"DreamMF.RemoteOrchestration.Database";
+                
+                // Call the appropriate method based on the provider
+                if (providerName == "sqlserver")
+                {
+                    mainOptionsBuilder.UseSqlServer(
+                        mainOptionsBuilder.Options.FindExtension<Microsoft.EntityFrameworkCore.SqlServer.Infrastructure.Internal.SqlServerOptionsExtension>()?.ConnectionString ?? "",
+                        x => x.MigrationsAssembly(migrationsAssembly));
+                }
+                else if (providerName == "postgresql")
+                {
+                    mainOptionsBuilder.UseNpgsql(
+                        mainOptionsBuilder.Options.FindExtension<Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure.Internal.NpgsqlOptionsExtension>()?.ConnectionString ?? "",
+                        x => x.MigrationsAssembly(migrationsAssembly));
+                }
+                else if (providerName == "mysql")
+                {
+                    var mySqlOptions = mainOptionsBuilder.Options.FindExtension<Pomelo.EntityFrameworkCore.MySql.Infrastructure.Internal.MySqlOptionsExtension>();
+                    if (mySqlOptions != null)
+                    {
+                        var serverVersion = mySqlOptions.ServerVersion;
+                        mainOptionsBuilder.UseMySql(
+                            mySqlOptions.ConnectionString ?? "",
+                            serverVersion,
+                            x => x.MigrationsAssembly(migrationsAssembly));
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error configuring migrations: {ex.Message}");
+            // Continue without configuring migrations
+        }
     }
 
     private string GetDatabaseType(IConfigurationDbContext configContext)

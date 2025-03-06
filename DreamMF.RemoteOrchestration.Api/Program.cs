@@ -9,6 +9,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.StaticFiles;
 using DreamMF.RemoteOrchestration.Api.Filters;
+using DreamMF.RemoteOrchestration.Core.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -152,6 +153,8 @@ builder.Services.AddScoped<IBackupService, BackupService>();
 
 builder.Services.AddAntiforgery();
 
+builder.Services.AddScoped<IDatabaseMigrationService, DatabaseMigrationService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -208,5 +211,8 @@ app.UseDirectoryBrowser(new DirectoryBrowserOptions
     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "remotes")),
     RequestPath = "/remotes"
 });
+
+// Apply database migrations
+await app.MigrateDatabaseAsync();
 
 app.Run();
