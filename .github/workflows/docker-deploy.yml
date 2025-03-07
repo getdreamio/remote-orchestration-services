@@ -34,17 +34,17 @@ jobs:
           platforms: ${{ matrix.platform }}
           push: true
           tags: |
-            dreammf/ros-frontend:${{ env.VERSION }}-linux-amd64
-            dreammf/ros-frontend:latest-linux-amd64
-            dreammf/ros-backend:${{ env.VERSION }}-linux-amd64
-            dreammf/ros-backend:latest-linux-amd64
+            dreammf/ros-frontend:${{ env.VERSION }}-${{ matrix.platform }}
+            dreammf/ros-frontend:latest-${{ matrix.platform }}
+            dreammf/ros-backend:${{ env.VERSION }}-${{ matrix.platform }}
+            dreammf/ros-backend:latest-${{ matrix.platform }}
 
       - name: Build and push latest amd64 images
         if: matrix.platform == 'linux/amd64'
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux-amd64
+          platforms: linux/amd64
           push: true
           tags: |
             dreammf/ros-frontend:latest
