@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   frontend:
-    image: dreammf/ros-frontend:1.2.0
+    image: dreammf/ros-frontend:${VERSION}
     build:
       context: .
       dockerfile: Dockerfile.frontend
@@ -19,7 +19,7 @@ services:
       - "3000:3000"
 
   backend:
-    image: dreammf/ros-backend:1.2.0
+    image: dreammf/ros-backend:${VERSION}
     build:
       context: .
       dockerfile: Dockerfile.backend
