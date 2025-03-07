@@ -2,10 +2,10 @@ version: '3.8'
 
 services:
   frontend:
-    image: dreammf/ros-frontend:${VERSION}
+    image: dreammf/ros-frontend:1.2.0
     build:
       context: .
-      target: frontend-server
+      dockerfile: Dockerfile.frontend
       # Note: Docker Compose doesn't natively handle multi-arch the same way
       # docker buildx does. This "platforms" key won't have effect in default Compose.
       platforms:
@@ -19,10 +19,10 @@ services:
       - "3000:3000"
 
   backend:
-    image: dreammf/ros-backend:${VERSION}
+    image: dreammf/ros-backend:1.2.0
     build:
       context: .
-      target: final
+      dockerfile: Dockerfile.backend
       platforms:
         - linux/amd64
         - linux/arm64
