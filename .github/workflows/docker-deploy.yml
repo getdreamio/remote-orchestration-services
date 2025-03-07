@@ -44,10 +44,11 @@ jobs:
             exit 0
           fi
 
-      - name: Build and push Docker images
+      - name: Build and push backend image
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile.backend
           platforms: linux/${{ matrix.arch }}
           push: true
           tags: |
@@ -58,30 +59,46 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile.frontend
           platforms: linux/${{ matrix.arch }}
           push: true
           tags: |
             dreammf/ros-frontend:${{ env.VERSION }}-${{ matrix.arch }}
             dreammf/ros-frontend:latest-${{ matrix.arch }}
+          build-args: |
+            BACKEND_URL=https://localhost:4001
+            AUTH_AUTHORITY=https://localhost:4001
+            AUTH_CLIENT_ID=DreamMF-Web-01202025
 
       - name: Build and push latest amd64 images
         if: matrix.arch == 'amd64'
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          platforms: linux/amd64
-          push: true
-          tags: |
-            dreammf/ros-frontend:latest
-            dreammf/ros-backend:latest
+        run: |
+          # Build and push latest backend image
+          docker buildx build \
+            --platform linux/amd64 \
+            --file ./Dockerfile.backend \
+            --push \
+            --tag dreammf/ros-backend:latest \
+            .
+            
+          # Build and push latest frontend image
+          docker buildx build \
+            --platform linux/amd64 \
+            --file ./Dockerfile.frontend \
+            --build-arg BACKEND_URL=https://localhost:4001 \
+            --build-arg AUTH_AUTHORITY=https://localhost:4001 \
+            --build-arg AUTH_CLIENT_ID=DreamMF-Web-01202025 \
+            --push \
+            --tag dreammf/ros-frontend:latest \
+            .
 
-      - name: Add Docker’s official GPG key and repository
+      - name: Add Docker's official GPG key and repository
         run: |
           # Install dependencies to add new repositories
           sudo apt-get update
           sudo apt-get install -y ca-certificates curl gnupg
 
-          # Add Docker’s official GPG key
+          # Add Docker's official GPG key
           sudo install -m 0755 -d /etc/apt/keyrings
           curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
           sudo chmod a+r /etc/apt/keyrings/docker.gpg
