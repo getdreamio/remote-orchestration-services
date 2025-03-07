@@ -1,7 +1,7 @@
 name: Docker Compose Build and Deploy
 
 env:
-  VERSION: 1.2.1
+  VERSION: 1.2.2
 
 on:
   push:
@@ -11,9 +11,6 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        arch: [amd64, arm64]
 
     steps:
       - name: Checkout code
@@ -28,69 +25,47 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Check if Docker images for this version/arch already exist
+      - name: Check if Docker images for this version already exist
         run: |
           # Check if the frontend image exists
-          if docker manifest inspect dreammf/ros-frontend:${{ env.VERSION }}-${{ matrix.arch }} > /dev/null 2>&1; then
-            echo "Frontend image dreammf/ros-frontend:${{ env.VERSION }}-${{ matrix.arch }} already exists on Docker Hub."
-            echo "Skipping build and push for this version/architecture."
-            exit 0
+          if docker manifest inspect dreammf/ros-frontend:${{ env.VERSION }} > /dev/null 2>&1; then
+            echo "Frontend image dreammf/ros-frontend:${{ env.VERSION }} already exists on Docker Hub."
+            echo "SKIP_FRONTEND=true" >> $GITHUB_ENV
           fi
 
           # Check if the backend image exists
-          if docker manifest inspect dreammf/ros-backend:${{ env.VERSION }}-${{ matrix.arch }} > /dev/null 2>&1; then
-            echo "Backend image dreammf/ros-backend:${{ env.VERSION }}-${{ matrix.arch }} already exists on Docker Hub."
-            echo "Skipping build and push for this version/architecture."
-            exit 0
+          if docker manifest inspect dreammf/ros-backend:${{ env.VERSION }} > /dev/null 2>&1; then
+            echo "Backend image dreammf/ros-backend:${{ env.VERSION }} already exists on Docker Hub."
+            echo "SKIP_BACKEND=true" >> $GITHUB_ENV
           fi
 
       - name: Build and push backend image
+        if: env.SKIP_BACKEND != 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile.backend
-          platforms: linux/${{ matrix.arch }}
+          platforms: linux/amd64
           push: true
           tags: |
-            dreammf/ros-backend:${{ env.VERSION }}-${{ matrix.arch }}
-            dreammf/ros-backend:latest-${{ matrix.arch }}
+            dreammf/ros-backend:${{ env.VERSION }}
+            dreammf/ros-backend:latest
 
       - name: Build and push frontend image
+        if: env.SKIP_FRONTEND != 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile.frontend
-          platforms: linux/${{ matrix.arch }}
+          platforms: linux/amd64
           push: true
           tags: |
-            dreammf/ros-frontend:${{ env.VERSION }}-${{ matrix.arch }}
-            dreammf/ros-frontend:latest-${{ matrix.arch }}
+            dreammf/ros-frontend:${{ env.VERSION }}
+            dreammf/ros-frontend:latest
           build-args: |
             BACKEND_URL=https://localhost:4001
             AUTH_AUTHORITY=https://localhost:4001
             AUTH_CLIENT_ID=DreamMF-Web-01202025
-
-      - name: Build and push latest amd64 images
-        if: matrix.arch == 'amd64'
-        run: |
-          # Build and push latest backend image
-          docker buildx build \
-            --platform linux/amd64 \
-            --file ./Dockerfile.backend \
-            --push \
-            --tag dreammf/ros-backend:latest \
-            .
-            
-          # Build and push latest frontend image
-          docker buildx build \
-            --platform linux/amd64 \
-            --file ./Dockerfile.frontend \
-            --build-arg BACKEND_URL=https://localhost:4001 \
-            --build-arg AUTH_AUTHORITY=https://localhost:4001 \
-            --build-arg AUTH_CLIENT_ID=DreamMF-Web-01202025 \
-            --push \
-            --tag dreammf/ros-frontend:latest \
-            .
 
       - name: Add Docker's official GPG key and repository
         run: |
