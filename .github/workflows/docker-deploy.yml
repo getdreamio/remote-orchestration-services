@@ -93,3 +93,5 @@ jobs:
 
       - name: Deploy with Docker Compose
         run: docker compose -f docker-compose.yml up -d
+        env:
+          VERSION: ${{ env.VERSION }}
