@@ -51,10 +51,18 @@ jobs:
           platforms: linux/${{ matrix.arch }}
           push: true
           tags: |
-            dreammf/ros-frontend:${{ env.VERSION }}-${{ matrix.arch }}
-            dreammf/ros-frontend:latest-${{ matrix.arch }}
             dreammf/ros-backend:${{ env.VERSION }}-${{ matrix.arch }}
             dreammf/ros-backend:latest-${{ matrix.arch }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/${{ matrix.arch }}
+          push: true
+          tags: |
+            dreammf/ros-frontend:${{ env.VERSION }}-${{ matrix.arch }}
+            dreammf/ros-frontend:latest-${{ matrix.arch }}
 
       - name: Build and push latest amd64 images
         if: matrix.arch == 'amd64'
