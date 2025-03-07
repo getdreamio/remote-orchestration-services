@@ -13,7 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        platform: [linux/amd64, linux/arm64]
+        arch: [amd64, arm64]    # <--- Just use arch here, no slash
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,16 +32,17 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: ${{ matrix.platform }}
+          # Reintroduce 'linux/' here, but keep your matrix value slash-free
+          platforms: linux/${{ matrix.arch }}
           push: true
           tags: |
-            dreammf/ros-frontend:${{ env.VERSION }}-${{ matrix.platform }}
-            dreammf/ros-frontend:latest-${{ matrix.platform }}
-            dreammf/ros-backend:${{ env.VERSION }}-${{ matrix.platform }}
-            dreammf/ros-backend:latest-${{ matrix.platform }}
+            dreammf/ros-frontend:${{ env.VERSION }}-${{ matrix.arch }}
+            dreammf/ros-frontend:latest-${{ matrix.arch }}
+            dreammf/ros-backend:${{ env.VERSION }}-${{ matrix.arch }}
+            dreammf/ros-backend:latest-${{ matrix.arch }}
 
       - name: Build and push latest amd64 images
-        if: matrix.platform == 'linux/amd64'
+        if: matrix.arch == 'amd64'
         uses: docker/build-push-action@v5
         with:
           context: .
