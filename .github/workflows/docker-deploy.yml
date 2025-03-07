@@ -28,6 +28,22 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Check if Docker images for this version/arch already exist
+        run: |
+          # Check if the frontend image exists
+          if docker manifest inspect dreammf/ros-frontend:${{ env.VERSION }}-${{ matrix.arch }} > /dev/null 2>&1; then
+            echo "Frontend image dreammf/ros-frontend:${{ env.VERSION }}-${{ matrix.arch }} already exists on Docker Hub."
+            echo "Skipping build and push for this version/architecture."
+            exit 0
+          fi
+
+          # Check if the backend image exists
+          if docker manifest inspect dreammf/ros-backend:${{ env.VERSION }}-${{ matrix.arch }} > /dev/null 2>&1; then
+            echo "Backend image dreammf/ros-backend:${{ env.VERSION }}-${{ matrix.arch }} already exists on Docker Hub."
+            echo "Skipping build and push for this version/architecture."
+            exit 0
+          fi
+
       - name: Build and push Docker images
         uses: docker/build-push-action@v5
         with:
@@ -51,9 +67,28 @@ jobs:
             dreammf/ros-frontend:latest
             dreammf/ros-backend:latest
 
-      - name: Ensure Docker Compose plugin is installed
+      - name: Add Docker’s official GPG key and repository
         run: |
+          # Install dependencies to add new repositories
           sudo apt-get update
+          sudo apt-get install -y ca-certificates curl gnupg
+
+          # Add Docker’s official GPG key
+          sudo install -m 0755 -d /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+          # Add Docker apt repository
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo $VERSION_CODENAME) stable" | \
+            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+          # Update package lists
+          sudo apt-get update
+
+      - name: Install Docker Compose plugin
+        run: |
           sudo apt-get install -y docker-compose-plugin
 
       - name: Deploy with Docker Compose
