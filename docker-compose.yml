@@ -1,11 +1,13 @@
 version: '3.8'
+
 services:
-  
   frontend:
     image: dreammf/ros-frontend:1.2.0
     build:
       context: .
       target: frontend-server
+      # Note: Docker Compose doesn't natively handle multi-arch the same way
+      # docker buildx does. This "platforms" key won't have effect in default Compose.
       platforms:
         - linux/amd64
         - linux/arm64
@@ -31,8 +33,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     
     volumes:
+      # This is a bind mount for HTTPS certs on the host
       - ~/.aspnet/https:/https:ro
-      - dream-ros-db-data:/app/remote_orchestration.db
+      # Named volume is now mounted on /app/data (a directory)
+      - dream-ros-db-data:/app/data
 
 volumes:
   dream-ros-db-data:
