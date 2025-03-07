@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [amd64, arm64]    # <--- Just use arch here, no slash
+        arch: [amd64, arm64]
 
     steps:
       - name: Checkout code
@@ -32,7 +32,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          # Reintroduce 'linux/' here, but keep your matrix value slash-free
           platforms: linux/${{ matrix.arch }}
           push: true
           tags: |
@@ -52,5 +51,10 @@ jobs:
             dreammf/ros-frontend:latest
             dreammf/ros-backend:latest
 
+      - name: Ensure Docker Compose plugin is installed
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-ce-cli-plugin-compose
+
       - name: Deploy with Docker Compose
-        run: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+        run: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
