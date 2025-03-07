@@ -100,6 +100,6 @@ jobs:
           sudo apt-get install -y docker-compose-plugin
 
       - name: Deploy with Docker Compose
-        run: docker compose -f docker-compose.yml up -d backend
+        run: docker compose -f docker-compose.yml up -d backend frontend
         env:
           VERSION: ${{ env.VERSION }}
