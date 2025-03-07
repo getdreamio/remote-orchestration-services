@@ -33,7 +33,7 @@ export async function loadDreamConfig(): Promise<DreamConfig> {
     window.DreamMF = window.DreamMF || {};
     
     try {
-        const response = await fetch('./env-config.json');
+        const response = await fetch('/static/config/env-config.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

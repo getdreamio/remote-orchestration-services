@@ -1,7 +1,7 @@
 name: Docker Compose Build and Deploy
 
 env:
-  VERSION: 1.2.2
+  VERSION: 1.2.3
 
 on:
   push:

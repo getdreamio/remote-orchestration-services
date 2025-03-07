@@ -21,7 +21,7 @@ export default defineConfig({
         },
         cleanDistPath: true,
         copy: [
-            { from: './public/env-config.json', to: 'env-config.json' }
+            { from: './public/env-config.json', to: 'static/config/env-config.json' }
         ]
     },
     server: {
