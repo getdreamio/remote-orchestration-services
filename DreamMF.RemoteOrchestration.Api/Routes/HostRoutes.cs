@@ -81,7 +81,7 @@ public static class HostRoutes
         group.MapPost("/{id}/attach", AttachRemoteToHost)
             .RequireAuthorization(new[] { "Administrator", "CanCreateEditHosts" })
             .WithTags(GroupName)
-            .Produces(StatusCodes.Status204NoContent)
+            .Produces<HostRemoteResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(500)
             .WithMetadata(new EndpointNameMetadata("Attach remote to host"))
@@ -91,7 +91,7 @@ public static class HostRoutes
         group.MapPost("/{id}/detach", DetachRemoteFromHost)
             .RequireAuthorization(new[] { "Administrator", "CanCreateEditHosts" })
             .WithTags(GroupName)
-            .Produces(StatusCodes.Status200OK)
+            .Produces<HostRemoteResponse>(StatusCodes.Status200OK)
             .Produces<HandledResponseModel>(400)
             .Produces<HandledResponseModel>(500)
             .WithMetadata(new EndpointNameMetadata("Detaches a remote from a host"))
@@ -149,14 +149,14 @@ public static class HostRoutes
 
     private static async Task<IResult> AttachRemoteToHost(int id, AttachRemoteRequest request, HostService hostService)
     {
-        var success = await hostService.AttachRemoteToHostAsync(id, request.RemoteId);
-        return success ? Results.NoContent() : Results.BadRequest();
+        var hostRemote = await hostService.AttachRemoteToHostAsync(id, request.RemoteId);
+        return hostRemote != null ? Results.Ok(hostRemote) : Results.BadRequest();
     }
 
     private static async Task<IResult> DetachRemoteFromHost(int id, AttachRemoteRequest request, HostService hostService)
     {
-        var success = await hostService.DetachRemoteFromHostAsync(id, request.RemoteId);
-        return success ? Results.NoContent() : Results.BadRequest();
+        var hostRemote = await hostService.DetachRemoteFromHostAsync(id, request.RemoteId);
+        return hostRemote != null ? Results.Ok(hostRemote) : Results.BadRequest();
     }
 
     private static async Task<IResult> GetHostsByEnvironment(string environment, HostService hostService)

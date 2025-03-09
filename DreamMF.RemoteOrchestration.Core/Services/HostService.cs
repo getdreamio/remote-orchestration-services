@@ -134,7 +134,7 @@ public class HostService
             .ToListAsync();
     }
 
-    public async Task<bool> AttachRemoteToHostAsync(int hostId, int remoteId)
+    public async Task<HostRemoteResponse?> AttachRemoteToHostAsync(int hostId, int remoteId)
     {
         if (hostId <= 0 || remoteId <= 0)
         {
@@ -143,7 +143,7 @@ public class HostService
         if (!await _dbContext.Hosts.AnyAsync(h => h.Host_ID == hostId) ||
             !await _dbContext.Remotes.AnyAsync(r => r.Remote_ID == remoteId))
         {
-            return false;
+            return null;
         }
 
         var hostRemote = new Host_Remote { 
@@ -154,10 +154,10 @@ public class HostService
         };
         _dbContext.Host_Remotes.Add(hostRemote);
         await _dbContext.SaveChangesAsync();
-        return true;
+        return hostRemote.ToResponse();
     }
 
-    public async Task<bool> DetachRemoteFromHostAsync(int hostId, int remoteId)
+    public async Task<HostRemoteResponse?> DetachRemoteFromHostAsync(int hostId, int remoteId)
     {
         if (hostId <= 0 || remoteId <= 0)
         {
@@ -166,15 +166,18 @@ public class HostService
         if (!await _dbContext.Hosts.AnyAsync(h => h.Host_ID == hostId) ||
             !await _dbContext.Remotes.AnyAsync(r => r.Remote_ID == remoteId))
         {
-            return false;
+            return null;
         }
 
         var hostRemote = await _dbContext.Host_Remotes
             .FirstOrDefaultAsync(hr => hr.Host_ID == hostId && hr.Remote_ID == remoteId);
-        if (hostRemote == null) return false;
-
+        if (hostRemote == null) return null;
+        
+        // Create a response before removing the entity
+        var response = hostRemote.ToResponse();
+        
         _dbContext.Host_Remotes.Remove(hostRemote);
         await _dbContext.SaveChangesAsync();
-        return true;
+        return response;
     }
 }
