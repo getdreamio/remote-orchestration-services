@@ -1,35 +1,50 @@
-import { useState, useEffect } from 'react';
-import { Input, Card, List, Tag, Empty, Spin, Typography, Badge, Row, Col, Space, Divider } from 'antd';
-import { SearchOutlined, TagOutlined, LinkOutlined, EnvironmentOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import { useSearch } from '@/hooks/useSearch';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Input, Card, List, Tag, Empty, Spin, Typography, Badge, Row, Col, Divider, Button } from 'antd';
+import { TagOutlined, LinkOutlined, EnvironmentOutlined, ClockCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { useSearch, Tag as TagType } from '@/hooks/useSearch';
+import { Link, useSearchParams } from 'react-router-dom';
 import debounce from 'lodash/debounce';
 import { Helmet } from 'react-helmet';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const Search = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchText, setSearchText] = useState(searchParams.get('q') || '');
     const [debouncedSearchText, setDebouncedSearchText] = useState(searchParams.get('q') || '');
-    const { data: results, isLoading } = useSearch(debouncedSearchText);
+    const searchInputRef = useRef<any>(null);
+    // Removed tag values state as we're handling search differently now
+    const { data: results, isLoading } = useSearch(debouncedSearchText, []);
 
-    // Debounce search input to reduce API calls and update URL
-    useEffect(() => {
-        const handler = debounce(() => {
-            setDebouncedSearchText(searchText);
-            if (searchText) {
-                setSearchParams({ q: searchText });
+    // Create a memoized debounced handler to prevent recreation on each render
+    const debouncedHandler = useMemo(() => {
+        return debounce((text: string) => {
+            setDebouncedSearchText(text);
+            
+            const params: Record<string, string> = {};
+            if (text) {
+                params.q = text;
+            }
+            
+            if (Object.keys(params).length > 0) {
+                setSearchParams(params);
             } else {
                 setSearchParams({});
             }
         }, 300);
+    }, [setSearchParams]);
 
-        handler();
-        return () => handler.cancel();
-    }, [searchText, setSearchParams]);
+    // Apply the debounced handler when search inputs change
+    useEffect(() => {
+        debouncedHandler(searchText);
+        return () => debouncedHandler.cancel();
+    }, [searchText, debouncedHandler]);
+    
+    // No longer initializing tag values from URL params
 
-    const renderTags = (tags: any[]) => {
+    // Using the Tag type from useSearch.ts
+    
+    const renderTags = useCallback((tags: TagType[]) => {
         if (!tags?.length) return null;
         
         // Group tags by key for better organization
@@ -64,7 +79,16 @@ const Search = () => {
                         {values.length > 0 && (
                             <>
                                 <Divider type="vertical" style={{ margin: '0 4px', borderColor: 'rgba(114, 46, 209, 0.4)' }} />
-                                <span style={{ color: '#722ED1', opacity: 0.8 }}>
+                                <span 
+                                    style={{ color: '#722ED1', opacity: 0.8, cursor: 'pointer' }}
+                                    onClick={() => {
+                                        // Add key:value to search text
+                                        const valueToAdd = values[0];
+                                        if (valueToAdd) {
+                                            setSearchText(`${key}:${valueToAdd}`);
+                                        }
+                                    }}
+                                >
                                     {values.join(', ')}
                                 </span>
                             </>
@@ -73,19 +97,51 @@ const Search = () => {
                 ))}
             </div>
         );
-    };
+    }, [setSearchText]);
+    
+    // No longer extracting tag values for dropdown
 
-    const renderResultsCount = () => {
-        if (!results || (!results.hosts.length && !results.remotes.length)) return null;
+    const renderResultsCount = useCallback(() => {
+        if (!results || (!results.hosts.length && !results.remotes.length)) {
+            if (searchText.trim()) {
+                return (
+                    <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <Text type="secondary" className="block dark:text-gray-400">
+                            No results found {searchText.trim() ? `for "${searchText}"` : ''}
+                        </Text>
+                    </div>
+                );
+            }
+            return null;
+        }
+        
         const total = (results.hosts?.length || 0) + (results.remotes?.length || 0);
         return (
-            <Text type="secondary" className="mb-4 block dark:text-gray-400">
-                Found {total} result{total !== 1 ? 's' : ''}
-                {results.hosts.length > 0 && ` • ${results.hosts.length} host${results.hosts.length !== 1 ? 's' : ''}`}
-                {results.remotes.length > 0 && ` • ${results.remotes.length} remote${results.remotes.length !== 1 ? 's' : ''}`}
-            </Text>
+            <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <Text strong className="block dark:text-white">
+                    Found {total} result{total !== 1 ? 's' : ''}
+                </Text>
+                <div className="mt-1 flex gap-2">
+                    {results.hosts.length > 0 && (
+                        <Badge count={results.hosts.length} showZero style={{ backgroundColor: '#722ED1' }} />
+                    )}
+                    {results.hosts.length > 0 && (
+                        <Text type="secondary" className="dark:text-gray-400">
+                            {results.hosts.length} host{results.hosts.length !== 1 ? 's' : ''}
+                        </Text>
+                    )}
+                    {results.remotes.length > 0 && (
+                        <Badge count={results.remotes.length} showZero style={{ backgroundColor: '#1890ff' }} />
+                    )}
+                    {results.remotes.length > 0 && (
+                        <Text type="secondary" className="dark:text-gray-400">
+                            {results.remotes.length} remote{results.remotes.length !== 1 ? 's' : ''}
+                        </Text>
+                    )}
+                </div>
+            </div>
         );
-    };
+    }, [results, searchText]);
 
     return (
         <>
@@ -98,16 +154,106 @@ const Search = () => {
             </div>
             <>
                 <div className="mb-8">
-                    <Input.Search
-                        size="large"
-                        placeholder="Search hosts and remotes..."
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
-                        className="search-input max-w-[600px] dark:bg-gray-800 dark:border-gray-700"
-                        enterButton
-                    />
+                    <Card className="search-card shadow-md border-0 dark:bg-gray-800 dark:border-gray-700">
+                        <div className="flex flex-col gap-4">
+                            <div className="flex flex-col md:flex-row gap-4 items-center">
+                                <div className="w-full md:w-2/3">
+                                    <Input.Search
+                                        ref={searchInputRef}
+                                        size="large"
+                                        placeholder="Search hosts and remotes..."
+                                        value={searchText}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
+                                        className="search-input w-full dark:bg-gray-800 dark:border-gray-700"
+                                        enterButton
+                                        allowClear
+                                    />
+                                    <div className="mt-2 flex flex-wrap gap-2">
+                                        <Button 
+                                            type="link" 
+                                            size="small"
+                                            onClick={() => {
+                                                // Check if text already contains a filter
+                                                const text = searchText.includes(':') ? '' : searchText;
+                                                setSearchText(`description:${text}`);
+                                                // Focus on the search input after setting the text
+                                                setTimeout(() => {
+                                                    searchInputRef.current?.focus();
+                                                }, 0);
+                                            }}
+                                            className="text-xs px-2 py-0"
+                                        >
+                                            <SearchOutlined className="mr-1" />Find by description
+                                        </Button>
+                                        <Button 
+                                            type="link" 
+                                            size="small"
+                                            onClick={() => {
+                                                // Check if text already contains a filter
+                                                const text = searchText.includes(':') ? '' : searchText;
+                                                setSearchText(`name:${text}`);
+                                                // Focus on the search input after setting the text
+                                                setTimeout(() => {
+                                                    searchInputRef.current?.focus();
+                                                }, 0);
+                                            }}
+                                            className="text-xs px-2 py-0"
+                                        >
+                                            <SearchOutlined className="mr-1" />Find by name
+                                        </Button>
+                                        <Button 
+                                            type="link" 
+                                            size="small"
+                                            onClick={() => {
+                                                // Check if text already contains a filter
+                                                const text = searchText.includes(':') ? '' : searchText;
+                                                setSearchText(`tag:${text}`);
+                                                // Focus on the search input after setting the text
+                                                setTimeout(() => {
+                                                    searchInputRef.current?.focus();
+                                                }, 0);
+                                            }}
+                                            className="text-xs px-2 py-0"
+                                        >
+                                            <TagOutlined className="mr-1" />Find by tag
+                                        </Button>
+                                        <Button 
+                                            type="link" 
+                                            size="small"
+                                            onClick={() => {
+                                                // Check if text already contains a filter
+                                                const text = searchText.includes(':') ? '' : searchText;
+                                                setSearchText(`module:${text}`);
+                                                // Focus on the search input after setting the text
+                                                setTimeout(() => {
+                                                    searchInputRef.current?.focus();
+                                                }, 0);
+                                            }}
+                                            className="text-xs px-2 py-0"
+                                        >
+                                            <SearchOutlined className="mr-1" />Find by module
+                                        </Button>
+                                    </div>
+                                </div>
+                                {/* Removed Project Name and Module buttons */}
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <Text type="secondary" className="text-xs dark:text-gray-500">
+                                        Examples: "name:dashboard", "description:dream", "Project Name:dream"
+                                    </Text>
+                                </div>
+                                {searchText.trim() && (
+                                    <Badge count={results ? (results.hosts.length + results.remotes.length) : 0} 
+                                           showZero 
+                                           style={{ backgroundColor: results && (results.hosts.length + results.remotes.length) > 0 ? '#722ED1' : '#ccc' }} />
+                                )}
+                            </div>
+                        </div>
+                    </Card>
                     <div className="mt-4">
                         {renderResultsCount()}
+                        {/* Removed tag filters section */}
                     </div>
                 </div>
 
@@ -157,7 +303,7 @@ const Search = () => {
                                         >
                                             <List
                                                 dataSource={results.hosts}
-                                                renderItem={(host) => (
+                                                renderItem={(host: any) => (
                                                     <List.Item className="dark:border-gray-700">
                                                         <List.Item.Meta
                                                             title={
@@ -172,7 +318,7 @@ const Search = () => {
                                                                             </Tag>
                                                                         )}
                                                                     </div>
-                                                                    {renderTags(host.tags)}
+                                                                    {renderTags(host.tags || [])}
                                                                 </div>
                                                             }
                                                             description={
@@ -224,7 +370,7 @@ const Search = () => {
                                         >
                                             <List
                                                 dataSource={results.remotes}
-                                                renderItem={(remote) => (
+                                                renderItem={(remote: any) => (
                                                     <List.Item className="dark:border-gray-700">
                                                         <List.Item.Meta
                                                             title={
@@ -232,7 +378,7 @@ const Search = () => {
                                                                     <Link to={`/remotes/${remote.id}`} className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 font-medium">
                                                                         {remote.name}
                                                                     </Link>
-                                                                    {renderTags(remote.tags)}
+                                                                    {renderTags(remote.tags || [])}
                                                                 </div>
                                                             }
                                                             description={

@@ -2,18 +2,34 @@ import { useQuery } from '@tanstack/react-query';
 import { getApiUrl } from '../utils/api';
 import { Host } from './useHosts';
 import { Remote } from './useRemotes';
-import { message } from 'antd';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
-export interface SearchResponse {
-    hosts: Host[];
-    remotes: Remote[];
+export interface Tag {
+    key: string;
+    value?: string;
 }
 
-const fetchSearchResults = async (searchText: string) => {
-    const response = await fetchWithAuth(getApiUrl(`/api/search?q=${encodeURIComponent(searchText)}`), {
+export interface SearchRequest {
+    searchText: string;
+    tagValues?: string[];
+}
+
+export interface SearchResponse {
+    hosts: (Host & { tags?: Tag[] })[];
+    remotes: (Remote & { tags?: Tag[] })[];
+}
+
+const fetchSearchResults = async (searchText?: string, tagValues?: string[]) => {
+    // Allow searching by tags only, without search text
+    const response = await fetchWithAuth(getApiUrl('/api/search'), {
         method: 'POST',
-        body: JSON.stringify({ searchText })
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+            searchText: searchText || '',
+            tagValues: tagValues?.length ? tagValues : undefined
+        })
     });
     if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -21,10 +37,10 @@ const fetchSearchResults = async (searchText: string) => {
     return response.json();
 };
 
-export const useSearch = (searchText: string) => {
+export const useSearch = (searchText?: string, tagValues?: string[]) => {
     return useQuery({
-        queryKey: ['search', searchText],
-        queryFn: () => fetchSearchResults(searchText),
-        enabled: !!searchText,
+        queryKey: ['search', searchText, tagValues],
+        queryFn: () => fetchSearchResults(searchText, tagValues),
+        enabled: (!!searchText && searchText.trim() !== '') || (tagValues && tagValues.length > 0),
     });
 };

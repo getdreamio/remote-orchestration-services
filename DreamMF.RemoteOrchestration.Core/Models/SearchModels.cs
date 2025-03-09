@@ -9,6 +9,11 @@ public class SearchRequest
     /// The text to search for in hosts and remotes
     /// </summary>
     public string SearchText { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Optional tag values to include in the search
+    /// </summary>
+    public List<string>? TagValues { get; set; }
 }
 
 /// <summary>

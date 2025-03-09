@@ -36,19 +36,19 @@ public static class SearchRoutes
             .Produces<HandledResponseModel>(500)
             .WithMetadata(new EndpointNameMetadata("Search entities"))
             .WithSummary("Search")
-            .WithDescription("Searches across hosts and remotes based on provided search text");
+            .WithDescription("Searches across hosts and remotes based on provided search text and/or tag values");
 
         return group;
     }
 
     private static async Task<IResult> Search(SearchRequest request, SearchService searchService)
     {
-        if (string.IsNullOrWhiteSpace(request.SearchText))
+        if (string.IsNullOrWhiteSpace(request.SearchText) && (request.TagValues == null || !request.TagValues.Any()))
         {
-            throw new HandledException(ExceptionType.Validation, "Search text cannot be empty");
+            throw new HandledException(ExceptionType.Validation, "Either search text or tag values must be provided");
         }
 
-        var results = await searchService.SearchAsync(request.SearchText);
+        var results = await searchService.SearchAsync(request.SearchText, request.TagValues);
         return Results.Ok(results);
     }
 }

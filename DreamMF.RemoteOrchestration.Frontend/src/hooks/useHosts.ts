@@ -3,7 +3,7 @@ import { config } from '@/config/env';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 import { getApiUrl } from '../utils/api';
 
-interface Host {
+export interface Host {
     id: number;
     name: string;
     description: string;

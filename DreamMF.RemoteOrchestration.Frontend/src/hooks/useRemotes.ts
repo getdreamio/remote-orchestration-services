@@ -4,7 +4,7 @@ import { fetchWithAuth } from '@/utils/fetchWithAuth';
 import { getApiUrl } from '../utils/api';
 import { ApiError } from '@/utils/errors';
 
-interface Remote {
+export interface Remote {
     id: number;
     name: string;
     key: string;
