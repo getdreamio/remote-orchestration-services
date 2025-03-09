@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Form, Input, Button, Card, Tabs, Table, Input as AntInput, Typography, Empty, InputRef, AutoComplete, Modal, Upload } from 'antd';
-import { useUpdateRemote, useRemote, RemoteModule, useRemoteVersions, useUpdateRemoteUrl, fetchModules, useDeleteRemote } from '@/hooks/useRemotes';
+import { useUpdateRemote, useRemote, RemoteModule, useRemoteVersions, useUpdateRemoteUrl, fetchModules, useDeleteRemote, useUploadRemoteVersion, useSetCurrentVersion, Version } from '@/hooks/useRemotes';
 import { PlusOutlined, DeleteOutlined, CodeOutlined, CopyOutlined, LinkOutlined, CheckCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import { formatDate } from '@/lib/date-utils';
 import { TagInput } from '@/components/tags/tag-input';
@@ -13,12 +13,7 @@ import notify from '../../utils/notifications';
 const { Title } = Typography;
 const { TabPane } = Tabs;
 
-interface Version {
-    id: string;
-    version: string;
-    createdAt: string;
-    isActive: boolean;
-}
+// Using the Version interface imported from useRemotes.ts
 
 const EditRemotePage: React.FC = () => {
     const [moduleInput, setModuleInput] = useState('');
@@ -29,6 +24,8 @@ const EditRemotePage: React.FC = () => {
     const updateRemote = useUpdateRemote();
     const updateRemoteUrl = useUpdateRemoteUrl();
     const deleteRemote = useDeleteRemote();
+    const uploadRemoteVersion = useUploadRemoteVersion();
+    const setCurrentVersion = useSetCurrentVersion();
     const { data: remote, isLoading, error } = useRemote(Number(id));
     const { data: versions = [], isLoading: versionsLoading } = useRemoteVersions(Number(id));
     const [activeTab, setActiveTab] = useState('general');
@@ -102,7 +99,7 @@ const EditRemotePage: React.FC = () => {
     const columns = [
         {
             title: 'Version',
-            dataIndex: 'value',
+            dataIndex: 'value', // This matches the property in the Version interface
             key: 'version',
         },
         {
@@ -120,8 +117,10 @@ const EditRemotePage: React.FC = () => {
         {
             title: 'Actions',
             key: 'actions',
-            render: (_, record: Version) => {
-                const isCurrentVersion = remote?.url?.includes(`/${record.value}/`);
+            render: (_: any, record: Version) => {
+                // Check if the current version matches the record value
+                const remoteUrl = remote?.url || '';
+                const isCurrentVersion = remoteUrl.includes(`/${record.value}/`);
                 return (
                     <div className="flex items-center gap-2">
                         {isCurrentVersion ? (
@@ -133,13 +132,13 @@ const EditRemotePage: React.FC = () => {
                                 type="primary"
                                 onClick={async () => {
                                     try {
-                                        await updateRemoteUrl.mutateAsync({
+                                        await setCurrentVersion.mutateAsync({
                                             id: Number(id),
                                             version: record.value
                                         });
-                                        notify.success('Remote URL updated successfully');
+                                        notify.success('Version set as current successfully');
                                     } catch (error) {
-                                        notify.error('Error', 'Failed to update remote URL');
+                                        notify.error('Error', 'Failed to set current version');
                                     }
                                 }}
                             >
@@ -407,21 +406,38 @@ const EditRemotePage: React.FC = () => {
                                     layout="vertical"
                                     onFinish={async (values) => {
                                         try {
-                                            const formData = new FormData();
-                                            formData.append('file', values.file.file.originFileObj);
-                                            
-                                            const response = await fetch(`/api/upload/remote/${remote?.name}/${values.version}/${remote?.key}/${remote?.scope}`, {
-                                                method: 'POST',
-                                                body: formData,
-                                            });
-
-                                            if (response.ok) {
-                                                notify.success('Version uploaded successfully');
-                                                setIsUploadModalVisible(false);
-                                                uploadForm.resetFields();
-                                            } else {
-                                                throw new Error('Upload failed');
+                                            // Validate required parameters
+                                            if (!remote?.name || !remote?.key || !remote?.scope || !values.version) {
+                                                notify.error('Error', 'Missing required parameters. Please ensure remote name, key, scope, and version are all provided.');
+                                                console.error('Missing parameters:', { 
+                                                    name: remote?.name, 
+                                                    key: remote?.key, 
+                                                    scope: remote?.scope, 
+                                                    version: values.version 
+                                                });
+                                                return;
                                             }
+
+                                            // Get the file from the Upload component
+                                            const fileList = values.file?.fileList;
+                                            if (!fileList || fileList.length === 0) {
+                                                throw new Error('No file selected');
+                                            }
+                                            
+                                            const file = fileList[0].originFileObj;
+                                            
+                                            // Use the uploadRemoteVersion hook to handle the upload
+                                            await uploadRemoteVersion.mutateAsync({
+                                                name: remote.name,
+                                                version: values.version,
+                                                key: remote.key,
+                                                scope: remote.scope,
+                                                file: file
+                                            });
+                                            
+                                            notify.success('Version uploaded successfully');
+                                            setIsUploadModalVisible(false);
+                                            uploadForm.resetFields();
                                         } catch (error) {
                                             notify.error('Error', 'Failed to upload version');
                                         }
@@ -445,6 +461,7 @@ const EditRemotePage: React.FC = () => {
                                             accept=".zip"
                                             maxCount={1}
                                             beforeUpload={() => false}
+                                            listType="picture"
                                         >
                                             <p className="ant-upload-drag-icon">
                                                 <UploadOutlined />

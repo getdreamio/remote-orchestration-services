@@ -17,7 +17,7 @@ interface Remote {
     updated_Date: string;
     modules?: RemoteModule[];
     latest_version?: string;
-    latest_version_url?: string;
+    url?: string;
 }
 
 export interface Version {
@@ -131,10 +131,90 @@ const updateRemoteUrl = async ({ id, version }: { id: number; version: string })
     return data;
 };
 
+const setCurrentVersion = async ({ id, version }: { id: number; version: string }) => {
+    try {
+        console.log('Setting current version:', { id, version });
+        
+        const response = await fetchWithAuth(getApiUrl(`/api/remotes/${id}/set-current-version`), {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ version }),
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Setting current version failed:', response.status, errorText);
+            throw new ApiError(`Setting current version failed: ${response.status} ${errorText}`, response.status);
+        }
+        
+        const data = await response.json();
+        console.log('Current version set successfully');
+        return data;
+    } catch (error) {
+        console.error('Error in setCurrentVersion:', error);
+        throw error;
+    }
+};
+
 const fetchRemoteVersions = async (remoteId: number) => {
     const response = await fetchWithAuth(getApiUrl(`/api/remotes/${remoteId}/versions`));
     const data = await response.json();
     return data;
+};
+
+interface UploadRemoteVersionParams {
+    name: string;
+    version: string;
+    key: string;
+    scope: string;
+    file: File;
+}
+
+const uploadRemoteVersion = async ({ name, version, key, scope, file }: UploadRemoteVersionParams) => {
+    try {
+        console.log('Starting file upload for:', { name, version, key, scope, fileName: file.name, fileSize: file.size });
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // Log all entries in the FormData to verify the file is being added correctly
+        for (const pair of formData.entries()) {
+            console.log('FormData entry:', pair[0], pair[1]);
+        }
+        
+        const url = getApiUrl(`/api/upload/remote/${encodeURIComponent(name)}/${encodeURIComponent(version)}/${encodeURIComponent(key)}/${encodeURIComponent(scope)}`);
+        console.log('Upload URL:', url);
+        
+        // Use fetchWithAuth but explicitly set the headers to not include Content-Type
+        const token = localStorage.getItem('auth_token');
+        console.log('Auth token available:', !!token);
+        
+        // Create a fetch request with the right configuration for file uploads
+        console.log('Sending fetch request...');
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
+            credentials: 'include',
+            mode: 'cors'
+        });
+        
+        console.log('Response received:', response.status, response.statusText);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Upload failed:', response.status, errorText);
+            throw new ApiError(`Upload failed: ${response.status} ${errorText}`, response.status);
+        }
+        
+        console.log('Upload completed successfully');
+        return true;
+    } catch (error) {
+        console.error('Error in uploadRemoteVersion:', error);
+        throw error;
+    }
 };
 
 export const useRemotes = () => {
@@ -216,5 +296,30 @@ export const useRemoteVersions = (remoteId: number) => {
         queryKey: ['remotes', remoteId, 'versions'],
         queryFn: () => fetchRemoteVersions(remoteId),
         enabled: !!remoteId,
+    });
+};
+
+export const useUploadRemoteVersion = () => {
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationFn: uploadRemoteVersion,
+        onSuccess: () => {
+            // Invalidate all remotes and versions queries to refresh the lists
+            queryClient.invalidateQueries({ queryKey: ['remotes'] });
+        },
+    });
+};
+
+export const useSetCurrentVersion = () => {
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationFn: setCurrentVersion,
+        onSuccess: () => {
+            // Invalidate all remotes and versions queries to refresh the lists
+            queryClient.invalidateQueries({ queryKey: ['remotes'] });
+            queryClient.invalidateQueries({ queryKey: ['remoteVersions'] });
+        },
     });
 };

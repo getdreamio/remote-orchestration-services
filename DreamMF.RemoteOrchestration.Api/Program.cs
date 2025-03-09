@@ -143,7 +143,7 @@ builder.Services.AddCors(options =>
     {
         builder.AllowAnyOrigin()
                .AllowAnyMethod()
-               .AllowAnyHeader();
+               .AllowAnyHeader();// This is required for credentials: 'include'
     });
 });
 

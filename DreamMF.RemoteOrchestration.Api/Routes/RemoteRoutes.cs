@@ -95,6 +95,17 @@ public static class RemoteRoutes
             .WithMetadata(new EndpointNameMetadata("Delete a remote"))
             .WithSummary("Delete Remote")
             .WithDescription("Deletes a remote instance by its unique identifier");
+            
+        group.MapPut("/{id}/set-current-version", SetCurrentVersion)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditRemotes" })
+            .WithTags(GroupName)
+            .Produces<RemoteResponse>(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(404)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("Set current version for a remote"))
+            .WithSummary("Set Current Version")
+            .WithDescription("Sets the specified version as the current version for a remote");
 
         return group;
     }
@@ -140,4 +151,18 @@ public static class RemoteRoutes
         var result = await remoteService.GetVersionsByRemoteIdAsync(id);
         return result != null ? Results.Ok(result) : Results.NotFound();
     }
+    
+    private static async Task<IResult> SetCurrentVersion(int id, [FromBody] SetCurrentVersionRequest request, RemoteService remoteService)
+    {
+        if (request == null || string.IsNullOrEmpty(request.Version))
+            return Results.BadRequest(new HandledResponseModel("Version is required", System.Net.HttpStatusCode.BadRequest));
+            
+        var remote = await remoteService.SetCurrentVersionAsync(id, request.Version);
+        return remote != null ? Results.Ok(remote) : Results.NotFound();
+    }
+}
+
+public class SetCurrentVersionRequest
+{
+    public required string Version { get; set; }
 }

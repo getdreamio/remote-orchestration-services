@@ -236,4 +236,33 @@ public class RemoteService
 
         return versions.Select(VersionMapper.ToResponse).ToList();
     }
+    
+    public async Task<RemoteResponse?> SetCurrentVersionAsync(int id, string version)
+    {
+        // Find the remote
+        var remote = await _dbContext.Remotes
+            .Include(r => r.RemoteModules)
+                .ThenInclude(rm => rm.Module)
+            .FirstOrDefaultAsync(r => r.Remote_ID == id);
+            
+        if (remote == null) return null;
+        
+        // Verify the version exists
+        var versionExists = await _dbContext.Versions
+            .AnyAsync(v => v.Remote_ID == id && v.Value == version);
+            
+        if (!versionExists) return null;
+        
+        // Construct the URL for the version
+        var baseUrl = $"/remotes/{remote.Name}/{version}/{remote.Key}/{remote.Scope}";
+        
+        // Update the remote's URL - this is the only property we need to update
+        remote.Url = baseUrl;
+        remote.Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        
+        await _dbContext.SaveChangesAsync();
+        _ = _analyticsService.LogRemoteReadAsync(id, "SetCurrentVersion", 1);
+        
+        return RemoteMapper.ToResponse(remote);
+    }
 }
