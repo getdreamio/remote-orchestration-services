@@ -180,4 +180,167 @@ public class HostService
         await _dbContext.SaveChangesAsync();
         return response;
     }
+
+    // Host Variables CRUD operations
+    public async Task<List<HostVariableResponse>> GetHostVariablesAsync(int hostId)
+    {
+        if (hostId <= 0)
+        {
+            throw new HandledException(ExceptionType.Validation, "Host ID must be greater than zero.");
+        }
+        
+        var variables = await _dbContext.HostVariables
+            .Where(hv => hv.Host_ID == hostId)
+            .ToListAsync();
+            
+        return variables.Select(v => v.ToResponse()).ToList();
+    }
+    
+    public async Task<HostVariableResponse?> GetHostVariableByIdAsync(int hostId, int variableId)
+    {
+        if (hostId <= 0 || variableId <= 0)
+        {
+            throw new HandledException(ExceptionType.Validation, "IDs must be greater than zero.");
+        }
+        
+        var variable = await _dbContext.HostVariables
+            .FirstOrDefaultAsync(hv => hv.Host_ID == hostId && hv.HostVariable_ID == variableId);
+            
+        return variable != null ? variable.ToResponse() : null;
+    }
+    
+    public async Task<HostVariableResponse?> GetHostVariableByKeyAsync(int hostId, string key)
+    {
+        if (hostId <= 0 || string.IsNullOrWhiteSpace(key))
+        {
+            throw new HandledException(ExceptionType.Validation, "Invalid input parameters.");
+        }
+        
+        var variable = await _dbContext.HostVariables
+            .FirstOrDefaultAsync(hv => hv.Host_ID == hostId && hv.Key == key);
+            
+        return variable != null ? variable.ToResponse() : null;
+    }
+    
+    public async Task<HostVariableResponse> CreateHostVariableAsync(int hostId, HostVariableRequest request)
+    {
+        if (hostId <= 0 || request == null)
+        {
+            throw new HandledException(ExceptionType.Validation, "Invalid input parameters.");
+        }
+        
+        // Check if host exists
+        var hostExists = await _dbContext.Hosts.AnyAsync(h => h.Host_ID == hostId);
+        if (!hostExists)
+        {
+            throw new HandledException(ExceptionType.Validation, $"Host with ID {hostId} not found.");
+        }
+        
+        // Check if key already exists for this host
+        var keyExists = await _dbContext.HostVariables
+            .AnyAsync(hv => hv.Host_ID == hostId && hv.Key == request.Key);
+            
+        if (keyExists)
+        {
+            throw new HandledException(ExceptionType.Validation, $"A variable with key '{request.Key}' already exists for this host.");
+        }
+        
+        var variable = HostVariableMapper.ToEntity(request, hostId);
+        _dbContext.HostVariables.Add(variable);
+        await _dbContext.SaveChangesAsync();
+        
+        return variable.ToResponse();
+    }
+    
+    public async Task<HostVariableResponse?> UpdateHostVariableAsync(int hostId, int variableId, HostVariableRequest request)
+    {
+        if (hostId <= 0 || variableId <= 0 || request == null)
+        {
+            throw new HandledException(ExceptionType.Validation, "Invalid input parameters.");
+        }
+        
+        var variable = await _dbContext.HostVariables
+            .FirstOrDefaultAsync(hv => hv.Host_ID == hostId && hv.HostVariable_ID == variableId);
+            
+        if (variable == null) return null;
+        
+        // Check if the new key already exists (if key is being changed)
+        if (variable.Key != request.Key)
+        {
+            var keyExists = await _dbContext.HostVariables
+                .AnyAsync(hv => hv.Host_ID == hostId && hv.Key == request.Key && hv.HostVariable_ID != variableId);
+                
+            if (keyExists)
+            {
+                throw new HandledException(ExceptionType.Validation, $"A variable with key '{request.Key}' already exists for this host.");
+            }
+        }
+        
+        variable.Key = request.Key;
+        variable.Value = request.Value;
+        variable.Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        
+        await _dbContext.SaveChangesAsync();
+        return variable.ToResponse();
+    }
+    
+    public async Task<bool> DeleteHostVariableAsync(int hostId, int variableId)
+    {
+        if (hostId <= 0 || variableId <= 0)
+        {
+            throw new HandledException(ExceptionType.Validation, "IDs must be greater than zero.");
+        }
+        
+        var variable = await _dbContext.HostVariables
+            .FirstOrDefaultAsync(hv => hv.Host_ID == hostId && hv.HostVariable_ID == variableId);
+            
+        if (variable == null) return false;
+        
+        _dbContext.HostVariables.Remove(variable);
+        await _dbContext.SaveChangesAsync();
+        return true;
+    }
+    
+    public async Task<bool> DeleteHostVariableByKeyAsync(int hostId, string key)
+    {
+        if (hostId <= 0 || string.IsNullOrWhiteSpace(key))
+        {
+            throw new HandledException(ExceptionType.Validation, "Invalid input parameters.");
+        }
+        
+        var variable = await _dbContext.HostVariables
+            .FirstOrDefaultAsync(hv => hv.Host_ID == hostId && hv.Key == key);
+            
+        if (variable == null) return false;
+        
+        _dbContext.HostVariables.Remove(variable);
+        await _dbContext.SaveChangesAsync();
+        return true;
+    }
+    
+    /// <summary>
+    /// Gets all variables for a host using the host's access key
+    /// </summary>
+    /// <param name="accessKey">The host's access key</param>
+    /// <returns>A list of host variables or null if the host is not found</returns>
+    public async Task<List<HostVariableResponse>?> GetHostVariablesByAccessKeyAsync(string accessKey)
+    {
+        if (string.IsNullOrWhiteSpace(accessKey))
+        {
+            throw new HandledException(ExceptionType.Validation, "Access key cannot be null or empty.");
+        }
+        
+        // Find the host with the given access key
+        var host = await _dbContext.Hosts
+            .FirstOrDefaultAsync(h => h.Key == accessKey);
+            
+        if (host == null) return null;
+        
+        // Get all variables for this host
+        var variables = await _dbContext.HostVariables
+            .Where(hv => hv.Host_ID == host.Host_ID)
+            .ToListAsync();
+            
+        return variables.Select(v => v.ToResponse()).ToList();
+    }
 }

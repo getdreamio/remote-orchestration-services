@@ -12,6 +12,7 @@ public interface IDreamService
     Task<DreamHostResponse> GetHostDetailsByAccessKey(string accessKey);
     Task<List<DreamRemoteResponse>> GetAttachedRemotesByAccessKey(string accessKey);
     Task<RemoteSummaryResponse> GetRemoteByAccessKeyAndName(string accessKey, string key);
+    Task<List<HostVariableResponse>> GetHostVariablesByAccessKey(string accessKey);
 }
 
 public class DreamService : IDreamService
@@ -52,5 +53,19 @@ public class DreamService : IDreamService
                 .ThenInclude(rm => rm.Module)
             .FirstOrDefaultAsync(r => r.Host_ID == host.Id && r.Remote.Key == key);
         return remote != null ? RemoteMapper.ToSummaryResponse(remote.Remote) : null;
+    }
+
+    public async Task<List<HostVariableResponse>> GetHostVariablesByAccessKey(string accessKey)
+    {
+        var host = await _dbContext.Hosts
+            .FirstOrDefaultAsync(h => h.Key == accessKey);
+            
+        if (host == null) return new List<HostVariableResponse>();
+        
+        var variables = await _dbContext.HostVariables
+            .Where(hv => hv.Host_ID == host.Host_ID)
+            .ToListAsync();
+            
+        return variables.Select(v => HostVariableMapper.ToResponse(v)).ToList();
     }
 }

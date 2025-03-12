@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { config } from '@/config/env';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 import { getApiUrl } from '../utils/api';
 
@@ -24,6 +23,20 @@ interface HostRemote {
     hostId: number;
     remoteId: number;
     createdAt: string;
+}
+
+export interface HostVariable {
+    id: number;
+    hostId: number;
+    key: string;
+    value: string;
+    createdDate: number;
+    updatedDate: number;
+}
+
+export interface HostVariableRequest {
+    key: string;
+    value: string;
 }
 
 export type HostRequest = Omit<Host, 'id' | 'createdAt' | 'updatedAt'>;
@@ -106,6 +119,46 @@ const deleteHost = async (id: number): Promise<void> => {
     });
 };
 
+// Fetch host variables
+const fetchHostVariables = async (hostId: number): Promise<HostVariable[]> => {
+    const response = await fetchWithAuth(getApiUrl(`/api/hosts/${hostId}/variables`));
+    const data = await response.json();
+    return data;
+};
+
+// Create a new host variable
+const createHostVariable = async ({ hostId, data }: { hostId: number; data: HostVariableRequest }): Promise<HostVariable> => {
+    const response = await fetchWithAuth(getApiUrl(`/api/hosts/${hostId}/variables`), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    const result = await response.json();
+    return result;
+};
+
+// Update an existing host variable
+const updateHostVariable = async ({ hostId, variableId, data }: { hostId: number; variableId: number; data: HostVariableRequest }): Promise<HostVariable> => {
+    const response = await fetchWithAuth(getApiUrl(`/api/hosts/${hostId}/variables/${variableId}`), {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    const result = await response.json();
+    return result;
+};
+
+// Delete a host variable
+const deleteHostVariable = async ({ hostId, variableId }: { hostId: number; variableId: number }): Promise<void> => {
+    await fetchWithAuth(getApiUrl(`/api/hosts/${hostId}/variables/${variableId}`), {
+        method: 'DELETE',
+    });
+};
+
 export const useHosts = () => {
     return useQuery({
         queryKey: ['hosts'],
@@ -180,6 +233,47 @@ export const useDetachRemote = () => {
         mutationFn: detachRemoteFromHost,
         onSuccess: (_, { hostId }) => {
             queryClient.invalidateQueries({ queryKey: ['hosts', hostId, 'remotes'] });
+        },
+    });
+};
+
+export const useHostVariables = (hostId: number) => {
+    return useQuery({
+        queryKey: ['hosts', hostId, 'variables'],
+        queryFn: () => fetchHostVariables(hostId),
+        enabled: !!hostId,
+    });
+};
+
+export const useCreateHostVariable = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: createHostVariable,
+        onSuccess: (_, { hostId }) => {
+            queryClient.invalidateQueries({ queryKey: ['hosts', hostId, 'variables'] });
+        },
+    });
+};
+
+export const useUpdateHostVariable = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: updateHostVariable,
+        onSuccess: (_, { hostId }) => {
+            queryClient.invalidateQueries({ queryKey: ['hosts', hostId, 'variables'] });
+        },
+    });
+};
+
+export const useDeleteHostVariable = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: deleteHostVariable,
+        onSuccess: (_, { hostId }) => {
+            queryClient.invalidateQueries({ queryKey: ['hosts', hostId, 'variables'] });
         },
     });
 };

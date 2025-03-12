@@ -108,6 +108,70 @@ public static class HostRoutes
             .WithSummary("List Hosts by Environment")
             .WithDescription("Retrieves a list of host instances associated with a specific environment");
 
+        // Host Variables endpoints
+        group.MapGet("/{id}/variables", GetHostVariables)
+            .RequireAuthorization()
+            .WithTags(GroupName)
+            .Produces<List<HostVariableResponse>>(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("List variables for a host"))
+            .WithSummary("Get Host Variables")
+            .WithDescription("Retrieves all variables associated with a specific host");
+
+        group.MapGet("/{id}/variables/{variableId}", GetHostVariableById)
+            .RequireAuthorization()
+            .WithTags(GroupName)
+            .Produces<HostVariableResponse>(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(404)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("Get host variable by ID"))
+            .WithSummary("Get Host Variable by ID")
+            .WithDescription("Retrieves a specific variable for a host by its ID");
+
+        group.MapPost("/{id}/variables", CreateHostVariable)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditHosts" })
+            .WithTags(GroupName)
+            .Produces<HostVariableResponse>(StatusCodes.Status201Created)
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("Create a host variable"))
+            .WithSummary("Create Host Variable")
+            .WithDescription("Creates a new variable for a specific host");
+
+        group.MapPut("/{id}/variables/{variableId}", UpdateHostVariable)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditHosts" })
+            .WithTags(GroupName)
+            .Produces<HostVariableResponse>(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(404)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("Update a host variable"))
+            .WithSummary("Update Host Variable")
+            .WithDescription("Updates an existing variable for a specific host");
+
+        group.MapDelete("/{id}/variables/{variableId}", DeleteHostVariable)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditHosts" })
+            .WithTags(GroupName)
+            .Produces(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(404)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("Delete a host variable"))
+            .WithSummary("Delete Host Variable")
+            .WithDescription("Deletes a specific variable from a host");
+
+        // Access key endpoint - no authorization required as it uses the access key for security
+        group.MapGet("/variables/access/{accessKey}", GetHostVariablesByAccessKey)
+            .WithTags(GroupName)
+            .Produces<List<HostVariableResponse>>(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(404)
+            .WithMetadata(new EndpointNameMetadata("Get host variables by access key"))
+            .WithSummary("Get Host Variables By Access Key")
+            .WithDescription("Retrieves all variables for a host using its access key");
+
         return group;
     }
 
@@ -163,5 +227,43 @@ public static class HostRoutes
     {
         var hosts = await hostService.GetHostsByEnvironmentAsync(environment);
         return Results.Ok(hosts);
+    }
+
+    // Host Variables handlers
+    private static async Task<IResult> GetHostVariables(int id, HostService hostService)
+    {
+        var variables = await hostService.GetHostVariablesAsync(id);
+        return Results.Ok(variables);
+    }
+
+    private static async Task<IResult> GetHostVariableById(int id, int variableId, HostService hostService)
+    {
+        var variable = await hostService.GetHostVariableByIdAsync(id, variableId);
+        return variable != null ? Results.Ok(variable) : Results.BadRequest();
+    }
+
+    private static async Task<IResult> CreateHostVariable(int id, HostVariableRequest request, HostService hostService)
+    {
+        var variable = await hostService.CreateHostVariableAsync(id, request);
+        return Results.Created($"/hosts/{id}/variables/{variable.Id}", variable);
+    }
+
+    private static async Task<IResult> UpdateHostVariable(int id, int variableId, HostVariableRequest request, HostService hostService)
+    {
+        var variable = await hostService.UpdateHostVariableAsync(id, variableId, request);
+        return variable != null ? Results.Ok(variable) : Results.BadRequest();
+    }
+
+    private static async Task<IResult> DeleteHostVariable(int id, int variableId, HostService hostService)
+    {
+        var success = await hostService.DeleteHostVariableAsync(id, variableId);
+        return success ? Results.Ok() : Results.BadRequest();
+    }
+
+    // Handler for the access key endpoint
+    private static async Task<IResult> GetHostVariablesByAccessKey(string accessKey, HostService hostService)
+    {
+        var variables = await hostService.GetHostVariablesByAccessKeyAsync(accessKey);
+        return variables != null ? Results.Ok(variables) : Results.NotFound();
     }
 }

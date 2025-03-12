@@ -29,6 +29,7 @@ public interface IRemoteOrchestrationDbContext
     DbSet<UserRole> UserRoles { get; set; }
     DbSet<UserRoleMapping> UserRoleMappings { get; set; }
     DbSet<SearchResult> SearchResults { get; set; }
+    DbSet<HostVariable> HostVariables { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 
@@ -53,6 +54,7 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
     public DbSet<UserRole> UserRoles { get; set; } = null!;
     public DbSet<UserRoleMapping> UserRoleMappings { get; set; } = null!;
     public DbSet<SearchResult> SearchResults { get; set; } = null!;
+    public DbSet<HostVariable> HostVariables { get; set; } = null!;
 
     public new DatabaseFacade Database => base.Database;
 
@@ -301,6 +303,22 @@ public class RemoteOrchestrationDbContext : DbContext, IRemoteOrchestrationDbCon
         modelBuilder.Entity<User>().ToTable("User");
         modelBuilder.Entity<UserRole>().ToTable("UserRole");
         modelBuilder.Entity<UserRoleMapping>().ToTable("UserRoleMapping");
+
+        modelBuilder.Entity<HostVariable>(entity =>
+        {
+            entity.HasKey(e => e.HostVariable_ID);
+            entity.Property(e => e.HostVariable_ID).ValueGeneratedOnAdd();
+            entity.Property(e => e.Key).IsRequired();
+            entity.Property(e => e.Created_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Updated_Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.ToTable("HostVariable");
+        });
+
+        modelBuilder.Entity<HostVariable>()
+            .HasOne(hv => hv.Host)
+            .WithMany()
+            .HasForeignKey(hv => hv.Host_ID)
+            .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
     }

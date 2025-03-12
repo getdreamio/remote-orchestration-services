@@ -57,6 +57,16 @@ public static class DreamRoutes
             .WithSummary("Reads remote using access key and remote key")
             .WithDescription("Reads remote using access key and remote key");
 
+        group.MapGet("/hosts/{accessKey}/variables", GetHostVariablesByAccessKey)
+            .WithTags(GroupName)
+            .Produces<List<HostVariableResponse>>(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(404)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("Get host configuration variables by access key"))
+            .WithSummary("Get Host Configuration Variables By Access Key")
+            .WithDescription("Retrieves all configuration variables for a host using its access key");
+
         return group;
     }
 
@@ -106,5 +116,19 @@ public static class DreamRoutes
             }
         }
         return cachedResult != null ? Results.Ok(cachedResult) : Results.NotFound();
+    }
+
+    private static async Task<IResult> GetHostVariablesByAccessKey(string accessKey, IDreamService service, IMemoryCache cache)
+    {
+        var cacheKey = $"variables_{accessKey}";
+        if (!cache.TryGetValue(cacheKey, out List<HostVariableResponse>? cachedResult))
+        {
+            cachedResult = await service.GetHostVariablesByAccessKey(accessKey);
+            // We don't need to check for null since the service returns an empty list if no variables are found
+            var cacheOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+            cache.Set(cacheKey, cachedResult, cacheOptions);
+        }
+        return Results.Ok(cachedResult);
     }
 }

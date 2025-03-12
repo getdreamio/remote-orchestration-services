@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Card, Typography, Spin, Tabs, Table, Button, Modal } from 'antd';
 import { LinkOutlined, DisconnectOutlined, DeleteOutlined } from '@ant-design/icons';
 import HostForm from '@/components/hosts/host-form';
+import HostConfigForm from '@/components/hosts/host-config-form';
 import { useGetHost, useHostRemotes, useAttachRemote, useDetachRemote, useDeleteHost } from '@/hooks/useHosts';
 import { useRemotes } from '@/hooks/useRemotes';
 import { formatDate } from '@/lib/date-utils';
@@ -248,9 +249,16 @@ const EditHostPage: React.FC = () => {
                                 columns={columns}
                                 dataSource={hostRemotes || []}
                                 rowKey="id"
-                                pagination={true}
+                                pagination={{ pageSize: 10 }}
                             />
                         </div>
+                    </TabPane>
+                    <TabPane tab="Configuration" key="configuration">
+                        <HostConfigForm 
+                            hostId={Number(id)}
+                            initialConfig={[]} // We'll update this when we implement the backend
+                            onSuccess={() => notify.success('Configuration updated successfully')}
+                        />
                     </TabPane>
                 </Tabs>
             </Card>
@@ -266,7 +274,7 @@ const EditHostPage: React.FC = () => {
                     columns={availableRemoteColumns}
                     dataSource={availableRemotes}
                     rowKey="id"
-                    pagination={true}
+                    pagination={{ pageSize: 10 }}
                 />
             </Modal>
         </div>

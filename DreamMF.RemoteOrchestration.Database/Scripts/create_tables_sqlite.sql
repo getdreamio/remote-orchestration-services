@@ -6,6 +6,7 @@ DROP VIEW IF EXISTS v_DailyHostReads;
 DROP VIEW IF EXISTS v_DailyRemoteReads;
 DROP TABLE IF EXISTS demo;
 DROP TABLE IF EXISTS Host;
+DROP TABLE IF EXISTS HostVariable;
 DROP TABLE IF EXISTS Remote;
 DROP TABLE IF EXISTS Tag;
 DROP TABLE IF EXISTS Module;
@@ -212,6 +213,16 @@ CREATE TABLE Host (
     Documentation_Url VARCHAR(255),
     Created_Date INTEGER NOT NULL,
     Updated_Date INTEGER NOT NULL
+);
+
+CREATE TABLE HostVariable (
+    HostVariable_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Host_ID INT NOT NULL,
+    Key VARCHAR(255) NOT NULL,
+    Value VARCHAR(1000),
+    Created_Date INTEGER NOT NULL,
+    Updated_Date INTEGER NOT NULL,
+    FOREIGN KEY (Host_ID) REFERENCES Host(Host_ID)
 );
 
 CREATE TABLE Remote (
