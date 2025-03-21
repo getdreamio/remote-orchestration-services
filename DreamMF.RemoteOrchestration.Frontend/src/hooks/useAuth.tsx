@@ -35,7 +35,6 @@ export const useAuth = () => {
   useEffect(() => {
     // Load saved auth state
     const savedToken = localStorage.getItem(TOKEN_KEY);
-    const savedUser = localStorage.getItem(USER_KEY);
     
     if (savedToken) {
       setToken(savedToken);
@@ -53,7 +52,7 @@ export const useAuth = () => {
     setIsLoading(false);
   }, []);
 
-  const saveAuthState = (token: string, user: AuthUser) => {
+  const saveAuthState = (token: string) => {
     localStorage.setItem(TOKEN_KEY, token);
     const userData = parseJwtToken(token);
     localStorage.setItem(USER_KEY, JSON.stringify(userData));
@@ -87,12 +86,27 @@ export const useAuth = () => {
       }
 
       const data = await response.json();
-      saveAuthState(data.token, parseJwtToken(data.token));
+      saveAuthState(data.token);
       navigate("/");
     } catch (error) {
       throw error;
     }
   }, [navigate]);
+
+  const loginWithToken = useCallback(async (token: string) => {
+    try {
+      // Validate the token by parsing it
+      const userData = parseJwtToken(token);
+      
+      // Save the authentication state
+      saveAuthState(token);
+      
+      return userData;
+    } catch (error) {
+      console.error('Error logging in with token:', error);
+      throw new Error('Invalid authentication token');
+    }
+  }, []);
 
   const logout = useCallback(async () => {
     try {
@@ -111,24 +125,27 @@ export const useAuth = () => {
     }
   }, [token, navigate]);
 
-  const register = useCallback(async (userData: RegisterRequest) => {
-    const response = await fetch(`${config.backendUrl}/api/auth/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
+  const register = useCallback(async (registerData: RegisterRequest) => {
+    try {
+      const response = await fetch(`${config.backendUrl}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(registerData),
+      });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Registration failed");
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.message || "Registration failed");
+      }
+
+      const { token } = await response.json();
+      saveAuthState(token);
+      navigate("/");
+    } catch (error) {
+      throw error;
     }
-
-    const data = await response.json();
-    navigate("/auth/login", {
-      state: { message: "Registration successful! You can now log in." }
-    });
   }, [navigate]);
 
   const hasRole = useCallback((role: string) => {
@@ -141,6 +158,7 @@ export const useAuth = () => {
     user,
     token,
     login,
+    loginWithToken,
     logout,
     register,
     hasRole

@@ -3,6 +3,7 @@ import { Card, Form, Input, Button, Typography, Alert } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/components/theme/theme-provider';
+import { SSOLoginButtons } from '@/components/auth/sso-login-buttons';
 
 const { Title, Text } = Typography;
 
@@ -98,11 +99,15 @@ const LoginPage: React.FC = () => {
                                 size="large"
                                 loading={loading}
                                 block
+                                className="bg-blue-600 hover:bg-blue-700"
                             >
-                                Sign In
+                                Sign in
                             </Button>
                         </Form.Item>
                     </Form>
+                    
+                    {/* SSO Login Buttons */}
+                    <SSOLoginButtons />
 
                     <div className="text-center mt-4">
                         <Text className="text-gray-600 dark:text-gray-400">

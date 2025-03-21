@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
     useConfigurations,
     useUpdateConfigurationBatch,
@@ -7,6 +7,7 @@ import { StorageSettingsForm } from '../components/settings/storage-settings-for
 import { DatabaseSettingsForm } from '../components/settings/database-settings-form';
 import { Card } from 'antd';
 import { ApiSettingsForm } from '@/components/settings/api-settings-form';
+import { SSOSettingsForm } from '@/components/settings/sso-settings-form';
 import { Helmet } from 'react-helmet';
 
 const SettingsPage = () => {
@@ -46,6 +47,9 @@ const SettingsPage = () => {
             <div className="space-y-6">
                 <Card title="API Settings" className="shadow-sm mb-4 bg-gray-50 dark:bg-gray-800">
                     <ApiSettingsForm />
+                </Card>
+                <Card title="Single Sign-On (SSO) Settings" className="shadow-sm mb-4 bg-gray-50 dark:bg-gray-800">
+                    <SSOSettingsForm />
                 </Card>
                 <Card title="Database Settings" className="shadow-sm mb-4 bg-gray-50 dark:bg-gray-800">
                     <DatabaseSettingsForm 
