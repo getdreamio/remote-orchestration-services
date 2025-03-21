@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Form, Input, Select, Card, InputNumber, Button, Modal, Upload, message } from 'antd';
+import { Form, Input, Select, InputNumber, Button, Modal, Upload } from 'antd';
 import { UploadOutlined, DatabaseOutlined } from '@ant-design/icons';
 import {
     Configuration,
-    DatabaseType,
 } from '@/hooks/useConfigurations';
 
 import {
@@ -19,7 +18,7 @@ import notify from '../../utils/notifications';
 
 interface DatabaseSettingsFormProps {
     configurations: Configuration[] | undefined;
-    onSave: (key: string, value: string) => void;
+    onSave: (changes: { key: string, value: string }[]) => void;
 }
 
 export const DatabaseSettingsForm: React.FC<DatabaseSettingsFormProps> = ({
@@ -42,32 +41,36 @@ export const DatabaseSettingsForm: React.FC<DatabaseSettingsFormProps> = ({
     const defaultSqlitePath = 'remote_orchestration.db';
 
     const handleSubmit = (values: any) => {
+        const changes: { key: string, value: string }[] = [];
+
         // Database Type
         if (values.databaseType) {
-            onSave(DB_HOST_TYPE, values.databaseType);
+            changes.push({ key: DB_HOST_TYPE, value: values.databaseType });
         }
 
         // SQLite Settings
         if (values.databasePath) {
-            onSave(DB_HOST_FILENAME, values.databasePath);
+            changes.push({ key: DB_HOST_FILENAME, value: values.databasePath });
         }
 
-        // SQL Server / Postgres Settings
+        // SQL Server / PostgreSQL Settings
         if (values.host) {
-            onSave(DB_HOST_KEY, values.host);
+            changes.push({ key: DB_HOST_KEY, value: values.host });
         }
         if (values.port) {
-            onSave(DB_PORT_KEY, values.port.toString());
+            changes.push({ key: DB_PORT_KEY, value: values.port.toString() });
         }
         if (values.databaseName) {
-            onSave(DB_NAME_KEY, values.databaseName);
+            changes.push({ key: DB_NAME_KEY, value: values.databaseName });
         }
         if (values.username) {
-            onSave(DB_USER_KEY, values.username);
+            changes.push({ key: DB_USER_KEY, value: values.username });
         }
         if (values.password) {
-            onSave(DB_PASSWORD_KEY, values.password);
+            changes.push({ key: DB_PASSWORD_KEY, value: values.password });
         }
+
+        onSave(changes);
     };
 
     const handleBackup = async () => {
