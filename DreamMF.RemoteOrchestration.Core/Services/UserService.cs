@@ -20,6 +20,7 @@ public interface IUserService
     Task<bool> AddUserRoleAsync(int userId, int roleId);
     Task<bool> RemoveUserRoleAsync(int userId, int roleId);
     Task<IEnumerable<UserRoleResponse>> GetAvailableRolesAsync();
+    Task<User> FindOrCreateExternalUserAsync(string email, string name, AuthProvider authProvider, string authUserId, string? accessToken = null);
 }
 
 public class UserService : IUserService
@@ -237,5 +238,81 @@ public class UserService : IUserService
             .ToListAsync();
         
         return roles;
+    }
+
+    public async Task<User> FindOrCreateExternalUserAsync(string email, string name, AuthProvider authProvider, string authUserId, string? accessToken = null)
+    {
+        // First, try to find user by email
+        var user = await _dbContext.Users
+            .Include(u => u.UserRoleMappings)
+            .ThenInclude(ur => ur.Role)
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+
+        if (user != null)
+        {
+            // If user exists but with different auth provider, update the provider
+            if (user.AuthProvider != authProvider || user.AuthUserId != authUserId)
+            {
+                user.AuthProvider = authProvider;
+                user.AuthUserId = authUserId;
+                user.AccessToken = accessToken;
+                user.TokenExpiry = accessToken != null ? DateTimeOffset.UtcNow.AddDays(30).ToUnixTimeSeconds() : null;
+                user.UpdatedDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                
+                await _dbContext.SaveChangesAsync();
+            }
+            
+            return user;
+        }
+
+        // If user doesn't exist, create a new one
+        var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var nameParts = name.Split(' ', 2);
+        var firstName = nameParts.Length > 0 ? nameParts[0] : "";
+        var lastName = nameParts.Length > 1 ? nameParts[1] : "";
+        
+        var newUser = new User
+        {
+            Email = email,
+            DisplayName = name,
+            FirstName = firstName,
+            LastName = lastName,
+            AuthProvider = authProvider,
+            AuthUserId = authUserId,
+            AccessToken = accessToken,
+            TokenExpiry = accessToken != null ? DateTimeOffset.UtcNow.AddDays(30).ToUnixTimeSeconds() : null,
+            Status = UserStatus.Active,
+            IsEmailVerified = true, // Email is verified by the provider
+            CreatedDate = now,
+            UpdatedDate = now
+        };
+
+        _dbContext.Users.Add(newUser);
+        await _dbContext.SaveChangesAsync();
+
+        // Assign default role for new users (e.g., basic user role)
+        var defaultRole = await _dbContext.UserRoles
+            .FirstOrDefaultAsync(r => r.NormalizedName == "CANCREATEEDITHOSTS");
+            
+        if (defaultRole != null)
+        {
+            var roleMapping = new UserRoleMapping
+            {
+                UserId = newUser.Id,
+                RoleId = defaultRole.Id,
+                CreatedDate = now
+            };
+            
+            _dbContext.Set<UserRoleMapping>().Add(roleMapping);
+            await _dbContext.SaveChangesAsync();
+            
+            // Reload user with roles
+            return await _dbContext.Users
+                .Include(u => u.UserRoleMappings)
+                .ThenInclude(ur => ur.Role)
+                .FirstAsync(u => u.Id == newUser.Id);
+        }
+        
+        return newUser;
     }
 }

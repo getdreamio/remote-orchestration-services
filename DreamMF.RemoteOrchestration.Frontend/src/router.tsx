@@ -1,4 +1,3 @@
-import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import RootLayout from './components/layout/root-layout';
 import DashboardPage from './pages/index';
@@ -17,6 +16,7 @@ import NotFoundPage from './pages/not-found';
 import LoginPage from './pages/auth/login';
 import LogoutPage from './pages/auth/logout';
 import RegisterPage from './pages/auth/register';
+import OAuthCallbackPage from './pages/auth/callback';
 // import ForgotPasswordPage from './pages/auth/forgot-password';
 // import ResetPasswordPage from './pages/auth/reset-password';
 import TagsPage from './pages/tags/index';
@@ -43,6 +43,11 @@ export const router = createBrowserRouter([
         element: <RegisterPage />,
         errorElement: <ErrorDisplay message="Error during registration" />,
       },
+    {
+        path: '/auth/callback',
+        element: <OAuthCallbackPage />,
+        errorElement: <ErrorDisplay message="Error during OAuth callback" />,
+    },
     //   {
     //     path: '/auth/forgot-password',
     //     element: <ForgotPasswordPage />,

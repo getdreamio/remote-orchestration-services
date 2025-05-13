@@ -56,6 +56,7 @@ public class User
     // Status and Security
     [Required]
     public UserStatus Status { get; set; }
+    public bool IsEmailVerified { get; set; }
     public long? LastLoginDate { get; set; }
     public string? LastLoginIp { get; set; }
     public int FailedLoginAttempts { get; set; }

@@ -168,6 +168,9 @@ builder.Services.Configure<AnalyticsConfig>(builder.Configuration.GetSection("An
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 builder.Services.AddHostedService<AnalyticsCleanupService>();
 
+// Register HttpClient for OAuth service
+builder.Services.AddHttpClient();
+
 builder.Services.AddScoped<HostService>();
 builder.Services.AddScoped<RemoteService>();
 builder.Services.AddScoped<TagService>();
@@ -178,6 +181,7 @@ builder.Services.AddScoped<IUploadService, UploadService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IBackupService, BackupService>();
+builder.Services.AddScoped<IOAuthService, OAuthService>();
 
 builder.Services.AddAntiforgery();
 
@@ -215,6 +219,7 @@ app.MapUploadRoutes();
 app.MapUserRoutes();
 app.MapAuthRoutes();
 app.MapDatabaseRoutes();
+app.MapOAuthRoutes();
 
 var provider = new FileExtensionContentTypeProvider();
 provider.Mappings[".js"] = "application/javascript";
