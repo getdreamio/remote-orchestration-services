@@ -256,15 +256,11 @@ public class RemoteService
         
         // Verify the version exists
         var versionExists = await _dbContext.Versions
-            .AnyAsync(v => v.Remote_ID == id && v.Value == version);
+            .FirstOrDefaultAsync(v => v.Remote_ID == id && v.Value == version);
             
-        if (!versionExists) return null;
+        if (versionExists == null) return null;
         
-        // Construct the URL for the version
-        var baseUrl = $"/remotes/{remote.Name}/{version}/{remote.Key}/{remote.Scope}";
-        
-        // Update the remote's URL - this is the only property we need to update
-        remote.Url = baseUrl;
+        remote.Url = versionExists.Url;
         remote.Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         
         await _dbContext.SaveChangesAsync();
