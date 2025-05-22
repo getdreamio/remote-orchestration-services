@@ -12,6 +12,7 @@ public static class HostRemoteMapper
             Id = hostRemote.Host_Remote_ID,
             HostId = hostRemote.Host_ID,
             RemoteId = hostRemote.Remote_ID,
+            UrlOverride = hostRemote.UrlOverride,
             CreatedDate = hostRemote.Created_Date,
             UpdatedDate = hostRemote.Updated_Date
         };

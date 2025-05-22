@@ -59,6 +59,11 @@ const RemotesPage: React.FC = () => {
             sorter: (a: Remote, b: Remote) => a.name.localeCompare(b.name),
         },
         {
+            title: 'Key',
+            dataIndex: 'key',
+            key: 'key'
+        },
+        {
             title: 'Scope',
             dataIndex: 'scope',
             key: 'scope',

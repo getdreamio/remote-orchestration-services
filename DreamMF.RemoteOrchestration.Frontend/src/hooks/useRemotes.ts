@@ -133,7 +133,6 @@ const updateRemoteUrl = async ({ id, version }: { id: number; version: string })
 
 const setCurrentVersion = async ({ id, version }: { id: number; version: string }) => {
     try {
-        console.log('Setting current version:', { id, version });
         
         const response = await fetchWithAuth(getApiUrl(`/api/remotes/${id}/set-current-version`), {
             method: 'PUT',
@@ -150,7 +149,6 @@ const setCurrentVersion = async ({ id, version }: { id: number; version: string 
         }
         
         const data = await response.json();
-        console.log('Current version set successfully');
         return data;
     } catch (error) {
         console.error('Error in setCurrentVersion:', error);
@@ -174,34 +172,15 @@ interface UploadRemoteVersionParams {
 
 const uploadRemoteVersion = async ({ name, version, key, scope, file }: UploadRemoteVersionParams) => {
     try {
-        console.log('Starting file upload for:', { name, version, key, scope, fileName: file.name, fileSize: file.size });
-        
         const formData = new FormData();
         formData.append('file', file);
         
-        // Log all entries in the FormData to verify the file is being added correctly
-        for (const pair of formData.entries()) {
-            console.log('FormData entry:', pair[0], pair[1]);
-        }
-        
         const url = getApiUrl(`/api/upload/remote/${encodeURIComponent(name)}/${encodeURIComponent(version)}/${encodeURIComponent(key)}/${encodeURIComponent(scope)}`);
-        console.log('Upload URL:', url);
         
-        // Use fetchWithAuth but explicitly set the headers to not include Content-Type
-        const token = localStorage.getItem('auth_token');
-        console.log('Auth token available:', !!token);
-        
-        // Create a fetch request with the right configuration for file uploads
-        console.log('Sending fetch request...');
-        const response = await fetch(url, {
+        const response = await fetchWithAuth(url, {
             method: 'POST',
-            body: formData,
-            headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
-            credentials: 'include',
-            mode: 'cors'
+            body: formData
         });
-        
-        console.log('Response received:', response.status, response.statusText);
         
         if (!response.ok) {
             const errorText = await response.text();
@@ -209,7 +188,6 @@ const uploadRemoteVersion = async ({ name, version, key, scope, file }: UploadRe
             throw new ApiError(`Upload failed: ${response.status} ${errorText}`, response.status);
         }
         
-        console.log('Upload completed successfully');
         return true;
     } catch (error) {
         console.error('Error in uploadRemoteVersion:', error);

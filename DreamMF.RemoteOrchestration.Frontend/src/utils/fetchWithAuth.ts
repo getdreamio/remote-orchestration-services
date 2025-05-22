@@ -13,12 +13,18 @@ export const fetchWithAuth = async (url: string, options: FetchOptions = {}) => 
     
     let requestHeaders = { ...initialHeaders };
     
+    // Check if we're sending FormData (file upload)
+    const isFormData = options.body instanceof FormData;
+    
     if (!skipAuth && token) {
         requestHeaders = {
             ...requestHeaders,
             'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            // Don't set Content-Type for FormData - browser will set it with boundary
+            ...(!isFormData && {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            })
         };
     }
 

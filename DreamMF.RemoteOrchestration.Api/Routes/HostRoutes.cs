@@ -98,6 +98,17 @@ public static class HostRoutes
             .WithSummary("Detaches a Remote from a Host")
             .WithDescription("Detaches a remote instance from a specific host instance");
 
+        group.MapPost("/{id}/remotes/set-current-version", SetCurrentVersionOverride)
+            .RequireAuthorization(new[] { "Administrator", "CanCreateEditHosts" })
+            .WithTags(GroupName)
+            .Produces<HostRemoteResponse>(StatusCodes.Status200OK)
+            .Produces<HandledResponseModel>(400)
+            .Produces<HandledResponseModel>(404)
+            .Produces<HandledResponseModel>(500)
+            .WithMetadata(new EndpointNameMetadata("Set current version for a host-remote relationship"))
+            .WithSummary("Set Current Version")
+            .WithDescription("Sets the current version URL override for a host-remote relationship");
+
         group.MapGet("/environment/{environment}", GetHostsByEnvironment)
             .RequireAuthorization()
             .WithTags(GroupName)
@@ -265,5 +276,11 @@ public static class HostRoutes
     {
         var variables = await hostService.GetHostVariablesByAccessKeyAsync(accessKey);
         return variables != null ? Results.Ok(variables) : Results.NotFound();
+    }
+
+    private static async Task<IResult> SetCurrentVersionOverride(int id, SetCurrentVersionOverrideRequest request, HostService hostService)
+    {
+        var hostRemote = await hostService.SetCurrentVersionOverrideAsync(id, request.RemoteId, request.Url);
+        return hostRemote != null ? Results.Ok(hostRemote) : Results.BadRequest();
     }
 }

@@ -229,12 +229,19 @@ public class RemoteService
 
     public async Task<List<VersionResponse>> GetVersionsByRemoteIdAsync(int id)
     {
+        // Get the remote to access its URL for comparison
+        var remote = await _dbContext.Remotes
+            .FirstOrDefaultAsync(r => r.Remote_ID == id);
+            
+        if (remote == null)
+            return new List<VersionResponse>();
+            
         var versions = await _dbContext.Versions
             .Where(v => v.Remote_ID == id)
             .OrderByDescending(v => v.Created_Date)
             .ToListAsync();
 
-        return versions.Select(VersionMapper.ToResponse).ToList();
+        return versions.Select(v => VersionMapper.ToResponse(v, remote.Url)).ToList();
     }
     
     public async Task<RemoteResponse?> SetCurrentVersionAsync(int id, string version)

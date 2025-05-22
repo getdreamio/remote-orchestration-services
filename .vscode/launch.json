@@ -1,18 +1,28 @@
 {
-	"version": "0.2.0",
-	"configurations": [
-		{
-			"name": "Debug API",
-			"type": "dotnet",
-			"request": "launch",
-			"projectPath": "${workspaceFolder}/DreamMF.RemoteOrchestration.Api/DreamMF.RemoteOrchestration.Api.csproj",
-		},
-		{
-			"name": "Debug Frontend (Firefox)",
-			"type": "firefox",
-			"request": "launch",
-			"url": "http://localhost:3000",
-			"webRoot": "${workspaceFolder}/DreamMF.RemoteOrchestration.Frontend",
-		}
-	]
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (minimal web API)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/DreamMF.RemoteOrchestration.Api/bin/Debug/net8.0/DreamMF.RemoteOrchestration.Api.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/DreamMF.RemoteOrchestration.Api",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://localhost:4000;https://localhost:4001"
+            },
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            }
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        }
+    ]
 }

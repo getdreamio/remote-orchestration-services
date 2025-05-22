@@ -1,56 +1,45 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "dotnet: build",
-			"type": "dotnet",
-			"task": "build",
-			"group": {
-				"kind": "build"
-			},
-			"problemMatcher": []
-		},
-		{
-			"label": "tsc: build",
-			"type": "typescript",
-			"tsconfig": "DreamMF.RemoteOrchestration.Frontend/tsconfig.json",
-			"problemMatcher": ["$tsc"],
-			"group": {
-				"kind": "build"
-			}
-		},
-		{
-			"label": "build",
-			"dependsOn": ["dotnet: build", "tsc: build"],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
-		},
-		{
-			"type": "npm",
-			"script": "start",
-			"path": "DreamMF.RemoteOrchestration.Frontend",
-			"label": "npm: start",
-			"detail": "rsbuild dev",
-			"problemMatcher": [
-				{
-					"pattern": [
-						{
-							"regexp": ".",
-							"file": 1,
-							"location": 2,
-							"message": 3
-						}
-					],
-					"background": {
-						"activeOnStart": true,
-						"beginsPattern": ".",
-						"endsPattern": "."
-					}
-				}
-			],
-			"isBackground": true
-		}
-	]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "${workspaceFolder}/DreamMF.RemoteOrchestration.Api/DreamMF.RemoteOrchestration.Api.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "publish",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "publish",
+                "${workspaceFolder}/DreamMF.RemoteOrchestration.Api/DreamMF.RemoteOrchestration.Api.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watch",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/DreamMF.RemoteOrchestration.Api/DreamMF.RemoteOrchestration.Api.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        }
+    ]
 }

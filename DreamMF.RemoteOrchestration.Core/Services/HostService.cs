@@ -125,13 +125,28 @@ public class HostService
         {
             throw new HandledException(ExceptionType.Validation, "Host ID must be greater than zero.");
         }
-        var remotes = _dbContext.Host_Remotes
+        
+        // First get the host-remote relationships with remotes included
+        var hostRemotes = await _dbContext.Host_Remotes
             .Where(hr => hr.Host_ID == hostId)
-            .Select(hr => hr.Remote_ID);
-        return await _dbContext.Remotes
-            .Where(r => remotes.Contains(r.Remote_ID))
-            .Select(r => r.ToResponse())
+            .Include(hr => hr.Remote)
             .ToListAsync();
+        
+        // Then map to RemoteResponse objects after the query has executed
+        var remotes = hostRemotes
+            .Where(hr => hr.Remote != null)
+            .Select(hr => {
+                var result = RemoteMapper.ToResponse(hr.Remote!);
+                // If UrlOverride is not null, use it instead of the remote's URL
+                if (!string.IsNullOrEmpty(hr.UrlOverride))
+                {
+                    result.Url = hr.UrlOverride;
+                }
+                return result;
+            })
+            .ToList();
+
+        return remotes;
     }
 
     public async Task<HostRemoteResponse?> AttachRemoteToHostAsync(int hostId, int remoteId)
@@ -179,6 +194,48 @@ public class HostService
         _dbContext.Host_Remotes.Remove(hostRemote);
         await _dbContext.SaveChangesAsync();
         return response;
+    }
+
+    public async Task<HostRemoteResponse?> SetCurrentVersionOverrideAsync(int hostId, int remoteId, string? url)
+    {
+        if (hostId <= 0 || remoteId <= 0)
+        {
+            throw new HandledException(ExceptionType.Validation, "IDs must be greater than zero.");
+        }
+        
+        // Check if the host and remote exist
+        if (!await _dbContext.Hosts.AnyAsync(h => h.Host_ID == hostId) ||
+            !await _dbContext.Remotes.AnyAsync(r => r.Remote_ID == remoteId))
+        {
+            return null;
+        }
+
+        // Get the host-remote relationship
+        var hostRemote = await _dbContext.Host_Remotes
+            .FirstOrDefaultAsync(hr => hr.Host_ID == hostId && hr.Remote_ID == remoteId);
+        
+        if (hostRemote == null)
+        {
+            // If the relationship doesn't exist, create it
+            hostRemote = new Host_Remote
+            {
+                Host_ID = hostId,
+                Remote_ID = remoteId,
+                UrlOverride = url ?? "latest",
+                Created_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+            };
+            _dbContext.Host_Remotes.Add(hostRemote);
+        }
+        else
+        {
+            // Update the existing relationship
+            hostRemote.UrlOverride = url;
+            hostRemote.Updated_Date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        }
+
+        await _dbContext.SaveChangesAsync();
+        return hostRemote.ToResponse();
     }
 
     // Host Variables CRUD operations

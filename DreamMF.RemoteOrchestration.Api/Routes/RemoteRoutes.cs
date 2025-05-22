@@ -62,7 +62,7 @@ public static class RemoteRoutes
             .Produces<HandledResponseModel>(500)
             .WithMetadata(new EndpointNameMetadata("Get versions for a remote"))
             .WithSummary("Get Remote Versions")
-            .WithDescription("Retrieves all versions for a specific remote instance");
+            .WithDescription("Retrieves all versions with their URLs for a specific remote instance");
 
         group.MapPost("/", CreateRemote)
             .RequireAuthorization(new[] { "Administrator", "CanCreateEditRemotes" })
@@ -160,9 +160,4 @@ public static class RemoteRoutes
         var remote = await remoteService.SetCurrentVersionAsync(id, request.Version);
         return remote != null ? Results.Ok(remote) : Results.NotFound();
     }
-}
-
-public class SetCurrentVersionRequest
-{
-    public required string Version { get; set; }
 }

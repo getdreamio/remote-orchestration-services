@@ -253,6 +253,7 @@ CREATE TABLE Host_Remote (
     Host_Remote_ID INTEGER PRIMARY KEY AUTOINCREMENT,
     Host_ID INT,
     Remote_ID INT,
+    UrlOverride VARCHAR(1000),
     Created_Date INTEGER NOT NULL,
     Updated_Date INTEGER NOT NULL,
     FOREIGN KEY (Host_ID) REFERENCES Host(Host_ID),

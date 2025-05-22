@@ -23,6 +23,10 @@ interface HostRemote {
     hostId: number;
     remoteId: number;
     createdAt: string;
+    urlOverride?: string;
+    name?: string;
+    scope?: string;
+    url?: string;
 }
 
 export interface HostVariable {
@@ -159,6 +163,19 @@ const deleteHostVariable = async ({ hostId, variableId }: { hostId: number; vari
     });
 };
 
+// Set current version override for a host-remote relationship
+const setCurrentVersionOverride = async ({ hostId, remoteId, url }: { hostId: number; remoteId: number; url: string | null }): Promise<void> => {
+    const response = await fetchWithAuth(getApiUrl(`/api/hosts/${hostId}/remotes/set-current-version`), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ remoteId, url }),
+    });
+    const data = await response.json();
+    return data;
+};
+
 export const useHosts = () => {
     return useQuery({
         queryKey: ['hosts'],
@@ -274,6 +291,18 @@ export const useDeleteHostVariable = () => {
         mutationFn: deleteHostVariable,
         onSuccess: (_, { hostId }) => {
             queryClient.invalidateQueries({ queryKey: ['hosts', hostId, 'variables'] });
+        },
+    });
+};
+
+export const useSetCurrentVersionOverride = () => {
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationFn: setCurrentVersionOverride,
+        onSuccess: (_, variables) => {
+            // Invalidate host remotes query to refresh the list
+            queryClient.invalidateQueries({ queryKey: ['hosts', variables.hostId, 'remotes'] });
         },
     });
 };

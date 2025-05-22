@@ -17,6 +17,8 @@ public class Host_Remote
     [ForeignKey("Remote_ID")]
     public virtual Remote? Remote { get; set; }
 
+    public string? UrlOverride { get; set; }
+
     public long Created_Date { get; set; }
     public long Updated_Date { get; set; }
 }

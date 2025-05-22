@@ -280,8 +280,7 @@ const EditRemotePage: React.FC = () => {
                             </Form.Item>
 
                             <div className="space-y-2 max-w-[50%]">
-                                <label className="block">Modules</label>
-                                <Form.Item label="Module" name="module">
+                                <Form.Item label="Modules" name="module">
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
                                         <AutoComplete
                                             options={moduleOptions}
@@ -435,7 +434,7 @@ const EditRemotePage: React.FC = () => {
                                                 file: file
                                             });
                                             
-                                            notify.success('Version uploaded successfully');
+                                            notify.success('Version uploaded successfully, this could take up to 30 seconds to show up.');
                                             setIsUploadModalVisible(false);
                                             uploadForm.resetFields();
                                         } catch (error) {
@@ -469,6 +468,12 @@ const EditRemotePage: React.FC = () => {
                                             <p className="ant-upload-text">Click or drag ZIP file to this area to upload</p>
                                         </Upload.Dragger>
                                     </Form.Item>
+
+                                    <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900 rounded-md border-l-4 border-yellow-500">
+                                        <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                                            <strong>Warning:</strong> This can take up to 3 minutes to allow cache to clear and changes to be visible.
+                                        </p>
+                                    </div>
 
                                     <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-md">
                                         <p className="text-sm text-gray-600 dark:text-gray-400">

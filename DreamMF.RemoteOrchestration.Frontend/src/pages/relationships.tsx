@@ -53,11 +53,13 @@ const Relationships = () => {
         const newNodes: Node[] = [];
         const newEdges: Edge[] = [];
         const hostSpacing = 250;
-        const remoteSpacing = 250;
+        const remoteSpacing = 200;
         const hostStartY = 50;
         const remoteStartY = 300;
-
-        // Add host nodes
+        const nodeWidth = 180; // Approximate width of a node
+        const nodeHeight = 80; // Approximate height of a node
+        
+        // Add host nodes with consistent spacing
         relationships.hosts.forEach((host, index) => {
             newNodes.push({
                 id: `host-${host.hostId}`,
@@ -76,32 +78,102 @@ const Relationships = () => {
             });
         });
 
+        // Helper function to check if a position overlaps with existing nodes
+        const doesOverlap = (x: number, y: number, existingPositions: Array<{x: number, y: number}>) => {
+            const buffer = 20; // Extra space between nodes
+            for (const pos of existingPositions) {
+                if (
+                    Math.abs(x - pos.x) < nodeWidth + buffer && 
+                    Math.abs(y - pos.y) < nodeHeight + buffer
+                ) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        // Group remotes by their connected hosts for better positioning
+        const hostConnections = new Map<string, string[]>(); // hostId -> remoteIds[]
+        relationships.remotes.forEach(remote => {
+            remote.connectedHostIds.forEach(hostId => {
+                if (!hostConnections.has(hostId)) {
+                    hostConnections.set(hostId, []);
+                }
+                hostConnections.get(hostId)?.push(remote.remoteId);
+            });
+        });
+
         // Track remote positions to handle shared remotes
         const remotePositions = new Map<string, { x: number, y: number }>();
-        let currentRemoteX = 100;
-
-        // First pass: calculate positions for remotes
-        relationships.remotes.forEach((remote) => {
-            if (!remotePositions.has(remote.remoteId)) {
-                // For remotes with multiple hosts, try to center them
-                if (remote.connectedHostIds.length > 1) {
+        const occupiedPositions: Array<{x: number, y: number}> = [];
+        
+        // First, position remotes that are connected to multiple hosts
+        relationships.remotes
+            .filter(remote => remote.connectedHostIds.length > 1)
+            .sort((a, b) => b.connectedHostIds.length - a.connectedHostIds.length) // Process most connected first
+            .forEach(remote => {
+                if (!remotePositions.has(remote.remoteId)) {
                     // Find the average X position of connected hosts
                     const hostXPositions = remote.connectedHostIds.map(hostId => {
                         const hostIndex = relationships.hosts.findIndex(h => h.hostId === hostId);
                         return hostIndex * hostSpacing + 100;
                     });
                     const avgX = hostXPositions.reduce((a, b) => a + b, 0) / hostXPositions.length;
-                    remotePositions.set(remote.remoteId, { 
-                        x: avgX, 
-                        y: remoteStartY + (Math.random() * 50) // Add slight vertical variation
-                    });
-                } else {
-                    remotePositions.set(remote.remoteId, { 
-                        x: currentRemoteX, 
-                        y: remoteStartY 
-                    });
-                    currentRemoteX += remoteSpacing;
+                    
+                    // Find a non-overlapping Y position
+                    let y = remoteStartY;
+                    while (doesOverlap(avgX, y, occupiedPositions)) {
+                        y += nodeHeight + 20;
+                    }
+                    
+                    remotePositions.set(remote.remoteId, { x: avgX, y });
+                    occupiedPositions.push({ x: avgX, y });
                 }
+            });
+            
+        // Then position remotes with single host connections
+        relationships.hosts.forEach((host, hostIndex) => {
+            const remoteIds = hostConnections.get(host.hostId) || [];
+            const singleConnectedRemotes = remoteIds.filter(remoteId => 
+                relationships.remotes.find(r => r.remoteId === remoteId)?.connectedHostIds.length === 1
+            );
+            
+            // Position single-connected remotes below their host
+            const hostX = hostIndex * hostSpacing + 100;
+            let offsetX = -((singleConnectedRemotes.length - 1) * remoteSpacing) / 2;
+            
+            singleConnectedRemotes.forEach(remoteId => {
+                if (!remotePositions.has(remoteId)) {
+                    let x = hostX + offsetX;
+                    let y = remoteStartY;
+                    
+                    // Find a non-overlapping position
+                    while (doesOverlap(x, y, occupiedPositions)) {
+                        y += nodeHeight + 20;
+                    }
+                    
+                    remotePositions.set(remoteId, { x, y });
+                    occupiedPositions.push({ x, y });
+                    offsetX += remoteSpacing;
+                }
+            });
+        });
+        
+        // Add any remaining remotes that haven't been positioned yet
+        let currentRemoteX = 100;
+        relationships.remotes.forEach(remote => {
+            if (!remotePositions.has(remote.remoteId)) {
+                let x = currentRemoteX;
+                let y = remoteStartY;
+                
+                // Find a non-overlapping position
+                while (doesOverlap(x, y, occupiedPositions)) {
+                    y += nodeHeight + 20;
+                }
+                
+                remotePositions.set(remote.remoteId, { x, y });
+                occupiedPositions.push({ x, y });
+                currentRemoteX += remoteSpacing;
             }
         });
 

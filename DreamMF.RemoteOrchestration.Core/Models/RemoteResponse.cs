@@ -19,6 +19,11 @@ public class RemoteResponse
     public string tag_Value { get; set; } = string.Empty;
 }
 
+public class RemoteResponseExtended : RemoteResponse
+{
+    public string UrlOverride { get; set; }
+}
+
 public class RemoteSummaryResponse
 {
     public int Id { get; set; }

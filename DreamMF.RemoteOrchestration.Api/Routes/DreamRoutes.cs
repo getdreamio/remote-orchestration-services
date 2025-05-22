@@ -79,7 +79,7 @@ public static class DreamRoutes
             if (cachedResult != null)
             {
                 var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(3));
                 cache.Set(cacheKey, cachedResult, cacheOptions);
             }
         }
@@ -95,7 +95,7 @@ public static class DreamRoutes
             if (cachedResult != null)
             {
                 var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(3));
                 cache.Set(cacheKey, cachedResult, cacheOptions);
             }
         }
@@ -111,7 +111,7 @@ public static class DreamRoutes
             if (cachedResult != null)
             {
                 var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(3));
                 cache.Set(cacheKey, cachedResult, cacheOptions);
             }
         }
@@ -126,7 +126,7 @@ public static class DreamRoutes
             cachedResult = await service.GetHostVariablesByAccessKey(accessKey);
             // We don't need to check for null since the service returns an empty list if no variables are found
             var cacheOptions = new MemoryCacheEntryOptions()
-                .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(3));
             cache.Set(cacheKey, cachedResult, cacheOptions);
         }
         return Results.Ok(cachedResult);

@@ -9,9 +9,9 @@ namespace DreamMF.RemoteOrchestration.Core.Services;
 
 public interface IDreamService
 {
-    Task<DreamHostResponse> GetHostDetailsByAccessKey(string accessKey);
+    Task<DreamHostResponse?> GetHostDetailsByAccessKey(string accessKey);
     Task<List<DreamRemoteResponse>> GetAttachedRemotesByAccessKey(string accessKey);
-    Task<RemoteSummaryResponse> GetRemoteByAccessKeyAndName(string accessKey, string key);
+    Task<RemoteSummaryResponse?> GetRemoteByAccessKeyAndName(string accessKey, string key);
     Task<List<HostVariableResponse>> GetHostVariablesByAccessKey(string accessKey);
 }
 
@@ -24,7 +24,7 @@ public class DreamService : IDreamService
         _dbContext = dbContext;
     }
 
-    public async Task<DreamHostResponse> GetHostDetailsByAccessKey(string accessKey)
+    public async Task<DreamHostResponse?> GetHostDetailsByAccessKey(string accessKey)
     {
         var host = await _dbContext.Hosts
             .FirstOrDefaultAsync(h => h.Key == accessKey);
@@ -34,25 +34,64 @@ public class DreamService : IDreamService
     public async Task<List<DreamRemoteResponse>> GetAttachedRemotesByAccessKey(string accessKey)
     {
         var host = await GetHostDetailsByAccessKey(accessKey);
-        var remotes = await _dbContext.Host_Remotes
+        if (host == null) return new List<DreamRemoteResponse>();
+
+        var hostRemotes = await _dbContext.Host_Remotes
+            .Include(hr => hr.Remote)
+                .ThenInclude(r => r!.RemoteModules)
+                    .ThenInclude(rm => rm.Module)
             .Where(hr => hr.Host_ID == host.Id)
-            .Select(hr => hr.Remote_ID)
             .ToListAsync();
-        return await _dbContext.Remotes
-            .Where(r => remotes.Contains(r.Remote_ID))
-            .Select(r => RemoteMapper.ToDreamResponse(r))
-            .ToListAsync();
+
+        var result = new List<DreamRemoteResponse>();
+        foreach (var hr in hostRemotes)
+        {
+            if (hr.Remote != null)
+            {
+                var response = RemoteMapper.ToDreamResponse(hr.Remote);
+                if (hr.UrlOverride == "latest") {
+                    // First fetch all versions for this remote
+                    var versions = await _dbContext.Versions
+                        .Where(v => v.Remote_ID == hr.Remote.Remote_ID)
+                        .ToListAsync();
+                    
+                    // Then map and filter on the client side
+                    var mappedVersions = versions
+                        .Select(v => VersionMapper.ToResponse(v, hr.Remote.Url))
+                        .ToList();
+                    
+                    // Find the current version
+                    var currentVersion = mappedVersions.FirstOrDefault(v => v.IsCurrent);
+                    
+                    if (currentVersion != null) {
+                        response.Url = currentVersion.Url;
+                    }
+                } else {
+                    response.Url = !string.IsNullOrEmpty(hr.UrlOverride) ? hr.UrlOverride : hr.Remote.Url;
+                }
+                result.Add(response);
+            }
+        }
+        return result;
     }
 
-    public async Task<RemoteSummaryResponse> GetRemoteByAccessKeyAndName(string accessKey, string key)
+    public async Task<RemoteSummaryResponse?> GetRemoteByAccessKeyAndName(string accessKey, string key)
     {
         var host = await GetHostDetailsByAccessKey(accessKey);
-        var remote = await _dbContext.Host_Remotes
+        if (host == null) return null;
+
+        var hostRemote = await _dbContext.Host_Remotes
             .Include(hr => hr.Remote)
-            .Include(hr => hr.Remote.RemoteModules)
+            .Include(hr => hr.Remote!.RemoteModules)
                 .ThenInclude(rm => rm.Module)
-            .FirstOrDefaultAsync(r => r.Host_ID == host.Id && r.Remote.Key == key);
-        return remote != null ? RemoteMapper.ToSummaryResponse(remote.Remote) : null;
+            .FirstOrDefaultAsync(r => r.Host_ID == host.Id && r.Remote!.Key == key);
+
+        if (hostRemote == null || hostRemote.Remote == null) return null;
+
+        var response = RemoteMapper.ToSummaryResponse(hostRemote.Remote);
+        // Use UrlOverride if available, otherwise use the remote's URL
+        response.Url = !string.IsNullOrEmpty(hostRemote.UrlOverride) ? hostRemote.UrlOverride : hostRemote.Remote.Url;
+        return response;
     }
 
     public async Task<List<HostVariableResponse>> GetHostVariablesByAccessKey(string accessKey)
